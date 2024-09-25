@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import './globals.css';
 
-export default function Home() {
+function Home() {
   return (
     <div className="container">
       <div className="left-side">
@@ -25,3 +25,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home;
