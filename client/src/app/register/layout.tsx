@@ -5,7 +5,7 @@ interface LayoutProps {
     children: ReactNode; // Accept children passed to this layout
 }
 
-export default function RootLayout({ children }: LayoutProps) {
+export default function RegisterLayout({ children }: LayoutProps) {
     return (
         <html lang="en">
             <head>
