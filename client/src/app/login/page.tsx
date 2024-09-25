@@ -1,4 +1,4 @@
-export default function Register() {
+export default function Login() {
 
     const inputStyles = {
         width: "100%",
@@ -38,7 +38,9 @@ export default function Register() {
                         <input type="password" id="password" name="password" placeholder="Password" style={inputStyles} className="p-3"></input>
                         </div>
                     </div>
-                    <button type="submit" style={logInButton} className="my-4">Log In</button>
+                        <a href="/mainPage">
+                            <button type="submit" style={logInButton} className="my-4">Log In</button>
+                        </a>
                 </form>
             </div>
             </div>
