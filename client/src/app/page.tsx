@@ -38,7 +38,6 @@ export default function Home() {
     transition: "all 0.3s ease",
   }
 
-
   const vanderbiltPlaneRow = {
     display: 'flex',
     alignItems: 'center',
@@ -90,7 +89,9 @@ export default function Home() {
       <div className="col-sm-4 text-center" style={rightSide}>
         <h1 className="my-5" style={{ fontWeight: 'bold' }}>VandyFlights</h1>
         <div className="my-5">
+          <a href="/login">
           <button className="p-3" style={logInButton}>Log In</button>
+          </a>
         </div>
         <div className="my-5">
           <a href="/register">
