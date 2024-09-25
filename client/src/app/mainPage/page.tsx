@@ -24,7 +24,7 @@ export default function MainPage() {
         <div className="col-md-4"></div>
         <div className="col-md-4 text-center my-5 py-5">
         <div>
-            <h1>Login</h1>
+            <h1>MAIN PAGE</h1>
 
             <div>
                 <form>
@@ -39,7 +39,7 @@ export default function MainPage() {
                         </div>
                     </div>
                     <a href="/mainPage">
-                    <button type="submit" style={logInButton} className="my-4">Log In</button>
+                    <button type="submit" style={logInButton} className="my-4">MAIN PAGE</button>
                     </a>
                 </form>
             </div>
