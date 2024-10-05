@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';;
 import Header from './Header';
 
 export default function EditProfile() {
-    const router = useRouter();
     const [formData, setFormData] = useState({
       vanderbiltEmail: '',
       password: '',
@@ -46,8 +44,6 @@ export default function EditProfile() {
             const data = await response.json();
             console.log('OAuth login successful:', data);
     
-            // Redirect to the mainPage after successful OAuth response
-            router.push('/mainPage');
           } else {
             console.error('OAuth login failed');
           }

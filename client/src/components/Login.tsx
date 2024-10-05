@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function Login() {
-    const router = useRouter();
     const [formData, setFormData] = useState({
       vanderbiltEmail: '',
       password: '',
@@ -45,8 +43,6 @@ export default function Login() {
             const data = await response.json();
             console.log('OAuth login successful:', data);
     
-            // Redirect to the mainPage after successful OAuth response
-            router.push('/mainPage');
           } else {
             console.error('OAuth login failed');
           }
