@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function MainPage() {
     const [searchData, setSearchData] = useState({
@@ -9,34 +10,78 @@ export default function MainPage() {
         roundTrip: 'true',
     });
 
+    const [airportSuggestions, setAirportSuggestions] = useState([]); // To store airport suggestions
+
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData({ ...searchData, [name]: value });
+        
+        // Fetch airport suggestions if the user is typing in the "destination" field
+        if (name === 'destination') {
+            fetchAirportSuggestions(value);
+        }
+    };
+
+    const fetchAirportSuggestions = async (query) => {
+        if (query.length > 2) { // Only fetch suggestions if query is longer than 2 characters
+            try {
+                // Replace with a real API endpoint and API key for fetching airport data
+                const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
+                
+                if (response.data) {
+                    setAirportSuggestions(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching airport data:', error);
+            }
+        } else {
+            setAirportSuggestions([]);
+        }
+    };
+
+    const handleAirportSelect = (airport) => {
+        setSearchData({ ...searchData, destination: `${airport.nameAirport} (${airport.codeIataAirport})` });
+        setAirportSuggestions([]); // Clear suggestions after selection
     };
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        // Handle search submission logic, perhaps call an API with searchData
         console.log('Search Data:', searchData);
     };
 
+
+    const imageStyle = {
+        width: '100%',
+        height: '150px',
+        objectFit: 'cover',
+        borderRadius: '10px',
+    };
+
     return (
-        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f5f5f5', padding: '20px' }}>
+        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#dfd0d5', padding: '20px', minHeight: '100vh' }}>
             {/* Header Section */}
             <header style={{
-                backgroundColor: '#f3d9db', 
+                backgroundColor: '#dfd0d5', 
                 padding: '10px 0',
                 textAlign: 'center',
                 display: 'flex',
                 justifyContent: 'space-between',
+                alignItems: 'center',
                 padding: '20px',
+                borderBottom: '2px solid #ccc',
             }}>
-                <h1 style={{ marginLeft: '20px', color: '#2f2f2f' }}>VandyFlights</h1>
-                <nav style={{ marginRight: '20px' }}>
-                    <a href="/" style={{ margin: '0 10px' }}>Home</a>
-                    <a href="/chat" style={{ margin: '0 10px' }}>Chat</a>
-                    <a href="/profile" style={{ margin: '0 10px' }}>Profile</a>
-                    <a href="/logout" style={{ margin: '0 10px' }}>Log Out</a>
+                {/* Logo Section */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img src="/vanderbilt.png" alt="VandyFlights Logo" style={{ width: '60px', marginRight: '10px' }} />
+                    <h1 style={{ color: '#000', fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>VandyFlights</h1>
+                </div>
+                
+                {/* Navigation Links */}
+                <nav style={{ display: 'flex', alignItems: 'center' }}>
+                    <a href="/" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Home</a>
+                    <a href="/chat" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Chat</a>
+                    <a href="/profile" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Profile</a>
+                    <a href="/logout" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Log Out</a>
                 </nav>
             </header>
 
@@ -50,7 +95,7 @@ export default function MainPage() {
                     textAlign: 'center',
                     color: 'white',
                 }}>
-                    <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>Explore the world with your Vandy community</h2>
+                    <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>Discover Your Next Adventure With Your Vandy Family</h2>
                     <form onSubmit={handleSearchSubmit} style={{ marginTop: '30px' }}>
                         <input
                             type="text"
@@ -65,19 +110,51 @@ export default function MainPage() {
                                 width: '15%',
                             }}
                         />
-                        <input
-                            type="text"
-                            name="destination"
-                            placeholder="Destination"
-                            onChange={handleSearchChange}
-                            style={{
-                                padding: '15px',
-                                borderRadius: '10px',
-                                border: 'none',
-                                margin: '0 10px',
-                                width: '15%',
-                            }}
-                        />
+                        <div style={{ position: 'relative', width: '15%', margin: '0 10px', display: 'inline-block' }}>
+                            <input
+                                type="text"
+                                name="destination"
+                                placeholder="Destination"
+                                onChange={handleSearchChange}
+                                value={searchData.destination}
+                                style={{
+                                    padding: '15px',
+                                    borderRadius: '10px',
+                                    border: 'none',
+                                    width: '100%',
+                                }}
+                            />
+                            {/* Suggestions Dropdown */}
+                            {airportSuggestions.length > 0 && (
+                                <ul style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    backgroundColor: 'white',
+                                    border: '1px solid #ccc',
+                                    zIndex: 1000,
+                                    listStyle: 'none',
+                                    padding: '0',
+                                    margin: '0',
+                                    borderRadius: '10px',
+                                    overflowY: 'auto',
+                                    maxHeight: '150px'
+                                }}>
+                                    {airportSuggestions.map((airport) => (
+                                        <li key={airport.codeIataAirport} 
+                                            onClick={() => handleAirportSelect(airport)} 
+                                            style={{
+                                                padding: '10px',
+                                                cursor: 'pointer',
+                                                borderBottom: '1px solid #ccc'
+                                            }}>
+                                            {airport.nameAirport} ({airport.codeIataAirport})
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
                         <input
                             type="date"
                             name="departureDate"
@@ -135,8 +212,8 @@ export default function MainPage() {
                 </section>
 
                 {/* Popular Destinations Section */}
-                <section style={{ marginTop: '50px', textAlign: 'center' }}>
-                    <h3 style={{ fontSize: '2rem', marginBottom: '20px' }}>Popular Destinations</h3>
+                <section style={{ marginTop: '10px', textAlign: 'center' }}>
+                    <h3 style={{ fontSize: '2rem', marginBottom: '20px', fontWeight: 'bold' }}>Popular Destinations</h3>
                     <div style={{
                         display: 'flex',
                         justifyContent: 'center',
@@ -144,8 +221,8 @@ export default function MainPage() {
                         flexWrap: 'wrap'
                     }}>
                         <div style={{
-                            maxWidth: '300px',
-                            minWidth: '250px',
+                            maxWidth: '250px',
+                            minWidth: '200px',
                             backgroundColor: 'white',
                             padding: '20px',
                             borderRadius: '10px',
@@ -154,20 +231,15 @@ export default function MainPage() {
                             <img
                                 src="/newyork.png"
                                 alt="New York"
-                                style={{
-                                    width: '100%',
-                                    height: '150px',
-                                    objectFit: 'cover',
-                                    borderRadius: '10px',
-                                }}
+                                style={imageStyle}
                             />
                             <h4>New York, NY</h4>
                             <p>100 others are going</p>
                         </div>
 
                         <div style={{
-                            maxWidth: '300px',
-                            minWidth: '250px',
+                            maxWidth: '250px',
+                            minWidth: '200px',
                             backgroundColor: 'white',
                             padding: '20px',
                             borderRadius: '10px',
@@ -176,20 +248,15 @@ export default function MainPage() {
                             <img
                                 src="/losangeles.jpg"
                                 alt="Los Angeles"
-                                style={{
-                                    width: '100%',
-                                    height: '150px',
-                                    objectFit: 'cover',
-                                    borderRadius: '10px',
-                                }}
+                                style={imageStyle}
                             />
                             <h4>Los Angeles, LA</h4>
                             <p>80 others are going</p>
                         </div>
 
                         <div style={{
-                            maxWidth: '300px',
-                            minWidth: '250px',
+                            maxWidth: '250px',
+                            minWidth: '200px',
                             backgroundColor: 'white',
                             padding: '20px',
                             borderRadius: '10px',
@@ -198,20 +265,15 @@ export default function MainPage() {
                             <img
                                 src="/miami.jpg"
                                 alt="Miami"
-                                style={{
-                                    width: '100%',
-                                    height: '150px',
-                                    objectFit: 'cover',
-                                    borderRadius: '10px',
-                                }}
+                                style={imageStyle}
                             />
                             <h4>Miami, FL</h4>
                             <p>60 others are going</p>
                         </div>
 
                         <div style={{
-                            maxWidth: '300px',
-                            minWidth: '250px',
+                            maxWidth: '250px',
+                            minWidth: '200px',
                             backgroundColor: 'white',
                             padding: '20px',
                             borderRadius: '10px',
@@ -220,20 +282,15 @@ export default function MainPage() {
                             <img
                                 src="/chicago.jpg"
                                 alt="Chicago"
-                                style={{
-                                    width: '100%',
-                                    height: '150px',
-                                    objectFit: 'cover',
-                                    borderRadius: '10px',
-                                }}
+                                style={imageStyle}
                             />
                             <h4>Chicago, IL</h4>
                             <p>40 others are going</p>
                         </div>
 
                         <div style={{
-                            maxWidth: '300px',
-                            minWidth: '250px',
+                            maxWidth: '250px',
+                            minWidth: '200px',
                             backgroundColor: 'white',
                             padding: '20px',
                             borderRadius: '10px',
@@ -242,12 +299,7 @@ export default function MainPage() {
                             <img
                                 src="/lasvegas.jpg"
                                 alt="Las Vegas"
-                                style={{
-                                    width: '100%',
-                                    height: '150px',
-                                    objectFit: 'cover',
-                                    borderRadius: '10px',
-                                }}
+                                style={imageStyle}
                             />
                             <h4>Las Vegas, NV</h4>
                             <p>20 others are going</p>
