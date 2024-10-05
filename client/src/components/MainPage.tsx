@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
+import FlightResults from './FlightResults';
+import Header from './Header';
 
 export default function MainPage() {
     const [searchData, setSearchData] = useState({
@@ -10,6 +12,7 @@ export default function MainPage() {
         roundTrip: 'true',
     });
 
+    const [showResults, setShowResults] = useState(false);
     const [airportSuggestions, setAirportSuggestions] = useState([]); // To store airport suggestions
 
     const handleSearchChange = (e) => {
@@ -27,9 +30,9 @@ export default function MainPage() {
             try {
                 // Replace with a real API endpoint and API key for fetching airport data
                 const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
-                
-                if (response.data) {
-                    setAirportSuggestions(response.data);
+                const data = await response.json();
+                if (data) {
+                    setAirportSuggestions(data);
                 }
             } catch (error) {
                 console.error('Error fetching airport data:', error);
@@ -46,9 +49,13 @@ export default function MainPage() {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
+        setShowResults(true);
         console.log('Search Data:', searchData);
     };
 
+    if (showResults) {
+        return <FlightResults searchData={searchData} />;
+    }
 
     const imageStyle = {
         width: '100%',
@@ -59,31 +66,7 @@ export default function MainPage() {
 
     return (
         <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#dfd0d5', padding: '20px', minHeight: '100vh' }}>
-            {/* Header Section */}
-            <header style={{
-                backgroundColor: '#dfd0d5', 
-                padding: '10px 0',
-                textAlign: 'center',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '20px',
-                borderBottom: '2px solid #ccc',
-            }}>
-                {/* Logo Section */}
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img src="/vanderbilt.png" alt="VandyFlights Logo" style={{ width: '60px', marginRight: '10px' }} />
-                    <h1 style={{ color: '#000', fontSize: '1.8rem', fontWeight: 'bold', margin: 0 }}>VandyFlights</h1>
-                </div>
-                
-                {/* Navigation Links */}
-                <nav style={{ display: 'flex', alignItems: 'center' }}>
-                    <a href="/" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Home</a>
-                    <a href="/chat" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Chat</a>
-                    <a href="/profile" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Profile</a>
-                    <a href="/logout" style={{ margin: '0 20px', fontSize: '1.1rem', color: '#000', textDecoration: 'none', fontWeight: 'bold' }}>Log Out</a>
-                </nav>
-            </header>
+            <Header />
 
             {/* Main Section */}
             <main style={{ marginTop: '30px' }}>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Header from './Header';
 
 export default function EditProfile() {
     const router = useRouter();
@@ -56,50 +57,52 @@ export default function EditProfile() {
     };
 
     return (
-        <div className="row my-5">
-            <div className="col-md-4"></div>
-            <div className="col-md-4 text-center my-5 py-5">
-            <div>
-                <h1>PLACEHOLDER</h1>
-
+        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#dfd0d5', padding: '20px', minHeight: '100vh' }}>
+            <Header />
+            <div className="row my-5">
+                <div className="col-md-4"></div>
+                <div className="col-md-4 text-center my-5 py-5">
                 <div>
-                    <form onSubmit={handleSubmit}>
-                        <div className="row py-3">
-                            <div className="col-sm-12">
-                                <input
-                                    type="email"
-                                    id="vanderbiltEmail"
-                                    name="vanderbiltEmail"
-                                    placeholder="Vanderbilt Email"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.vanderbiltEmail}
-                                    onChange={handleChange}
-                                />
+                    <h1>PLACEHOLDER</h1>
+
+                    <div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="row py-3">
+                                <div className="col-sm-12">
+                                    <input
+                                        type="email"
+                                        id="vanderbiltEmail"
+                                        name="vanderbiltEmail"
+                                        placeholder="Vanderbilt Email"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.vanderbiltEmail}
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className="row py-3">
-                            <div className="col-sm-12">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    placeholder="Password"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                />
+                            <div className="row py-3">
+                                <div className="col-sm-12">
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Password"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                            <a href="/mainPage">
-                                <button type="submit" style={logInButton} className="my-4">Log In</button>
-                            </a>
-                    </form>
-                </div>
+                                <a href="/mainPage">
+                                    <button type="submit" style={logInButton} className="my-4">Log In</button>
+                                </a>
+                        </form>
+                    </div>
                 </div>
             </div>
-
         </div>
+    </div>
     );
 }
