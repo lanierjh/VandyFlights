@@ -45,7 +45,6 @@ export default function Chat() {
             console.log('OAuth login successful:', data);
     
             // Redirect to the chat page after successful OAuth response
-            router.push('/chat');
           } else {
             console.error('OAuth login failed');
           }

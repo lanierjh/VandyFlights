@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import FlightResults from './FlightResults';
+import { useRouter } from 'next/navigation';
 import Header from './Header';
 
 export default function MainPage() {
@@ -12,8 +12,8 @@ export default function MainPage() {
         roundTrip: 'true',
     });
 
-    const [showResults, setShowResults] = useState(false);
-    const [airportSuggestions, setAirportSuggestions] = useState([]); // To store airport suggestions
+    const [airportSuggestions, setAirportSuggestions] = useState([]); 
+    const router = useRouter();
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
@@ -49,13 +49,25 @@ export default function MainPage() {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        setShowResults(true);
-        console.log('Search Data:', searchData);
+        router.push({
+            pathname: '/flightResults',
+            query: { 
+                origin: searchData.origin,
+                destination: searchData.destination,
+                departureDate: searchData.departureDate,
+                returnDate: searchData.returnDate,
+                roundTrip: searchData.roundTrip,
+            },
+        });
     };
 
-    if (showResults) {
-        return <FlightResults searchData={searchData} />;
-    }
+    const handlePopularDestinationClick = (destination) => {
+        setSearchData({ ...searchData, destination });
+        router.push({
+            pathname: '/flightResults',
+            query: { ...searchData, destination },
+        });
+    };
 
     const imageStyle = {
         width: '100%',
@@ -210,7 +222,9 @@ export default function MainPage() {
                             padding: '20px',
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        }}>
+                            cursor: 'pointer',
+                        }}onClick={() => handlePopularDestinationClick('New York, NY')}
+                        >
                             <img
                                 src="/newyork.png"
                                 alt="New York"
@@ -227,7 +241,9 @@ export default function MainPage() {
                             padding: '20px',
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        }}>
+                            cursor: 'pointer',
+                        }}onClick={() => handlePopularDestinationClick('Los Angeles, LA')}
+                        >
                             <img
                                 src="/losangeles.jpg"
                                 alt="Los Angeles"
@@ -244,7 +260,9 @@ export default function MainPage() {
                             padding: '20px',
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        }}>
+                            cursor: 'pointer',
+                        }}onClick={() => handlePopularDestinationClick('Miami, FL')}
+                        >
                             <img
                                 src="/miami.jpg"
                                 alt="Miami"
@@ -261,7 +279,10 @@ export default function MainPage() {
                             padding: '20px',
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        }}>
+                            cursor: 'pointer',
+                        }}
+                        onClick={() => handlePopularDestinationClick('Chicago, IL')}
+                        >
                             <img
                                 src="/chicago.jpg"
                                 alt="Chicago"
@@ -278,7 +299,10 @@ export default function MainPage() {
                             padding: '20px',
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        }}>
+                            cursor: 'pointer',
+                        }}
+                        onClick={() => handlePopularDestinationClick('Las Vegas, NV')}
+                        >
                             <img
                                 src="/lasvegas.jpg"
                                 alt="Las Vegas"
