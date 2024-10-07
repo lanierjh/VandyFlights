@@ -1,12 +1,31 @@
+"use client"; // Ensure this is at the top for client-side functionality
 import Header from './Header';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation'; // For accessing query parameters
+import { useEffect, useState } from 'react';
 
-export default function FlightResults({ searchData }) {
-    const router = useRouter();
-    const { origin, destination, departureDate, returnDate, roundTrip } = router.query;
+export default function FlightResults() {
+    const searchParams = useSearchParams(); // Retrieve the query parameters from the URL
+    const origin = searchParams.get('origin');
+    const destination = searchParams.get('destination');
+    const departureDate = searchParams.get('departureDate');
+    const returnDate = searchParams.get('returnDate');
+    const roundTrip = searchParams.get('roundTrip');
+    
+    const [isLoading, setIsLoading] = useState(true); // Loading state until the query is ready
+
+    // Effect to check when the necessary query parameters are available
+    useEffect(() => {
+        if (origin && destination && departureDate && roundTrip) {
+            setIsLoading(false); // Stop loading once all required data is available
+        }
+    }, [origin, destination, departureDate, returnDate, roundTrip]);
+
+    if (isLoading) {
+        return <div>Loading...</div>; // Loading indicator while data is being retrieved
+    }
 
     return (
-        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#dfd0d5', padding: '20px', minHeight: '100vh' }}>
+        <div style={styles.container}>
             <Header />
 
             <main style={{ marginTop: '30px' }}>
@@ -22,3 +41,10 @@ export default function FlightResults({ searchData }) {
         </div>
     );
 }
+const styles = {
+    container: {
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#F1D6D9', 
+      minHeight: '100vh',
+    },
+};
