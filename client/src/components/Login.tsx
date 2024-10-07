@@ -42,7 +42,7 @@ export default function Login() {
             // Simulate receiving an OAuth token or success response
             const data = await response.json();
             console.log('OAuth login successful:', data);
-    
+            window.location.href = '/mainPage'; 
           } else {
             console.error('OAuth login failed');
           }
@@ -93,9 +93,8 @@ export default function Login() {
                             </a>
                     </form>
                 </div>
-                </div>
             </div>
-
         </div>
+    </div>
     );
 }

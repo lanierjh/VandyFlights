@@ -51,13 +51,13 @@ export default function MainPage() {
         e.preventDefault();
         router.push({
             pathname: '/flightResults',
-            query: { 
+            query: {
                 origin: searchData.origin,
                 destination: searchData.destination,
                 departureDate: searchData.departureDate,
                 returnDate: searchData.returnDate,
                 roundTrip: searchData.roundTrip,
-            },
+            }
         });
     };
 

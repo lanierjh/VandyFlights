@@ -1,6 +1,6 @@
 "use client";
-import EditProf from '@/components/EditProfile';
+import EditProfile from '@/components/EditProfile';
 
-export default function EditProfile() {
-  return <EditProf />;
+export default function Profile() {
+  return <EditProfile />;
 }
