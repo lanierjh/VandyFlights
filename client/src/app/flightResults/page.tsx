@@ -1,6 +1,6 @@
 "use client";
-import FlightRes from '@/components/FlightResults';
+import FlightResults from '@/components/FlightResults';
 
-export default function FlightResults() {
-  return <FlightRes />;
+export default function Results() {
+  return <FlightResults />;
 }

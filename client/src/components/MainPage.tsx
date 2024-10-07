@@ -49,23 +49,28 @@ export default function MainPage() {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        router.push({
-            pathname: '/flightResults',
-            query: {
-                origin: searchData.origin,
-                destination: searchData.destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip,
-            }
-        });
+        const query = new URLSearchParams({
+            origin: searchData.origin,
+            destination: searchData.destination,
+            departureDate: searchData.departureDate,
+            returnDate: searchData.returnDate,
+            roundTrip: searchData.roundTrip,
+        }).toString();
+    
+        router.push(`/flightResults?${query}`);
     };
 
     const handlePopularDestinationClick = (destination) => {
         setSearchData({ ...searchData, destination });
         router.push({
             pathname: '/flightResults',
-            query: { ...searchData, destination },
+            query: { 
+                origin: searchData.origin,
+                destination,
+                departureDate: searchData.departureDate,
+                returnDate: searchData.returnDate,
+                roundTrip: searchData.roundTrip,
+            },
         });
     };
 
