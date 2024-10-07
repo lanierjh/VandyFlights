@@ -77,7 +77,7 @@ export default function MainPage() {
     };
 
     return (
-        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#dfd0d5', padding: '20px', minHeight: '100vh' }}>
+        <div style={styles.container}>
             <Header />
 
             {/* Main Section */}
@@ -317,3 +317,11 @@ export default function MainPage() {
         </div>
     );
 }
+
+const styles = {
+    container: {
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#F1D6D9', 
+      minHeight: '100vh',
+    },
+};

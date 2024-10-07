@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import Header from './Header'; // Assuming you have a header component
+import Header from './Header'; 
 
 export default function EditProfile() {
     const [formData, setFormData] = useState({
@@ -23,22 +23,24 @@ export default function EditProfile() {
 
     const handleSaveClick = () => {
         setIsEditing(false);
-        // Here, you can add logic to save the updated info, e.g., making a POST request to update the data.
+        // Logic to save data (e.g., API call)
         console.log('Form data saved:', formData);
     };
 
     return (
-        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#dfd0d5', padding: '20px', minHeight: '100vh' }}>
-            <Header />
-            <div className="edit-profile-container" style={{ marginTop: '50px', padding: '20px', backgroundColor: 'white', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#F1D6D9', minHeight: '100vh' }}>
+            {/* Header Component at the top */}
+            <Header /> {/* The header spans the top, just like on the chat page */}
+
+            <div className="edit-profile-container" style={styles.profileContainer}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {/* Profile Picture and Info */}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Image 
-                            src="/newyork.png" // Path to the uploaded image
+                            src="/newyork.png" // Replace with actual profile image path
                             alt="Profile picture"
-                            width={80}
-                            height={80}
+                            width={100}
+                            height={100}
                             style={{ borderRadius: '50%', marginRight: '20px' }}
                         />
                         <div>
@@ -51,35 +53,23 @@ export default function EditProfile() {
                         <button 
                             type="button" 
                             onClick={handleSaveClick}
-                            style={{
-                                backgroundColor: '#28a745', 
-                                color: 'white', 
-                                border: 'none', 
-                                borderRadius: '10px', 
-                                padding: '10px 20px', 
-                                cursor: 'pointer'
-                            }}>
+                            style={styles.saveButton}>
                             Save
                         </button>
                     ) : (
                         <button 
                             type="button" 
                             onClick={handleEditClick}
-                            style={{
-                                backgroundColor: '#1e3a8a', 
-                                color: 'white', 
-                                border: 'none', 
-                                borderRadius: '10px', 
-                                padding: '10px 20px', 
-                                cursor: 'pointer'
-                            }}>
+                            style={styles.editButton}>
                             Edit
                         </button>
                     )}
                 </div>
+
+                {/* Profile Form */}
                 <form className="profile-form" style={{ marginTop: '30px' }}>
-                    <div className="row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div className="form-group" style={{ flex: '0 0 48%' }}>
+                    <div className="row" style={styles.row}>
+                        <div className="form-group" style={styles.formGroup}>
                             <label htmlFor="firstName">First Name</label>
                             <input 
                                 type="text" 
@@ -89,10 +79,10 @@ export default function EditProfile() {
                                 onChange={handleChange} 
                                 placeholder="Your First Name"
                                 disabled={!isEditing}
-                                style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc' }}
+                                style={styles.inputField}
                             />
                         </div>
-                        <div className="form-group" style={{ flex: '0 0 48%' }}>
+                        <div className="form-group" style={styles.formGroup}>
                             <label htmlFor="lastName">Last Name</label>
                             <input 
                                 type="text" 
@@ -102,12 +92,12 @@ export default function EditProfile() {
                                 onChange={handleChange} 
                                 placeholder="Your Last Name"
                                 disabled={!isEditing}
-                                style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc' }}
+                                style={styles.inputField}
                             />
                         </div>
                     </div>
-                    <div className="row" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                        <div className="form-group" style={{ flex: '0 0 48%' }}>
+                    <div className="row" style={styles.row}>
+                        <div className="form-group" style={styles.formGroup}>
                             <label htmlFor="gender">Gender</label>
                             <select 
                                 id="gender" 
@@ -115,14 +105,14 @@ export default function EditProfile() {
                                 value={formData.gender}
                                 onChange={handleChange} 
                                 disabled={!isEditing}
-                                style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc' }}
+                                style={styles.inputField}
                             >
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
-                        <div className="form-group" style={{ flex: '0 0 48%' }}>
+                        <div className="form-group" style={styles.formGroup}>
                             <label htmlFor="graduatingClass">Graduating Class</label>
                             <input 
                                 type="text" 
@@ -132,7 +122,7 @@ export default function EditProfile() {
                                 onChange={handleChange} 
                                 placeholder="Your Graduating Class"
                                 disabled={!isEditing}
-                                style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc' }}
+                                style={styles.inputField}
                             />
                         </div>
                     </div>
@@ -147,7 +137,7 @@ export default function EditProfile() {
                                 onChange={handleChange} 
                                 placeholder="Your Email"
                                 disabled={!isEditing}
-                                style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #ccc' }}
+                                style={styles.inputField}
                             />
                         </div>
                     </div>
@@ -156,3 +146,44 @@ export default function EditProfile() {
         </div>
     );
 }
+
+// Styles
+const styles = {
+    profileContainer: {
+        margin: '50px auto',
+        padding: '40px', // Increased padding for more spacious layout
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        maxWidth: '900px', // Increased max width to make the container bigger
+    },
+    row: {
+        display: 'flex',
+        justifyContent: 'space-between',
+    },
+    formGroup: {
+        flex: '0 0 48%',
+    },
+    inputField: {
+        width: '100%',
+        padding: '15px', // Increased padding for bigger input fields
+        borderRadius: '10px',
+        border: '1px solid #ccc',
+    },
+    saveButton: {
+        backgroundColor: '#28a745', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '10px', 
+        padding: '15px 30px', // Bigger button
+        cursor: 'pointer',
+    },
+    editButton: {
+        backgroundColor: '#1e3a8a', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '10px', 
+        padding: '15px 30px', // Bigger button
+        cursor: 'pointer',
+    },
+};

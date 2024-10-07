@@ -4,7 +4,7 @@ import React from 'react';
 export default function Header() {
   return (
     <header style={{
-      backgroundColor: '#dfd0d5', 
+      backgroundColor: '#F1D6D9', 
       padding: '10px 0',
       textAlign: 'center',
       display: 'flex',
