@@ -15,6 +15,7 @@ export default function FlightResults() {
 
     // Effect to check when the necessary query parameters are available
     useEffect(() => {
+        fetch("http://127.0.0.1:8000/flights")
         if (origin && destination && departureDate && roundTrip) {
             setIsLoading(false); // Stop loading once all required data is available
         }
