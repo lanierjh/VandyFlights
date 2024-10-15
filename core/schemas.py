@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, validator
 import re
+from datetime import date,time
 
 class UserCreate(BaseModel):
     username: str
@@ -22,10 +23,24 @@ class UserCreate(BaseModel):
             raise ValueError('Password must contain at least one special character')
         return value
 
+
+
+
+class FlightCreate(BaseModel):
+    flight_number: str
+    departure: date #str?
+    arrival: date #str?
+    departure_time: time
+    arrival_time: time
+    price: int
+
+    class Config:
+        orm_mode = True
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
-    
+
 
 class UserResponse(BaseModel):
     id: int
