@@ -18,17 +18,16 @@ export default function MainPage() {
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData({ ...searchData, [name]: value });
-        
-        // Fetch airport suggestions if the user is typing in the "destination" field
+
         if (name === 'destination') {
             fetchAirportSuggestions(value);
         }
     };
 
     const fetchAirportSuggestions = async (query) => {
-        if (query.length > 2) { // Only fetch suggestions if query is longer than 2 characters
+        if (query.length > 2) { 
             try {
-                // Replace with a real API endpoint and API key for fetching airport data
+                // TODO Need to CHANGE
                 const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
                 const data = await response.json();
                 if (data) {
@@ -44,7 +43,7 @@ export default function MainPage() {
 
     const handleAirportSelect = (airport) => {
         setSearchData({ ...searchData, destination: `${airport.nameAirport} (${airport.codeIataAirport})` });
-        setAirportSuggestions([]); // Clear suggestions after selection
+        setAirportSuggestions([]);
     };
 
     const handleSearchSubmit = (e) => {

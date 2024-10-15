@@ -53,7 +53,6 @@ export default function Register() {
             return;
         }  
 
-        // Clear any previous error messages
         setErrorMessage('');
 
         try {

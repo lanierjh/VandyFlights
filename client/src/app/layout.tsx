@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 
 interface LayoutProps {
-    children: ReactNode; // Accept children passed to this layout
+    children: ReactNode;
 }
 
 export default function RootLayout({ children }: LayoutProps) {

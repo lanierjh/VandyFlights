@@ -23,7 +23,6 @@ export default function EditProfile() {
 
     const handleSaveClick = () => {
         setIsEditing(false);
-        // Logic to save data (e.g., API call)
         console.log('Form data saved:', formData);
     };
 
@@ -37,7 +36,7 @@ export default function EditProfile() {
                     {/* Profile Picture and Info */}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Image 
-                            src="/newyork.png" // Replace with actual profile image path
+                            src="/newyork.png" // TODO NEED TO CHANGE
                             alt="Profile picture"
                             width={100}
                             height={100}
@@ -147,15 +146,14 @@ export default function EditProfile() {
     );
 }
 
-// Styles
 const styles = {
     profileContainer: {
         margin: '50px auto',
-        padding: '40px', // Increased padding for more spacious layout
+        padding: '40px',
         backgroundColor: 'white',
         borderRadius: '10px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        maxWidth: '900px', // Increased max width to make the container bigger
+        maxWidth: '900px',
     },
     row: {
         display: 'flex',
@@ -166,7 +164,7 @@ const styles = {
     },
     inputField: {
         width: '100%',
-        padding: '15px', // Increased padding for bigger input fields
+        padding: '15px', 
         borderRadius: '10px',
         border: '1px solid #ccc',
     },
@@ -175,7 +173,7 @@ const styles = {
         color: 'white', 
         border: 'none', 
         borderRadius: '10px', 
-        padding: '15px 30px', // Bigger button
+        padding: '15px 30px', 
         cursor: 'pointer',
     },
     editButton: {
@@ -183,7 +181,7 @@ const styles = {
         color: 'white', 
         border: 'none', 
         borderRadius: '10px', 
-        padding: '15px 30px', // Bigger button
+        padding: '15px 30px', 
         cursor: 'pointer',
     },
 };

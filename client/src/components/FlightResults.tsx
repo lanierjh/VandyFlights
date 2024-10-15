@@ -1,27 +1,26 @@
-"use client"; // Ensure this is at the top for client-side functionality
+"use client";
 import Header from './Header';
-import { useSearchParams } from 'next/navigation'; // For accessing query parameters
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function FlightResults() {
-    const searchParams = useSearchParams(); // Retrieve the query parameters from the URL
+    const searchParams = useSearchParams();
     const origin = searchParams.get('origin');
     const destination = searchParams.get('destination');
     const departureDate = searchParams.get('departureDate');
     const returnDate = searchParams.get('returnDate');
     const roundTrip = searchParams.get('roundTrip');
     
-    const [isLoading, setIsLoading] = useState(true); // Loading state until the query is ready
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Effect to check when the necessary query parameters are available
     useEffect(() => {
         if (origin && destination && departureDate && roundTrip) {
-            setIsLoading(false); // Stop loading once all required data is available
+            setIsLoading(false);
         }
     }, [origin, destination, departureDate, returnDate, roundTrip]);
 
     if (isLoading) {
-        return <div>Loading...</div>; // Loading indicator while data is being retrieved
+        return <div>Loading...</div>; 
     }
 
     return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from './Header'; // Assuming you have a Header component
+import Header from './Header';
 
 export default function ChatPage() {
   const [selectedFriend, setSelectedFriend] = useState('James Huang');
@@ -44,9 +44,9 @@ export default function ChatPage() {
           <h2 style={styles.chatHeader}>{selectedFriend}</h2>
           <div style={styles.messagesContainer}>
             {/* Chat messages will go here */}
-            <div style={styles.messageBubble}>Lorem ipsum dolor sit amet.</div>
-            <div style={styles.messageBubble}>Consectetur adipiscing elit.</div>
-            <div style={styles.messageBubble}>Sed do eiusmod tempor.</div>
+            <div style={styles.messageBubble}>VANDERBILT</div>
+            <div style={styles.messageBubble}>I NEED TO CHANGE THIS.</div>
+            <div style={styles.messageBubble}>HELP.</div>
             {/* More messages */}
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function ChatPage() {
 const styles = {
   container: {
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: '#F1D6D9', // light pink background like in your image
+    backgroundColor: '#F1D6D9',
     minHeight: '100vh',
   },
   mainContent: {

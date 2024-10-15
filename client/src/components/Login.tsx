@@ -39,7 +39,6 @@ export default function Login() {
           });
     
           if (response.ok) {
-            // Simulate receiving an OAuth token or success response
             const data = await response.json();
             console.log('OAuth login successful:', data);
             window.location.href = '/mainPage'; 
