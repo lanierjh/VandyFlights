@@ -1,11 +1,26 @@
 from typing import Union
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 import http.client
-import re
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://your-frontend-domain.com",  # Add any other domains here
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # List of allowed origins
+    allow_credentials=True,  # Whether to allow cookies and credentials
+    allow_methods=["*"],  # List of allowed HTTP methods (GET, POST, etc.). Use ["*"] to allow all methods
+    allow_headers=["*"],  # List of allowed headers. Use ["*"] to allow all headers
+)
 
 conn = http.client.HTTPSConnection("sky-scanner3.p.rapidapi.com")
 
