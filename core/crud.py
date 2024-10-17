@@ -1,14 +1,29 @@
-from fastapi import requests
+from fastapi import FastAPI, requests, HTTPException, status
+
 from sqlalchemy.orm import Session
 
+
 from core.models import User, Flight
-from core.schemas import UserCreate, FlightCreate
+from core.schemas import UserCreate, FlightCreate, UserResponse
 from datetime import date,time, datetime
+
+from core.security.util import hash_password
+
+app = FastAPI()
 
 
 def create_user(db: Session, user: UserCreate):
-    from core.security.util import hash_password
-    hashed_password = hash_password(user.password);
+    existing_user = db.query(User).filter(
+        (User.username == user.username) | (User.email == user.email)
+    ).first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username or email already exists"
+        )
+
+    hashed_password = hash_password(user.password)
     db_user = User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
     db.commit()

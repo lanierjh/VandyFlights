@@ -56,21 +56,36 @@ export default function Register() {
         setErrorMessage('');
 
         try {
-          const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+          // const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            const response = await fetch('http://localhost:8000/register', {
+
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify({
+                username: formData.firstName + formData.lastName,
+                email: formData.vanderbiltEmail,
+                password: formData.password
+            }),
           });
           if (response.ok) {
             console.log('Registration successful:', formData);
             router.push('/mainPage');
           } else {
-            console.error('Registration failed');
+            const errorData = await response.json();
+
+            if (errorData.detail === "Username or email already exists") {
+                setErrorMessage('The username or email you entered is already in use.');
+            } else {
+                setErrorMessage(errorData.detail || 'An error occurred. Please try again.');
+            }
+
+            console.error('Registration failed:', errorData.detail);
           }
         } catch (error) {
           console.error('Error during registration:', error);
+          setErrorMessage('An error occurred. Please try again.');
         }
     };
 
