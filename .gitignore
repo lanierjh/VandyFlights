@@ -1,2 +1,4 @@
 client/node_modules
 client/.next
+__pycache__/
+.idea/
