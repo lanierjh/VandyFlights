@@ -4,13 +4,12 @@ from sqlalchemy.orm import Session
 
 
 from core.models import User, Flight
-from core.schemas import UserCreate, FlightCreate, UserResponse
+from core.schemas import UserCreate, FlightCreate, UserAuthenticate
 from datetime import date,time, datetime
 
-from core.security.util import hash_password
+from core.security.util import hash_password, verify_password
 
 app = FastAPI()
-
 
 def create_user(db: Session, user: UserCreate):
     existing_user = db.query(User).filter(
@@ -33,6 +32,15 @@ def create_user(db: Session, user: UserCreate):
 def get_user_by_username_or_email(db: Session, username: str, email: str):
     return db.query(User).filter((User.username == username) | (User.email == email)).first()
 
+def user_login(db:Session, user = UserAuthenticate):
+    existing_user = db.query(User).filter(User.email == user.email).first()
+
+    if not existing_user or not verify_password(user.password, existing_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+    return {"success": "User authenticated", "user": existing_user}
 
 def create_flight(db: Session, flight_data: FlightCreate, user: User):
     new_flight = Flight(

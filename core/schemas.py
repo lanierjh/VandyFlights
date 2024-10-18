@@ -32,7 +32,9 @@ class UserCreate(BaseModel):
     #         raise ValueError('Password must contain at least one special character')
     #     return value
 
-
+class UserAuthenticate(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class FlightCreate(BaseModel):
