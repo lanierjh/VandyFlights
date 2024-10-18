@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import './globals.css';
+import '../styles/globals.css';
 
 export default function Home() {
   const homeContent = {
