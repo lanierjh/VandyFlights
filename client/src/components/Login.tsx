@@ -10,7 +10,7 @@ export default function Login() {
         width: "100%",
         borderRadius: "10px",
         border: "none",
-    }
+    };
 
     const logInButton = {
         width: "100%",
@@ -23,8 +23,22 @@ export default function Login() {
         fontWeight: "bold",
         cursor: "pointer",
         transition: "all 0.3s ease",
-    }
-    
+    };
+
+    const returnHomeButton = {
+        position: "absolute",
+        top: "20px",
+        right: "20px",
+        backgroundColor: "#1e3a8a",
+        color: "white",
+        padding: "10px 20px",
+        borderRadius: "20px",
+        border: "none",
+        cursor: "pointer",
+        fontSize: "1.2rem",
+        fontWeight: "bold",
+    };
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -52,48 +66,51 @@ export default function Login() {
 
     return (
         <div className="row my-5">
+            {/* Return to Home Button */}
+            <button style={returnHomeButton} onClick={() => window.location.href = '/'}>
+                Return to Home
+            </button>
+
             <div className="col-md-4"></div>
             <div className="col-md-4 text-center my-5 py-5">
-            <div>
-                <h1>Login</h1>
-
                 <div>
-                    <form onSubmit={handleSubmit}>
-                        <div className="row py-3">
-                            <div className="col-sm-12">
-                                <input
-                                    type="email"
-                                    id="vanderbiltEmail"
-                                    name="vanderbiltEmail"
-                                    placeholder="Vanderbilt Email"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.vanderbiltEmail}
-                                    onChange={handleChange}
-                                />
+                    <h1>Login</h1>
+
+                    <div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="row py-3">
+                                <div className="col-sm-12">
+                                    <input
+                                        type="email"
+                                        id="vanderbiltEmail"
+                                        name="vanderbiltEmail"
+                                        placeholder="Vanderbilt Email"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.vanderbiltEmail}
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className="row py-3">
-                            <div className="col-sm-12">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    placeholder="Password"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                />
+                            <div className="row py-3">
+                                <div className="col-sm-12">
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Password"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                            <a href="/mainPage">
-                                <button type="submit" style={logInButton} className="my-4">Log In</button>
-                            </a>
-                    </form>
+                            <button type="submit" style={logInButton} className="my-4">Log In</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     );
 }
