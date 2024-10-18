@@ -28,12 +28,9 @@ export default function EditProfile() {
 
     return (
         <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#F1D6D9', minHeight: '100vh' }}>
-            {/* Header Component at the top */}
-            <Header /> {/* The header spans the top, just like on the chat page */}
-
+            <Header />
             <div className="edit-profile-container" style={styles.profileContainer}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    {/* Profile Picture and Info */}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Image 
                             src="/newyork.png" // TODO NEED TO CHANGE
@@ -47,7 +44,6 @@ export default function EditProfile() {
                             <p>{formData.email}</p>
                         </div>
                     </div>
-                    {/* Edit / Save Button */}
                     {isEditing ? (
                         <button 
                             type="button" 
@@ -64,8 +60,6 @@ export default function EditProfile() {
                         </button>
                     )}
                 </div>
-
-                {/* Profile Form */}
                 <form className="profile-form" style={{ marginTop: '30px' }}>
                     <div className="row" style={styles.row}>
                         <div className="form-group" style={styles.formGroup}>

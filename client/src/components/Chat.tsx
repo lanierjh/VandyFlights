@@ -3,6 +3,9 @@ import Header from './Header';
 
 export default function ChatPage() {
   const [selectedFriend, setSelectedFriend] = useState('James Huang');
+  const [activeTab, setActiveTab] = useState('Friends');
+  const [searchTerm, setSearchTerm] = useState(''); 
+  const [filteredFriends, setFilteredFriends] = useState([]);
 
   const friendsList = [
     'Jane Sun',
@@ -11,22 +14,59 @@ export default function ChatPage() {
     'Jackson Lanier',
   ];
 
-  const handleFriendSelect = (friend: string) => {
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    setSearchTerm(''); 
+    if (tab === 'Search Friends') {
+      setFilteredFriends(friendsList);
+    }
+  };
+
+  const handleFriendSelect = (friend) => {
     setSelectedFriend(friend);
+  };
+
+  const handleSearchChange = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    const filtered = friendsList.filter((friend) =>
+      friend.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredFriends(filtered);
   };
 
   return (
     <div style={styles.container}>
       <Header />
       <div style={styles.mainContent}>
-        {/* Friends List Section */}
         <div style={styles.friendsList}>
           <div style={styles.tabContainer}>
-            <button style={styles.activeTab}>Friends</button>
-            <button style={styles.tab}>Search Friends</button>
+            <button
+              style={activeTab === 'Friends' ? styles.activeTab : styles.tab}
+              onClick={() => handleTabClick('Friends')}
+            >
+              Friends
+            </button>
+            <button
+              style={activeTab === 'Search Friends' ? styles.activeTab : styles.tab}
+              onClick={() => handleTabClick('Search Friends')}
+            >
+              Search Friends
+            </button>
           </div>
+          
+          {activeTab === 'Search Friends' && (
+            <input
+              type="text"
+              placeholder="Search for a friend..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              style={styles.searchInput}
+            />
+          )}
+
           <ul style={styles.friendItems}>
-            {friendsList.map((friend, index) => (
+            {(activeTab === 'Friends' ? friendsList : filteredFriends).map((friend, index) => (
               <li
                 key={index}
                 onClick={() => handleFriendSelect(friend)}
@@ -38,24 +78,19 @@ export default function ChatPage() {
             ))}
           </ul>
         </div>
-
-        {/* Chat Section */}
         <div style={styles.chatWindow}>
           <h2 style={styles.chatHeader}>{selectedFriend}</h2>
           <div style={styles.messagesContainer}>
-            {/* Chat messages will go here */}
             <div style={styles.messageBubble}>VANDERBILT</div>
             <div style={styles.messageBubble}>I NEED TO CHANGE THIS.</div>
             <div style={styles.messageBubble}>HELP.</div>
-            {/* More messages */}
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
-// Styles
 const styles = {
   container: {
     fontFamily: 'Arial, sans-serif',
@@ -96,6 +131,13 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
   },
+  searchInput: {
+    width: '100%',
+    padding: '10px',
+    margin: '10px 0',
+    borderRadius: '10px',
+    border: '1px solid #ccc',
+  },
   friendItems: {
     listStyle: 'none',
     padding: 0,
@@ -134,4 +176,3 @@ const styles = {
     borderRadius: '10px',
   },
 };
-

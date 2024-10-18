@@ -90,7 +90,6 @@ export default function Register() {
 
     return (
         <div className="row my-5">
-            {/* Return to Home Button */}
             <button style={returnHomeButton} onClick={() => router.push('/')}>
                 Return to Home
             </button>

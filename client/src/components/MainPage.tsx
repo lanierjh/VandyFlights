@@ -84,9 +84,7 @@ export default function MainPage() {
         <div style={styles.container}>
             <Header />
 
-            {/* Main Section */}
             <main style={{ marginTop: '30px' }}>
-                {/* Search Section */}
                 <section style={{
                     backgroundImage: `url('/nashville.jpg')`,
                     backgroundSize: 'cover',
@@ -123,7 +121,6 @@ export default function MainPage() {
                                     width: '100%',
                                 }}
                             />
-                            {/* Suggestions Dropdown */}
                             {airportSuggestions.length > 0 && (
                                 <ul style={{
                                     position: 'absolute',
@@ -167,7 +164,6 @@ export default function MainPage() {
                             }}
                         />
                         
-                        {/* Conditionally render the return date input based on round-trip selection */}
                         {searchData.roundTrip === 'true' && (
                             <input
                                 type="date"
@@ -210,7 +206,6 @@ export default function MainPage() {
                     </form>
                 </section>
 
-                {/* Popular Destinations Section */}
                 <section style={{ marginTop: '10px', textAlign: 'center' }}>
                     <h3 style={{ fontSize: '2rem', marginBottom: '20px', fontWeight: 'bold' }}>Popular Destinations</h3>
                     <div style={{

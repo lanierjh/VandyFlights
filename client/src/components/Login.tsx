@@ -47,7 +47,7 @@ export default function Login() {
         e.preventDefault();
     
         try {
-          // Simulate OAuth login by sending a GET request to a dummy OAuth endpoint
+          // TODO: CHANGE THIS
           const response = await fetch('https://jsonplaceholder.typicode.com/posts/1', {
             method: 'GET', // Simulate an OAuth GET request
           });
@@ -66,7 +66,6 @@ export default function Login() {
 
     return (
         <div className="row my-5">
-            {/* Return to Home Button */}
             <button style={returnHomeButton} onClick={() => window.location.href = '/'}>
                 Return to Home
             </button>
