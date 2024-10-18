@@ -5,7 +5,7 @@ import Header from './Header';
 
 export default function MainPage() {
     const [searchData, setSearchData] = useState({
-        origin: 'Nashville (BNA)',
+        origin: 'Nashville, TN (BNA)',
         destination: '',
         departureDate: '',
         returnDate: '',
