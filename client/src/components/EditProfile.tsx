@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Header from './Header'; 
+import Header from './Header';
 
 export default function EditProfile() {
     const [formData, setFormData] = useState({
-        firstName: 'Alexa',
-        lastName: 'Rawles',
-        gender: 'female',
+        firstName: 'Vikash',
+        lastName: 'Singh',
+        nextTrip: 'Fall Break',
         graduatingClass: '2025',
-        email: 'alexarawles@gmail.com'
+        email: 'Vikash@gmail.com',
+        currentTripDestination: 'New York, NY',
+        nextTripDestination: 'Miami, FL',
     });
 
     const [isEditing, setIsEditing] = useState(false);
+
+    const tripOptions = [
+        'Fall Break',
+        'Thanksgiving',
+        'Winter Break',
+        'Spring Break',
+        'Summer Break',
+    ];
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -91,18 +101,20 @@ export default function EditProfile() {
                     </div>
                     <div className="row" style={styles.row}>
                         <div className="form-group" style={styles.formGroup}>
-                            <label htmlFor="gender">Gender</label>
+                            <label htmlFor="nextTrip">Next Break</label>
                             <select 
-                                id="gender" 
-                                name="gender" 
-                                value={formData.gender}
-                                onChange={handleChange} 
+                                id="nextTrip" 
+                                name="nextTrip" 
+                                value={formData.nextTrip}
+                                onChange={handleChange}
                                 disabled={!isEditing}
                                 style={styles.inputField}
                             >
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
+                                {tripOptions.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className="form-group" style={styles.formGroup}>
@@ -114,6 +126,34 @@ export default function EditProfile() {
                                 value={formData.graduatingClass}
                                 onChange={handleChange} 
                                 placeholder="Your Graduating Class"
+                                disabled={!isEditing}
+                                style={styles.inputField}
+                            />
+                        </div>
+                    </div>
+                    <div className="row" style={styles.row}>
+                        <div className="form-group" style={styles.formGroup}>
+                            <label htmlFor="currentTripDestination">Current Trip Destination</label>
+                            <input 
+                                type="text" 
+                                id="currentTripDestination" 
+                                name="currentTripDestination" 
+                                value={formData.currentTripDestination}
+                                onChange={handleChange} 
+                                placeholder="Current Trip Destination"
+                                disabled={!isEditing}
+                                style={styles.inputField}
+                            />
+                        </div>
+                        <div className="form-group" style={styles.formGroup}>
+                            <label htmlFor="nextTripDestination">Next Trip Destination</label>
+                            <input 
+                                type="text" 
+                                id="nextTripDestination"
+                                name="nextTripDestination" 
+                                value={formData.nextTripDestination}
+                                onChange={handleChange} 
+                                placeholder="Next Trip Destination"
                                 disabled={!isEditing}
                                 style={styles.inputField}
                             />
@@ -161,6 +201,7 @@ const styles = {
         padding: '15px', 
         borderRadius: '10px',
         border: '1px solid #ccc',
+        appearance: 'none',
     },
     saveButton: {
         backgroundColor: '#28a745', 
