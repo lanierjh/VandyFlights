@@ -46,5 +46,5 @@ def show_flights():
     res = conn.getresponse()
     data = res.read()
 
-    #print(data.decode("utf-8"))
+    print(data.decode("utf-8"))
     return{data}
