@@ -54,6 +54,13 @@ export default function FlightResults() {
         return <div>Loading...</div>; // Loading indicator while data is being retrieved
     }
 
+    let parsedOrigin;
+    try {
+        parsedOrigin = JSON.parse(origin); // Parse the JSON string back into an object
+    } catch (error) {
+        console.error("Error parsing data:", error);
+    }
+
     return (
         <div style={styles.container}>
             <Header />
@@ -61,7 +68,7 @@ export default function FlightResults() {
             <main style={{ marginTop: '30px' }}>
                 <h2>Flight Search Result Page</h2>
                 <div style={{ display: 'flex', justifyContent: 'space-around', padding: '10px' }}>
-                    <span><strong>Origin:</strong> {origin}</span>
+                    <span><strong>Origin:</strong> {parsedOrigin}</span>
                 </div>
             </main>
         </div>
