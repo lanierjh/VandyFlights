@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],  # List of allowed headers. Use ["*"] to allow all headers
 )
 
-conn = http.client.HTTPSConnection("sky-scanner3.p.rapidapi.com")
+conn = http.client.HTTPSConnection("tripadvisor16.p.rapidapi.com")
 
 @app.get("/")
 def read_root():
@@ -37,14 +37,17 @@ def read_item(item_id: int, q: Union[str, None] = None):
 def show_flights():
 
     headers = {
-    'x-rapidapi-key': "6bed6c986cmshe33b94dc86bcd1fp1fff96jsnb3053b492c28",
-    'x-rapidapi-host': "sky-scanner3.p.rapidapi.com"
+    'x-rapidapi-key': "8f9d9710dcmsh46dbd3b58cf0e4bp139f74jsn1e7767cf4d9e",
+    'x-rapidapi-host': "tripadvisor16.p.rapidapi.com"
     }
+    
+    start = "BNA"
+    destination = "LAX" #placeholders for now
+    flightType = "ONE_WAY"
 
-    conn.request("GET", "/flights/auto-complete?query=Tennessee", headers=headers)
+    conn.request("GET", "/api/v1/flights/searchFlights?sourceAirportCode="+ start+"&destinationAirportCode="+ destination+"&date=2024-11-01&itineraryType="+flightType+"&sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&classOfService=ECONOMY&returnDate=2024-11-09&pageNumber=1&nearby=yes&nonstop=yes&currencyCode=USD&region=USA", headers=headers)
 
     res = conn.getresponse()
     data = res.read()
-
-    print(data.decode("utf-8"))
     return{data}
+
