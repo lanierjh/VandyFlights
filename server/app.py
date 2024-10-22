@@ -24,14 +24,14 @@ app.add_middleware(
 
 conn = http.client.HTTPSConnection("tripadvisor16.p.rapidapi.com")
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+#@app.get("/")
+#def read_root():
+    #return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+#@app.get("/items/{item_id}")
+#def read_item(item_id: int, q: Union[str, None] = None):
+    #return {"item_id": item_id, "q": q}
 
 @app.get("/flights")
 def show_flights():
@@ -67,6 +67,6 @@ def show_flights():
         output += "PRICE PER PASSENGER: " + price + ", URL: " +urls[index] + "\n"
         index += 1
     
-    #print(totalPrice)
+
     return{"output": output}
 

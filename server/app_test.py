@@ -43,5 +43,15 @@ def test_Variables():
     assert 'PRICE PER PASSENGER' in show_flights()["output"]
     assert 'URL' in show_flights()["output"]
     
+
+#HOW TO RUN:
+#install pytest within the folder this file is in in your terminal with the command below:
+#pip install pytest
+
+#then, simply run:
+#python -m pytest
+#to run the test. If this doesn't work, the command:
+#pytest
+#can work as well, depending on the configurations of your system
         
         
