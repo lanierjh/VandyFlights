@@ -2,6 +2,7 @@ from typing import Union
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import re
 
 import http.client
 
@@ -10,8 +11,7 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:8000",
-    "http://localhost:3000",
-    "http://your-frontend-domain.com",  # Add any other domains here
+    "http://localhost:3000",  # Add any other domains here
 ]
 
 app.add_middleware(
@@ -45,9 +45,28 @@ def show_flights():
     destination = "LAX" #placeholders for now
     flightType = "ONE_WAY"
 
-    conn.request("GET", "/api/v1/flights/searchFlights?sourceAirportCode="+ start+"&destinationAirportCode="+ destination+"&date=2024-11-01&itineraryType="+flightType+"&sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&classOfService=ECONOMY&returnDate=2024-11-09&pageNumber=1&nearby=yes&nonstop=yes&currencyCode=USD&region=USA", headers=headers)
+    conn.request("GET", "/api/v1/flights/searchFlights?sourceAirportCode="+ start +"&destinationAirportCode="+destination+"&date=2024-11-01&itineraryType="+flightType+"&sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&classOfService=ECONOMY&pageNumber=1&nearby=yes&nonstop=yes&currencyCode=USD&region=USA", headers=headers)
 
     res = conn.getresponse()
     data = res.read()
-    return{data}
+    
+    finalData = data.decode("utf-8")
+    
+    output = start + " to " + destination + " results: "
+    
+    urls = re.findall(r'"url":"(.*?)"', finalData)
+
+    index = 0
+    # Print and return the results
+    while(index<len(urls)):
+        last_index = urls[index].rfind("=")
+        price = urls[index][last_index+1:]
+        if(price == "0"):
+            price = "Variable"
+        print(f"PRICE PER PASSENGER: {price}, URL: {urls[index]}")
+        output += "PRICE PER PASSENGER: " + price + ", URL: " +urls[index] + "\n"
+        index += 1
+    
+    #print(totalPrice)
+    return{"output": output}
 
