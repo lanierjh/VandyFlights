@@ -31,8 +31,9 @@ export default function FlightResults() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/flights");
+                const response = await fetch("http://127.0.0.1:8001/flights");
                 const data = await response.json();
+                console.log(response)
 
                 // Assuming the response data has the necessary fields
                 setOrigin(data);
