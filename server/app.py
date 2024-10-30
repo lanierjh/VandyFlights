@@ -68,5 +68,5 @@ def show_flights():
         index += 1
     
 
-    return{"output": output}
+    return output
 
