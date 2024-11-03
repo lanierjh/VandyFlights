@@ -18,3 +18,4 @@ def login(user_cerd: schemas.UserLogin, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND, detail="Invalid Credentials")
 
     return "success"
+
