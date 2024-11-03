@@ -45,7 +45,7 @@ pool = sqlalchemy.create_engine(
 # SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{username}:{password}@127.0.0.1:3306/vandyflights"
 
 # engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=pool)
 
 Base = declarative_base()
 # SessionLocal()
