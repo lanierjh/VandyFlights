@@ -1,14 +1,16 @@
+import auth
 import sqlalchemy
 from sqlalchemy import create_engine
+from sqlalchemy.connectors import Connector
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
-from google.colab import auth
+# from google.colab import auth
+# from google.cloud.sql.connector import Connector
+
 import os
-from google.cloud.sql.connector import Connector
 
-
-auth.authenticate_user()
+# auth.authenticate_user()
 
 dotenv_path = os.path.join('../','.env')
 load_dotenv(dotenv_path)
