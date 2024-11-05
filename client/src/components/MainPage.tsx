@@ -48,6 +48,12 @@ export default function MainPage() {
 
     const handleSearchSubmit = async (e) => {
         e.preventDefault();
+        if (!searchData.destination || !searchData.departureDate) {
+            alert("Please provide a valid destination and departure date.");
+            return;
+        }
+        console.log("Submitting search data:", searchData);
+        
         try {
             const response = await axios.post('http://localhost:8001/flights', {
                 origin: searchData.origin,
@@ -56,7 +62,12 @@ export default function MainPage() {
                 returnDate: searchData.returnDate,
                 roundTrip: searchData.roundTrip === 'true',
             });
-            localStorage.setItem('flightResults', JSON.stringify(response.data.results));
+            console.log("Flight Data Response:", response.data);
+
+            // Store the flight results in localStorage
+            localStorage.setItem('flightResults', JSON.stringify(response.data));
+    
+            // Navigate to the flightResults page
             router.push('/flightResults');
         } catch (error) {
             console.error("Error fetching flights:", error);

@@ -5,18 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 import http.client
 import json
 import os
-
+import logging 
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://localhost:3000",  # Add any other domains here
-]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,14 +25,17 @@ class FlightRequest(BaseModel):
     departureDate: str
     returnDate: Optional[str] = None
     roundTrip: bool
-import logging
 
 # Configure logging to display debug messages
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 @app.post("/flights")
-def show_flights(flight_request: FlightRequest) -> Dict[str, Union[str, List[Dict[str, str]]]]:
+async def show_flights(flight_request: FlightRequest):
+    logger.debug(f"Received FlightRequest: {flight_request}")
+    if not flight_request.destination or not flight_request.departureDate:
+        raise HTTPException(status_code=400, detail="Destination and departure date are required.")
+
     headers = {
         'x-rapidapi-key': "8f9d9710dcmsh46dbd3b58cf0e4bp139f74jsn1e7767cf4d9e",
         'x-rapidapi-host': "tripadvisor16.p.rapidapi.com"
@@ -63,13 +61,9 @@ def show_flights(flight_request: FlightRequest) -> Dict[str, Union[str, List[Dic
         res = conn.getresponse()
         data = res.read()
 
-        # Log raw data from the API response for debugging
-        logger.debug(f"Raw API Response: {data}")
-
         final_data = json.loads(data.decode("utf-8"))
-        logger.debug(f"Parsed JSON Data: {final_data}")
-
         flights = []
+
         if "flights" in final_data.get("data", {}):
             for flight in final_data["data"]["flights"]:
                 for segment in flight["segments"]:
@@ -86,7 +80,11 @@ def show_flights(flight_request: FlightRequest) -> Dict[str, Union[str, List[Dic
                             flight_info["url"] = link["url"]
                             flight_info["price"] = str(link.get("totalPricePerPassenger", "Variable")) 
                         flights.append(flight_info)
-        else:
+        
+        # Limit the number of flights to 10
+        flights = flights[:10]
+
+        if not flights:
             raise HTTPException(status_code=404, detail="No flights found.")
 
     except json.JSONDecodeError as json_error:
