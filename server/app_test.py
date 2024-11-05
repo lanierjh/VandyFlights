@@ -35,13 +35,14 @@ def test_show_flights(mock_conn, mock_rapidapi_response):
     data = response.json()
     
     # Validate that the output matches expected strings.
-    assert "BNA to LAX results" in data["output"]
+    assert "BNA to LAX results" in data[0]
     
     #test known values in the output
 def test_Variables():
-    assert 'Variable' in show_flights()["output"]
-    assert 'PRICE PER PASSENGER' in show_flights()["output"]
-    assert 'URL' in show_flights()["output"]
+    output = show_flights()["output"]
+    assert 'Variable' in output
+    assert 'PRICE PER PASSENGER' in output
+    assert 'URL' in output
     
 
 #HOW TO RUN:
