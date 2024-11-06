@@ -4,18 +4,18 @@ import { useSearchParams } from 'next/navigation'; // For accessing query parame
 import { useEffect, useState } from 'react';
 
 export default function FlightResults() {
-    //const searchParams = useSearchParams(); // Retrieve the query parameters from the URL
-    //const origin = searchParams.get('origin');
-    //const destination = searchParams.get('destination');
-    //const departureDate = searchParams.get('departureDate');
-    //const returnDate = searchParams.get('returnDate');
-    //const roundTrip = searchParams.get('roundTrip');
+    const searchParams = useSearchParams(); // Retrieve the query parameters from the URL
+    const origin = searchParams.get('origin');
+    const destination = searchParams.get('destination');
+    const departureDate = searchParams.get('departureDate');
+    const returnDate = searchParams.get('returnDate');
+    const roundTrip = searchParams.get('roundTrip');
 
-    const [origin, setOrigin] = useState(null);
-    const [destination, setDestination] = useState('');
-    const [departureDate, setDepartureDate] = useState('');
-    const [returnDate, setReturnDate] = useState('');
-    const [roundTrip, setRoundTrip] = useState(false);
+    const [result, setOrigin] = useState(null);
+    //const [destination, setDestination] = useState('');
+    //const [departureDate, setDepartureDate] = useState('');
+    //const [returnDate, setReturnDate] = useState('');
+    //const [roundTrip, setRoundTrip] = useState(false);
     //const [isLoading, setIsLoading] = useState(true);
     
     const [isLoading, setIsLoading] = useState(true); // Loading state until the query is ready
@@ -30,21 +30,41 @@ export default function FlightResults() {
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const response = await fetch("http://127.0.0.1:8001/flights");
-                const data = await response.json();
-
-                // Assuming the response data has the necessary fields
-                setOrigin(data);
-                //setDestination(data.destination);
-                //setDepartureDate(data.departureDate);
-                //setReturnDate(data.returnDate);
-                //setRoundTrip(data.roundTrip);
-            } catch (error) {
-                console.error("Error fetching flight data:", error);
-            } finally {
-                setIsLoading(false); // Stop loading once data fetching is done
+            if(roundTrip == 'false'){
+                try {
+                    const response = await fetch(`http://127.0.0.1:8001/flights/origin=BNA&destination=${destination}&departureDate=${departureDate}&roundTrip=${roundTrip}`);
+                    const data = await response.json();
+    
+                    // Assuming the response data has the necessary fields
+                    setOrigin(data);
+                    //setDestination(data.destination);
+                    //setDepartureDate(data.departureDate);
+                    //setReturnDate(data.returnDate);
+                    //setRoundTrip(data.roundTrip);
+                } catch (error) {
+                    console.error("Error fetching flight data:", error);
+                } finally {
+                    setIsLoading(false); // Stop loading once data fetching is done
+                }
             }
+            else{
+                try {
+                    const response = await fetch(`http://127.0.0.1:8001/flights/origin=BNA&destination=${destination}&departureDate=${departureDate}&roundTrip=${roundTrip}`);
+                    const data = await response.json();
+    
+                    // Assuming the response data has the necessary fields
+                    setOrigin(data);
+                    //setDestination(data.destination);
+                    //setDepartureDate(data.departureDate);
+                    //setReturnDate(data.returnDate);
+                    //setRoundTrip(data.roundTrip);
+                } catch (error) {
+                    console.error("Error fetching flight data:", error);
+                } finally {
+                    setIsLoading(false); // Stop loading once data fetching is done
+                }
+            }
+            
         };
 
         fetchData();
@@ -69,7 +89,7 @@ export default function FlightResults() {
             <main style={{ marginTop: '30px' }}>
                 <h2>Flight Search Result Page</h2>
                 <div style={{ display: 'flex', justifyContent: 'space-around', padding: '10px' }}>
-                    <span><strong>Origin:</strong> {origin}</span>
+                    <span><strong>Origin:</strong> {result}</span>
                 </div>
             </main>
         </div>

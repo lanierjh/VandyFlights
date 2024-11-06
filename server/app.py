@@ -1,8 +1,9 @@
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import re
+import requests
 import pydantic
 
 import http.client
@@ -34,26 +35,94 @@ def read_root():
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
-@app.get("/flights")
-def show_flights():
-
+@app.get("/flights/origin=BNA&destination={destination}&departureDate={departureDate}&roundTrip={roundTrip}")
+async def show_flightsONEWAY(request: Request, destination: str, departureDate: str, roundTrip: str):
+    
+    #params = request.query_params
+    #origin = params.get("origin", "BNA")  # Default to "BNA" if not provided
+    #destination = params.get("destination", "LAX")  # Default to "LAX" if not provided
+    #departure_date = params.get("departureDate", "2024-11-09")  # Default date
+    #round_trip = params.get("roundTrip", "ONE_WAY")  # Default to "ONE_WAY"
+    
     headers = {
     'x-rapidapi-key': "8f9d9710dcmsh46dbd3b58cf0e4bp139f74jsn1e7767cf4d9e",
     'x-rapidapi-host': "tripadvisor16.p.rapidapi.com"
     }
     
-    start = "BNA"
-    destination = "LAX" #placeholders for now
-    flightType = "ONE_WAY"
+    roundTrip = 'ONE_WAY' #Placeholder
+    
+    url = (
+        f"/api/v1/flights/searchFlights?"
+        f"sourceAirportCode=BNA&"
+        f"destinationAirportCode={destination}&"
+        f"date={departureDate}&"
+        f"itineraryType={roundTrip}&"
+        "sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&"
+        "classOfService=ECONOMY&pageNumber=1&nearby=yes&nonstop=yes&"
+        "currencyCode=USD&region=USA"
+    )
 
-    conn.request("GET", "/api/v1/flights/searchFlights?sourceAirportCode="+ start +"&destinationAirportCode="+destination+"&date=2024-11-09&itineraryType="+flightType+"&sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&classOfService=ECONOMY&pageNumber=1&nearby=yes&nonstop=yes&currencyCode=USD&region=USA", headers=headers)
+    conn.request("GET", url, headers=headers)
 
     res = conn.getresponse()
     data = res.read()
     
     finalData = data.decode("utf-8")
     
-    output = start + " to " + destination + " results: "
+    output = f"BNA to {destination} results: "
+    
+    urls = re.findall(r'"url":"(.*?)"', finalData)
+
+    index = 0
+    # Print and return the results
+    while(index<len(urls)):
+        last_index = urls[index].rfind("=")
+        price = urls[index][last_index+1:]
+        if(price == "0"):
+            price = "Variable"
+        print(f"PRICE PER PASSENGER: {price}, URL: {urls[index]}")
+        output += "PRICE PER PASSENGER: " + price + ", URL: " +urls[index] + "\n"
+        index += 1
+    
+
+    return{output}
+
+
+@app.get("/flights/origin=BNA&destination={destination}&departureDate={departureDate}&returnDate={returnDate}&roundTrip={roundTrip}")
+async def show_flightsROUND(request: Request, destination: str, departureDate: str, returnDate: str, roundTrip: str):
+    
+    #params = request.query_params
+    #origin = params.get("origin", "BNA")  # Default to "BNA" if not provided
+    #destination = params.get("destination", "LAX")  # Default to "LAX" if not provided
+    #departure_date = params.get("departureDate", "2024-11-09")  # Default date
+    #round_trip = params.get("roundTrip", "ONE_WAY")  # Default to "ONE_WAY"
+    
+    headers = {
+    'x-rapidapi-key': "8f9d9710dcmsh46dbd3b58cf0e4bp139f74jsn1e7767cf4d9e",
+    'x-rapidapi-host': "tripadvisor16.p.rapidapi.com"
+    }
+    
+    roundTrip = 'ROUND_TRIP' #Placeholder
+    
+    url = (
+        f"/api/v1/flights/searchFlights?"
+        f"sourceAirportCode=BNA&"
+        f"destinationAirportCode={destination}&"
+        f"date={departureDate}&"
+        f"itineraryType={roundTrip}&"
+        "sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&"
+        f"classOfService=ECONOMY&returnDate={returnDate}&pageNumber=1&nearby=yes&nonstop=yes&"
+        "currencyCode=USD&region=USA"
+    )
+
+    conn.request("GET", url, headers=headers)
+
+    res = conn.getresponse()
+    data = res.read()
+    
+    finalData = data.decode("utf-8")
+    
+    output = f"BNA to {destination} results: "
     
     urls = re.findall(r'"url":"(.*?)"', finalData)
 
