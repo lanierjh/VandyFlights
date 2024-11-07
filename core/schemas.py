@@ -3,7 +3,7 @@ import re
 from datetime import date,time
 
 class UserResponse(BaseModel):
-    id: int
+    id: str
     username: str
     email: str
     is_active: bool
@@ -38,10 +38,3 @@ class UserLogin(BaseModel):
     password: str
 
 
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    email: EmailStr
-
-    class Config:
-        from_attributes = True

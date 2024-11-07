@@ -17,19 +17,19 @@ app.add_middleware(
     allow_headers=["*"],  # This allows all headers, including Content-Type
 )
 
-@app.get("/")
-def read_root(db: Session = Depends(get_db)):
-    return {"hello": db}
-
-@app.post("/register", response_model=UserResponse)  # Modify the response_model as needed
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    return create_user(db, user)
-
-@app.post("/login")
-def login(user_data: UserAuthenticate, db: Session = Depends(get_db)):
-    return user_login(db,user_data)
-
-@app.post("/flights/", response_model=FlightCreate)  # Modify the response_model as needed
-def add_flight(flight_data: FlightCreate, db: Session = Depends(get_db)):
-    user = get_user_by_username_or_email(db, flight_data.username, flight_data.email)  # Modify as necessary
-    return create_flight(db, flight_data, user)
+# @app.get("/")
+# def read_root(db: Session = Depends(get_db)):
+#     return {"hello": db}
+#
+# @app.post("/register", response_model=UserResponse)  # Modify the response_model as needed
+# def register_user(user: UserCreate, db: Session = Depends(get_db)):
+#     return create_user(db, user)
+#
+# @app.post("/login")
+# def login(user_data: UserAuthenticate, db: Session = Depends(get_db)):
+#     return user_login(db,user_data)
+#
+# @app.post("/flights/", response_model=FlightCreate)  # Modify the response_model as needed
+# def add_flight(flight_data: FlightCreate, db: Session = Depends(get_db)):
+#     user = get_user_by_username_or_email(db, flight_data.username, flight_data.email)  # Modify as necessary
+#     return create_flight(db, flight_data, user)

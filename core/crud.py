@@ -31,13 +31,13 @@ def create_user(user: UserCreate):
         "username": user.username,
         "email": user.email,
         "hashed_password": hashed_password,
-        "created_at": datetime.utcnow()
+        "created_at": datetime.utcnow(),
+        "is_active": True
     }
     new_user_ref = users_ref.document()
     new_user_ref.set(new_user_data)
 
     return {"id": new_user_ref.id, **new_user_data}
-
 
 def get_user_by_username_or_email(username: str, email: str):
     users_ref = db.collection("users")

@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 
 class User(BaseModel):
+    id : str
     username: str
     email: str
     hashed_password: str

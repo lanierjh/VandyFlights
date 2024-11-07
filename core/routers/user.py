@@ -1,9 +1,8 @@
 from fastapi import FastAPI, HTTPException, status, APIRouter
 from core import crud, schemas
 
-router = APIRouter()
 
-
+router = APIRouter(tags=["auth"])
 @router.post("/register/", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
 def register_user(user: schemas.UserCreate):
     # Check if a user with the given username or email already exists
@@ -13,11 +12,5 @@ def register_user(user: schemas.UserCreate):
 
     # Create the new user
     new_user_data = crud.create_user(user)
+    return new_user_data
 
-    # Return the new user data with the ID
-    return {
-        "id": new_user_data["id"],
-        "username": new_user_data["username"],
-        "email": new_user_data["email"],
-        "created_at": new_user_data["created_at"]
-    }

@@ -26,7 +26,7 @@ from core import schemas
 from core.security import util
 from core.db import get_db
 db = get_db()
-router = APIRouter()
+router = APIRouter(tags=["auth"])
 
 @router.post("/login")
 def login(user_cred: schemas.UserLogin):
