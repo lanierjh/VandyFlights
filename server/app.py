@@ -28,7 +28,7 @@ conn = http.client.HTTPSConnection("tripadvisor16.p.rapidapi.com")
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Dummy values": "For required root route"}
 
 
 @app.get("/items/{item_id}")
