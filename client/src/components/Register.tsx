@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Register() {
-    const router = useRouter(); 
+    const router = useRouter();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -36,7 +36,7 @@ export default function Register() {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
 
         if (!formData.vanderbiltEmail.endsWith('@vanderbilt.edu')) {
             setErrorMessage('Email must end with @vanderbilt.edu');
@@ -47,31 +47,45 @@ export default function Register() {
             setErrorMessage('Password must be at least six characters');
             return;
         }
-        
+
         if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(formData.password)) {
             setErrorMessage('Password must have at least one letter and one number');
             return;
-        }  
+        }
 
-        // Clear any previous error messages
         setErrorMessage('');
 
         try {
-          const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+          // const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            const response = await fetch('http://localhost:8000/register', {
+
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify({
+                username: formData.firstName + formData.lastName,
+                email: formData.vanderbiltEmail,
+                password: formData.password
+            }),
           });
           if (response.ok) {
             console.log('Registration successful:', formData);
             router.push('/mainPage');
           } else {
-            console.error('Registration failed');
+            const errorData = await response.json();
+
+            if (errorData.detail === "Username or email already exists") {
+                setErrorMessage('The username or email you entered is already in use.');
+            } else {
+                setErrorMessage(errorData.detail || 'An error occurred. Please try again.');
+            }
+
+            console.error('Registration failed:', errorData.detail);
           }
         } catch (error) {
           console.error('Error during registration:', error);
+          setErrorMessage('An error occurred. Please try again.');
         }
     };
 
@@ -92,7 +106,7 @@ export default function Register() {
                     <form onSubmit={handleSubmit}>
                         <div className="row py-3">
                             <div className="col-sm-6">
-                                <input 
+                                <input
                                     type="text"
                                     id="firstName"
                                     name="firstName"
@@ -149,9 +163,9 @@ export default function Register() {
                             </div>
                         </div>
 
-                        <button 
-                            type="submit" 
-                            style={registerButton} 
+                        <button
+                            type="submit"
+                            style={registerButton}
                             className="my-4"
                         >
                             Register

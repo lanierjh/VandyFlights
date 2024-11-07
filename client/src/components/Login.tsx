@@ -6,6 +6,9 @@ export default function Login() {
       password: '',
     });
 
+    const [errorMessage, setErrorMessage] = useState('');
+
+
     const inputStyles = {
         width: "100%",
         borderRadius: "10px",
@@ -24,32 +27,44 @@ export default function Login() {
         cursor: "pointer",
         transition: "all 0.3s ease",
     }
-    
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        console.log("Form submitted:", formData); // Added log
+
+
         try {
-          // Simulate OAuth login by sending a GET request to a dummy OAuth endpoint
-          const response = await fetch('https://jsonplaceholder.typicode.com/posts/1', {
-            method: 'GET', // Simulate an OAuth GET request
-          });
-    
-          if (response.ok) {
-            // Simulate receiving an OAuth token or success response
-            const data = await response.json();
-            console.log('OAuth login successful:', data);
-            window.location.href = '/mainPage'; 
-          } else {
-            console.error('OAuth login failed');
-          }
+            const response = await fetch('http://localhost:8000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Send data as JSON
+                },
+                body: JSON.stringify({
+                    email: formData.vanderbiltEmail,
+                    password: formData.password
+                }),
+            });
+            console.log("response", response.status);
+            if (response.ok) {
+                console.log('Registration successful:', formData);
+                window.location.href = '/mainPage';
+            } else if (response.status === 401) {
+                setErrorMessage('Your email or password is invalid.');
+                console.error('Login failed: Invalid email or password');
+            } else {
+                const errorData = await response.json();
+                setErrorMessage(errorData.detail || 'An error occurred. Please try again.');
+                console.error('Login failed:', errorData.detail);
+            }
         } catch (error) {
-          console.error('Error during OAuth login:', error);
+        console.error('Error during login:', error);
+        setErrorMessage('An error occurred. Please try again.');
         }
-    };
+    }
 
     return (
         <div className="row my-5">
@@ -57,7 +72,11 @@ export default function Login() {
             <div className="col-md-4 text-center my-5 py-5">
             <div>
                 <h1>Login</h1>
-
+                {errorMessage && (
+                    <div className="alert alert-danger" role="alert">
+                        {errorMessage}
+                    </div>
+                )}
                 <div>
                     <form onSubmit={handleSubmit}>
                         <div className="row py-3">
@@ -88,9 +107,7 @@ export default function Login() {
                                 />
                             </div>
                         </div>
-                            <a href="/mainPage">
-                                <button type="submit" style={logInButton} className="my-4">Log In</button>
-                            </a>
+                        <button type="submit" style={logInButton} className="my-4">Log In</button>
                     </form>
                 </div>
             </div>
