@@ -53,23 +53,23 @@ def get_user_by_username_or_email(username: str, email: str):
     return None
 
 
-def user_login(user: UserAuthenticate):
-    users_ref = db.collection("users")
-    user_query = list(users_ref.where("email", "==", user.email).limit(1).stream())
-
-    if not user_query:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
-        )
-
-    user_data = user_query[0].to_dict()
-    if not verify_password(user.password, user_data["hashed_password"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
-        )
-    return {"success": "User authenticated", "user": user_data}
+# def user_login(user: UserAuthenticate):
+#     users_ref = db.collection("users")
+#     user_query = list(users_ref.where("email", "==", user.email).limit(1).stream())
+#
+#     if not user_query:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Invalid email or password"
+#         )
+#
+#     user_data = user_query[0].to_dict()
+#     if not verify_password(user.password, user_data["hashed_password"]):
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Invalid email or password"
+#         )
+#     return {"success": "User authenticated", "user": user_data}
 
 
 def create_flight(flight_data: FlightCreate, user_id: str):
