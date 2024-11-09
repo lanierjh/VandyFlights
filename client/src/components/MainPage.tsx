@@ -14,6 +14,7 @@ export default function MainPage() {
 
     const [airportSuggestions, setAirportSuggestions] = useState([]); 
     const router = useRouter();
+    const todayDate = new Date().toISOString().split("T")[0];
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
@@ -173,6 +174,7 @@ export default function MainPage() {
                             type="date"
                             name="departureDate"
                             onChange={handleSearchChange}
+                            min={todayDate}
                             style={{
                                 padding: '15px',
                                 borderRadius: '10px',
@@ -188,6 +190,7 @@ export default function MainPage() {
                                 type="date"
                                 name="returnDate"
                                 onChange={handleSearchChange}
+                                min={searchData.departureDate || todayDate}
                                 style={{
                                     padding: '15px',
                                     borderRadius: '10px',

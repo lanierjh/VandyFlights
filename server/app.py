@@ -80,9 +80,6 @@ async def show_flights(flight_request: FlightRequest):
                             flight_info["url"] = link["url"]
                             flight_info["price"] = str(link.get("totalPricePerPassenger", "Variable")) 
                         flights.append(flight_info)
-        
-        # Limit the number of flights to 10
-        flights = flights[:10]
 
         if not flights:
             raise HTTPException(status_code=404, detail="No flights found.")
