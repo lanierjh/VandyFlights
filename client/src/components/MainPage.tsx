@@ -5,7 +5,7 @@ import Header from './Header';
 
 export default function MainPage() {
     const [searchData, setSearchData] = useState({
-        origin: 'Nashville (BNA)',
+        origin: 'BNA',
         destination: '',
         departureDate: '',
         returnDate: '',
@@ -14,50 +14,65 @@ export default function MainPage() {
 
     const [airportSuggestions, setAirportSuggestions] = useState([]); 
     const router = useRouter();
+    const todayDate = new Date().toISOString().split("T")[0];
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData({ ...searchData, [name]: value });
         
         // Fetch airport suggestions if the user is typing in the "destination" field
-        if (name === 'destination') {
-            fetchAirportSuggestions(value);
-        }
+        // if (name === 'destination') {
+        //     fetchAirportSuggestions(value);
+        // }
     };
-
-    const fetchAirportSuggestions = async (query) => {
-        if (query.length > 2) { // Only fetch suggestions if query is longer than 2 characters
-            try {
-                // Replace with a real API endpoint and API key for fetching airport data
-                const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
-                const data = await response.json();
-                if (data) {
-                    setAirportSuggestions(data);
-                }
-            } catch (error) {
-                console.error('Error fetching airport data:', error);
-            }
-        } else {
-            setAirportSuggestions([]);
-        }
-    };
+    // const fetchAirportSuggestions = async (query) => {
+    //     if (query.length > 2) { // Only fetch suggestions if query is longer than 2 characters
+    //         try {
+    //             // Replace with a real API endpoint and API key for fetching airport data
+    //             const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
+    //             const data = await response.json();
+    //             if (data) {
+    //                 setAirportSuggestions(data);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching airport data:', error);
+    //         }
+    //     } else {
+    //         setAirportSuggestions([]);
+    //     }
+    // };
 
     const handleAirportSelect = (airport) => {
         setSearchData({ ...searchData, destination: `${airport.nameAirport} (${airport.codeIataAirport})` });
         setAirportSuggestions([]); // Clear suggestions after selection
     };
 
-    const handleSearchSubmit = (e) => {
+    const handleSearchSubmit = async (e) => {
         e.preventDefault();
-        const query = new URLSearchParams({
-            origin: searchData.origin,
-            destination: searchData.destination,
-            departureDate: searchData.departureDate,
-            returnDate: searchData.returnDate,
-            roundTrip: searchData.roundTrip,
-        }).toString();
+        if (!searchData.destination || !searchData.departureDate) {
+            alert("Please provide a valid destination and departure date.");
+            return;
+        }
+        console.log("Submitting search data:", searchData);
+        
+        try {
+            const response = await axios.post('http://localhost:8001/flights', {
+                origin: searchData.origin,
+                destination: searchData.destination,
+                departureDate: searchData.departureDate,
+                returnDate: searchData.returnDate,
+                roundTrip: searchData.roundTrip === 'true',
+            });
+            console.log("Flight Data Response:", response.data);
+
+            // Store the flight results in localStorage
+            localStorage.setItem('flightResults', JSON.stringify(response.data));
     
-        router.push(`/flightResults?${query}`);
+            // Navigate to the flightResults page
+            router.push('/flightResults');
+        } catch (error) {
+            console.error("Error fetching flights:", error);
+        }
     };
 
     const handlePopularDestinationClick = (destination) => {
@@ -159,6 +174,7 @@ export default function MainPage() {
                             type="date"
                             name="departureDate"
                             onChange={handleSearchChange}
+                            min={todayDate}
                             style={{
                                 padding: '15px',
                                 borderRadius: '10px',
@@ -174,6 +190,7 @@ export default function MainPage() {
                                 type="date"
                                 name="returnDate"
                                 onChange={handleSearchChange}
+                                min={searchData.departureDate || todayDate}
                                 style={{
                                     padding: '15px',
                                     borderRadius: '10px',

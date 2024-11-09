@@ -7,7 +7,9 @@ import requests
 import pydantic
 
 import http.client
-
+import json
+import os
+import logging 
 app = FastAPI()
 
 origins = [
@@ -18,10 +20,10 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # List of allowed origins
-    allow_credentials=True,  # Whether to allow cookies and credentials
-    allow_methods=["*"],  # List of allowed HTTP methods (GET, POST, etc.). Use ["*"] to allow all methods
-    allow_headers=["*"],  # List of allowed headers. Use ["*"] to allow all headers
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 conn = http.client.HTTPSConnection("tripadvisor16.p.rapidapi.com")
@@ -98,8 +100,8 @@ async def show_flightsROUND(request: Request, destination: str, departureDate: s
     #round_trip = params.get("roundTrip", "ONE_WAY")  # Default to "ONE_WAY"
     
     headers = {
-    'x-rapidapi-key': "8f9d9710dcmsh46dbd3b58cf0e4bp139f74jsn1e7767cf4d9e",
-    'x-rapidapi-host': "tripadvisor16.p.rapidapi.com"
+        'x-rapidapi-key': "8f9d9710dcmsh46dbd3b58cf0e4bp139f74jsn1e7767cf4d9e",
+        'x-rapidapi-host': "tripadvisor16.p.rapidapi.com"
     }
     
     roundTrip = 'ROUND_TRIP' #Placeholder
