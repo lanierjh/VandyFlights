@@ -38,3 +38,14 @@ class UserLogin(BaseModel):
     password: str
 
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class FriendRequest(BaseModel):
+    friend_identifier: str
+
+class FriendRequestResponse(BaseModel):
+    requester_id: str
+    recipient_id: str
+    status: str

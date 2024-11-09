@@ -53,25 +53,6 @@ def get_user_by_username_or_email(username: str, email: str):
     return None
 
 
-def user_login(user: UserAuthenticate):
-    users_ref = db.collection("users")
-    user_query = list(users_ref.where("email", "==", user.email).limit(1).stream())
-
-    if not user_query:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
-        )
-
-    user_data = user_query[0].to_dict()
-    if not verify_password(user.password, user_data["hashed_password"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
-        )
-    return {"success": "User authenticated", "user": user_data}
-
-
 def create_flight(flight_data: FlightCreate, user_id: str):
     flight_ref = db.collection("users").document(user_id).collection("flights").document()
     new_flight_data = {
@@ -103,5 +84,125 @@ def fetch_flight_details(query: str):
         return result
     else:
         raise Exception("Failed to fetch flight details")
+
+
+from google.cloud import firestore
+
+
+def get_user_id_by_username_or_email(identifier: str):
+    # Search by username or email in the "users" collection
+    users_ref = db.collection("users")
+
+    # Look up by username
+    query = users_ref.where("username", "==", identifier).limit(1).get()
+    if not query:
+        # If not found by username, look up by email
+        query = users_ref.where("email", "==", identifier).limit(1).get()
+
+    if query:
+        return query[0].id  # Return the document ID (user ID)
+    else:
+        return None  # User not found
+
+
+from google.cloud import firestore
+
+
+
+def send_friend_request(requester_id: str, friend_identifier: str):
+    friend_id = get_user_id_by_username_or_email(friend_identifier)
+    if not friend_id:
+        raise ValueError("User not found")
+
+    # Reference to the recipient's friend requests subcollection
+    recipient_requests_ref = db.collection("users").document(friend_id).collection("friend_requests")
+
+    # Check if a request is already pending
+    existing_request = recipient_requests_ref.where("requester_id", "==", requester_id).where("status", "==",
+                                                                                              "pending").get()
+    if existing_request:
+        raise ValueError("Friend request already sent")
+
+    # Create the friend request with status 'pending'
+    recipient_requests_ref.add({
+        "requester_id": requester_id,
+        "status": "pending"
+    })
+
+
+# def accept_friend_request(recipient_id: str, requester_id: str):
+#     recipient_requests_ref = db.collection("users").document(recipient_id).collection("friend_requests")
+#     request_query = recipient_requests_ref.where("requester_id", "==", requester_id).where("status", "==",
+#                                                                                            "pending").limit(1).get()
+#     if not request_query:
+#         raise ValueError("Friend request not found or already processed")
+#
+#     request = request_query[0]
+#     request.reference.update({"status": "accepted"})
+#
+#     # Add each other as friends
+#     recipient_ref = db.collection("users").document(recipient_id)
+#     requester_ref = db.collection("users").document(requester_id)
+#     recipient_ref.update({"friends": firestore.ArrayUnion([requester_id])})
+#     requester_ref.update({"friends": firestore.ArrayUnion([recipient_id])})
+def accept_friend_request(recipient_id: str, requester_email: str):
+    # Get the requester ID from their email
+    requester_id = get_user_id_by_username_or_email(requester_email)
+    if not requester_id:
+        raise ValueError("Requester not found")
+
+    # Reference to the recipient's friend_requests subcollection
+    recipient_requests_ref = db.collection("users").document(recipient_id).collection("friend_requests")
+    request_query = recipient_requests_ref.where("requester_id", "==", requester_email).where("status", "==",
+                                                                                              "pending").limit(1).get()
+
+    if not request_query:
+        raise ValueError("Friend request not found or already processed")
+
+    # Update the friend request status to "accepted"
+    request = request_query[0]
+    request.reference.update({"status": "accepted"})
+
+    # Add each other as friends
+    recipient_ref = db.collection("users").document(recipient_id)
+    requester_ref = db.collection("users").document(requester_id)
+    recipient_ref.update({"friends": firestore.ArrayUnion([requester_id])})
+    requester_ref.update({"friends": firestore.ArrayUnion([recipient_id])})
+
+
+def reject_friend_request(recipient_id: str, requester_email: str):
+    # Get the requester ID from their email
+    requester_id = get_user_id_by_username_or_email(requester_email)
+    if not requester_id:
+        raise ValueError("Requester not found")
+
+    recipient_requests_ref = db.collection("users").document(recipient_id).collection("friend_requests")
+    request_query = recipient_requests_ref.where("requester_id", "==", requester_email).where("status", "==", "pending").limit(1).get()
+
+    if not request_query:
+        raise ValueError("Friend request not found or already processed")
+
+    request = request_query[0]
+    request.reference.update({"status": "rejected"})
+
+def remove_friend(user_id: str, friend_id: str):
+    user_ref = db.collection("users").document(user_id)
+    user = user_ref.get().to_dict()
+
+    if friend_id in user.get("friends", []):
+        user_ref.update({"friends": firestore.ArrayRemove([friend_id])})
+
+
+def get_friends(user_id: str):
+    user_ref = db.collection("users").document(user_id)
+    user = user_ref.get().to_dict()
+    friend_ids = user.get("friends", [])
+
+    friends = []
+    for friend_id in friend_ids:
+        friend = db.collection("users").document(friend_id).get().to_dict()
+        if friend:
+            friends.append({"id": friend_id, "username": friend["username"]})
+    return friends
 
 

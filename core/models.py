@@ -7,6 +7,7 @@ class User(BaseModel):
     email: str
     hashed_password: str
     is_active: bool = True
+    friends : List[str]  = []
 
 class Flight(BaseModel):
     flight_number: str
