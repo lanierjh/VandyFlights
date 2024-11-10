@@ -172,7 +172,7 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
             res = conn.getresponse()
             data = res.read()
             final_data = json.loads(data.decode("utf-8"))
-
+            print(final_data)
             if "flights" in final_data.get("data", {}):
                 for flight in final_data["data"]["flights"]:
                     flights.extend(extract_flight_info(flight))
