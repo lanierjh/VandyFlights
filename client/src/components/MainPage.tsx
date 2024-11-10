@@ -55,23 +55,45 @@ export default function MainPage() {
         }
         console.log("Submitting search data:", searchData);
         
-        try {
-            const response = await axios.post('http://localhost:8001/flights', {
-                origin: searchData.origin,
-                destination: searchData.destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip === 'true',
-            });
-            console.log("Flight Data Response:", response.data);
-
-            // Store the flight results in localStorage
-            localStorage.setItem('flightResults', JSON.stringify(response.data));
+        if(searchData.roundTrip == 'true'){
+            try {
+                const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip === 'true',
+                });
+                console.log("Flight Data Response:", response.data);
     
-            // Navigate to the flightResults page
-            router.push('/flightResults');
-        } catch (error) {
-            console.error("Error fetching flights:", error);
+                // Store the flight results in localStorage
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+        
+                // Navigate to the flightResults page
+                router.push('/flightResults');
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            }
+        }
+        else{
+            try {
+                const response = await axios.post('http://localhost:8001/flightsONEWAY', {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip === 'false',
+                });
+                console.log("Flight Data Response:", response.data);
+    
+                // Store the flight results in localStorage
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+        
+                // Navigate to the flightResults page
+                router.push('/flightResults');
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            }
         }
     };
 

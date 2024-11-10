@@ -45,22 +45,41 @@ export default function FlightResults() {
         }
         
         setIsLoading(true);
-        
-        try {
-            const response = await axios.post('http://localhost:8001/flights', {
-                origin: searchData.origin,
-                destination: searchData.destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip,
-            });
-            console.log("Flight Data Response:", response.data);
-            localStorage.setItem('flightResults', JSON.stringify(response.data));
-            setFlightData(response.data);
-        } catch (error) {
-            console.error("Error fetching flights:", error);
-        } finally {
-            setIsLoading(false);
+        if(searchData.roundTrip == 'false'){
+            try {
+                const response = await axios.post("http://localhost:8001/flightsONEWAY", {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip,
+                });
+                console.log("Flight Data Response:", response.data);
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+                setFlightData(response.data);
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        else{
+            try {
+                const response = await axios.post("http://localhost:8001/flightsROUNDTRIP", {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip,
+                });
+                console.log("Flight Data Response:", response.data);
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+                setFlightData(response.data);
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -116,7 +135,7 @@ export default function FlightResults() {
         .slice(0, resultsLimit);
 
     if (isLoading) {
-        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for.</div>;
+        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
     }
 
     if (!flightData || !flightData.flights || flightData.flights.length === 0) {
