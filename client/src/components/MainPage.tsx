@@ -97,18 +97,28 @@ export default function MainPage() {
         }
     };
 
-    const handlePopularDestinationClick = (destination) => {
-        setSearchData({ ...searchData, destination });
-        router.push({
-            pathname: '/flightResults',
-            query: { 
+    const handlePopularDestinationClick = async (destination) => {
+        const departureDate = new Date().toISOString().split("T")[0];
+        const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
+        
+        try {
+            const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
                 origin: searchData.origin,
                 destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip,
-            },
-        });
+                departureDate,
+                returnDate,
+                roundTrip: true,
+            });
+            console.log("Flight Data Response:", response.data);
+    
+            // Store the flight results in localStorage
+            localStorage.setItem('flightResults', JSON.stringify(response.data));
+    
+            // Navigate to the flightResults page
+            router.push('/flightResults');
+        } catch (error) {
+            console.error("Error fetching flights:", error);
+        }
     };
 
     const imageStyle = {
@@ -267,7 +277,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('New York, NY')}
+                        }}onClick={() => handlePopularDestinationClick('LGA')}
                         >
                             <img
                                 src="/newyork.png"
@@ -286,7 +296,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('Los Angeles, LA')}
+                        }}onClick={() => handlePopularDestinationClick('LAX')}
                         >
                             <img
                                 src="/losangeles.jpg"
@@ -305,7 +315,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('Miami, FL')}
+                        }}onClick={() => handlePopularDestinationClick('MIA')}
                         >
                             <img
                                 src="/miami.jpg"
@@ -325,7 +335,7 @@ export default function MainPage() {
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
                         }}
-                        onClick={() => handlePopularDestinationClick('Chicago, IL')}
+                        onClick={() => handlePopularDestinationClick('ORD')}
                         >
                             <img
                                 src="/chicago.jpg"
@@ -345,7 +355,7 @@ export default function MainPage() {
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
                         }}
-                        onClick={() => handlePopularDestinationClick('Las Vegas, NV')}
+                        onClick={() => handlePopularDestinationClick('LAS')}
                         >
                             <img
                                 src="/lasvegas.jpg"

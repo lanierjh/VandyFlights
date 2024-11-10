@@ -54,6 +54,7 @@ export default function FlightResults() {
             });
             console.log("Flight Data Response:", response.data);
             localStorage.setItem('flightResults', JSON.stringify(response.data));
+            localStorage.setItem('searchData', JSON.stringify(searchData));
             setFlightData(response.data);
         } catch (error) {
             console.error("Error fetching flights:", error);
@@ -67,10 +68,8 @@ export default function FlightResults() {
             window.open(flight.url, '_blank');
         } else {
             setSelectedOutboundFlight(flight);
-            router.push({
-                pathname: '/select-return-flight',
-                query: { origin: searchData.destination, destination: searchData.origin }
-            });
+            localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+            router.push('/returnflightresults');
         }
     };
 
@@ -158,7 +157,6 @@ export default function FlightResults() {
                 </form>
             </section>
 
-            {/* Sort Options and Results Limit */}
             <section style={styles.sortSection}>
                 <label htmlFor="sort" style={styles.sortLabel}>Sort by:</label>
                 <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.sortSelect}>
@@ -176,7 +174,6 @@ export default function FlightResults() {
             </section>
 
             <div style={styles.content}>
-                {/* Sidebar for People Going to Destination */}
                 <aside style={styles.sidebar}>
                     <h3>People Going to {searchData.destination}</h3>
                     <ul>
@@ -186,24 +183,24 @@ export default function FlightResults() {
                     </ul>
                 </aside>
 
-                {/* Flight Results */}
                 <main style={styles.resultsContainer}>
                     {filteredFlights.map((flight, index) => (
                         <div key={index} style={styles.flightCard}>
-                            <div style={styles.flightDetails}>
-                                <div style={styles.flightInfo}>
-                                    <p><strong>Departure: {new Date(flight.departureDateTime).toLocaleTimeString()}</strong></p>
-                                    <p>From: {flight.origin}</p>
-                                </div>
-                                <div style={styles.flightIcon}>
-                                    <img src="/plane.png" alt="Plane" style={styles.planeIcon} />
-                                    <p>Carrier: {flight.airlineCarrier}</p>
-                                </div>
-                                <div style={styles.flightInfo}>
-                                    <p><strong>Arrival: {new Date(flight.arrivalDateTime).toLocaleTimeString()}</strong></p>
-                                    <p>To: {flight.destination}</p>
-                                </div>
+                            {/* Left section for logo */}
+                            <div style={styles.flightLogo}>
+                                <img src={flight.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
                             </div>
+
+                            {/* Middle section for flight details */}
+                            <div style={styles.flightDetails}>
+                                <p style={styles.flightTime}><strong>{new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong></p>
+                                <p style={styles.flightDuration}>{Math.floor((new Date(flight.arrivalDateTime) - new Date(flight.departureDateTime)) / (1000 * 60 * 60))} hr {((new Date(flight.arrivalDateTime) - new Date(flight.departureDateTime)) / (1000 * 60)) % 60} min</p>
+                                <p style={styles.flightRoute}>{flight.origin} - {flight.destination}</p>
+                                <p style={styles.flightCarrier}>{flight.carrier} - Flight {flight.flightNumber}</p>
+                                <p style={styles.flightStops}>{flight.stops === 0 ? "Nonstop" : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}</p>
+                            </div>
+
+                            {/* Right section for price and select button */}
                             <div style={styles.priceSection}>
                                 <p style={styles.price}>${flight.price}</p>
                                 <button style={styles.selectButton} onClick={() => handleSelectFlight(flight)}>Select</button>
@@ -215,6 +212,7 @@ export default function FlightResults() {
         </div>
     );
 }
+
 const styles = {
     container: {
         fontFamily: 'Arial, sans-serif',
@@ -294,31 +292,6 @@ const styles = {
         padding: '8px 0',
         borderBottom: '1px solid #ddd',
     },
-    resultsContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        flex: 1,
-    },
-    flightCard: {
-        backgroundColor: '#fff',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        padding: '20px',
-        margin: '10px 0',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        width: '100%',
-        maxWidth: '700px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    flightDetails: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '15px',
-        flex: 1,
-    },
     flightInfo: {
         display: 'flex',
         flexDirection: 'column',
@@ -331,9 +304,57 @@ const styles = {
         alignItems: 'center',
         textAlign: 'center',
     },
+    resultsContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        flex: 1,
+    },
+    flightCard: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#fff',
+        border: '1px solid #ddd',
+        borderRadius: '8px',
+        padding: '20px',
+        margin: '10px 0',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        width: '100%',
+        maxWidth: '700px',
+    },
+    flightLogo: {
+        flex: '0 0 auto',
+        marginRight: '20px',
+    },
     planeIcon: {
-        width: '30px',
-        marginBottom: '5px',
+        width: '100px', // Increased size for the logo
+        height: '100px',
+    },
+    flightDetails: {
+        flex: '1 1 auto',
+        textAlign: 'center',
+    },
+    flightTime: {
+        fontSize: '1.2em',
+        fontWeight: 'bold',
+    },
+    flightDuration: {
+        fontSize: '1em',
+        color: '#666',
+    },
+    flightRoute: {
+        fontSize: '1em',
+        color: '#333',
+    },
+    flightCarrier: {
+        fontSize: '1em',
+        color: '#333',
+        fontStyle: 'italic',
+    },
+    flightStops: {
+        fontSize: '0.9em',
+        color: '#999',
     },
     priceSection: {
         display: 'flex',
@@ -353,5 +374,5 @@ const styles = {
         borderRadius: '5px',
         cursor: 'pointer',
         fontSize: '1em',
-    }
+    },
 };
