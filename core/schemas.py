@@ -3,22 +3,24 @@ import re
 from datetime import date,time
 
 class UserResponse(BaseModel):
-    id: int
+    id: str
     username: str
     email: str
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserCreate(BaseModel):
     username: str
+    first_name: str
+    last_name: str
     email: EmailStr
     password: str
 
 
 class UserAuthenticate(BaseModel):
-    email: EmailStr
+    username: str
     password: str
 
 
@@ -31,17 +33,16 @@ class FlightCreate(BaseModel):
     price: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
+class FriendRequest(BaseModel):
+    friend_identifier: str
 
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    email: EmailStr
-
-    class Config:
-        orm_mode = True
+class FriendRequestResponse(BaseModel):
+    requester_id: str
+    recipient_id: str
+    status: str
