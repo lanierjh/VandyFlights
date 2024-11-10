@@ -16,12 +16,10 @@ export default function FlightResults() {
     });
     const [selectedOutboundFlight, setSelectedOutboundFlight] = useState(null);
     const [sortOption, setSortOption] = useState('Top flights');
-    const [resultsLimit, setResultsLimit] = useState(); // default to 10 results
-    const [stopFilter, setStopFilter] = useState("All"); // New state for stop filter
+    const [resultsLimit, setResultsLimit] = useState(50); 
     const router = useRouter();
-    const todayDate = new Date().toISOString().split("T")[0]
+    const todayDate = new Date().toISOString().split("T")[0];
 
-    // Dummy data for people going to the destination
     const passengers = ["Alice Johnson", "Bob Smith", "Carol Williams", "David Brown", "Eve Davis"];
 
     useEffect(() => {
@@ -45,41 +43,22 @@ export default function FlightResults() {
         }
         
         setIsLoading(true);
-        if(searchData.roundTrip == 'false'){
-            try {
-                const response = await axios.post("http://localhost:8001/flightsONEWAY", {
-                    origin: searchData.origin,
-                    destination: searchData.destination,
-                    departureDate: searchData.departureDate,
-                    returnDate: searchData.returnDate,
-                    roundTrip: searchData.roundTrip,
-                });
-                console.log("Flight Data Response:", response.data);
-                localStorage.setItem('flightResults', JSON.stringify(response.data));
-                setFlightData(response.data);
-            } catch (error) {
-                console.error("Error fetching flights:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-        else{
-            try {
-                const response = await axios.post("http://localhost:8001/flightsROUNDTRIP", {
-                    origin: searchData.origin,
-                    destination: searchData.destination,
-                    departureDate: searchData.departureDate,
-                    returnDate: searchData.returnDate,
-                    roundTrip: searchData.roundTrip,
-                });
-                console.log("Flight Data Response:", response.data);
-                localStorage.setItem('flightResults', JSON.stringify(response.data));
-                setFlightData(response.data);
-            } catch (error) {
-                console.error("Error fetching flights:", error);
-            } finally {
-                setIsLoading(false);
-            }
+        try {
+            const endpoint = searchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
+            const response = await axios.post(`http://localhost:8001/${endpoint}`, {
+                origin: searchData.origin,
+                destination: searchData.destination,
+                departureDate: searchData.departureDate,
+                returnDate: searchData.returnDate,
+                roundTrip: searchData.roundTrip,
+            });
+            console.log("Flight Data Response:", response.data);
+            localStorage.setItem('flightResults', JSON.stringify(response.data));
+            setFlightData(response.data);
+        } catch (error) {
+            console.error("Error fetching flights:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -106,8 +85,6 @@ export default function FlightResults() {
                         return new Date(a.departureDateTime) - new Date(b.departureDateTime);
                     case 'Arrival time':
                         return new Date(a.arrivalDateTime) - new Date(b.arrivalDateTime);
-                    case 'Duration':
-                        return a.durationMinutes - b.durationMinutes;
                     default:
                         return 0;
                 }
@@ -120,19 +97,7 @@ export default function FlightResults() {
         setResultsLimit(Number(e.target.value));
     };
 
-    const handleStopFilterChange = (e) => {
-        setStopFilter(e.target.value);
-    };
-
-    // Filter flights based on the selected stop filter
-    const filteredFlights = flightData?.flights
-        .filter(flight => {
-            if (stopFilter === "Nonstop") return flight.stops === 0;
-            if (stopFilter === "1 Stop") return flight.stops === 1;
-            if (stopFilter === "2+ Stops") return flight.stops >= 2;
-            return true; // "All" option or if no filter is applied
-        })
-        .slice(0, resultsLimit);
+    const filteredFlights = flightData?.flights.slice(0, resultsLimit);
 
     if (isLoading) {
         return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
@@ -193,7 +158,7 @@ export default function FlightResults() {
                 </form>
             </section>
 
-            {/* Sort Options, Results Limit, and Stop Filter */}
+            {/* Sort Options and Results Limit */}
             <section style={styles.sortSection}>
                 <label htmlFor="sort" style={styles.sortLabel}>Sort by:</label>
                 <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.sortSelect}>
@@ -201,20 +166,12 @@ export default function FlightResults() {
                     <option>Price</option>
                     <option>Departure time</option>
                     <option>Arrival time</option>
-                    <option>Duration</option>
                 </select>
                 <label htmlFor="resultsLimit" style={styles.resultsLimitLabel}>Show:</label>
                 <select id="resultsLimit" value={resultsLimit} onChange={handleResultsLimitChange} style={styles.resultsLimitSelect}>
-                    <option value={5}>5 flights</option>
                     <option value={10}>10 flights</option>
                     <option value={20}>20 flights</option>
-                </select>
-                <label htmlFor="stopFilter" style={styles.stopFilterLabel}>Stops:</label>
-                <select id="stopFilter" value={stopFilter} onChange={handleStopFilterChange} style={styles.stopFilterSelect}>
-                    <option value="All">All</option>
-                    <option value="Nonstop">Nonstop</option>
-                    <option value="1 Stop">1 Stop</option>
-                    <option value="2+ Stops">2+ Stops</option>
+                    <option value={50}>50 flights</option>
                 </select>
             </section>
 
@@ -240,10 +197,7 @@ export default function FlightResults() {
                                 </div>
                                 <div style={styles.flightIcon}>
                                     <img src="/plane.png" alt="Plane" style={styles.planeIcon} />
-                                    <p>
-                                        {flight.duration} 
-                                        {flight.stops > 0 ? ` (${flight.stops} stop${flight.stops > 1 ? 's' : ''} via ${flight.stopLocations.join(', ')})` : " (Nonstop)"}
-                                    </p>
+                                    <p>Carrier: {flight.airlineCarrier}</p>
                                 </div>
                                 <div style={styles.flightInfo}>
                                     <p><strong>Arrival: {new Date(flight.arrivalDateTime).toLocaleTimeString()}</strong></p>
@@ -261,7 +215,6 @@ export default function FlightResults() {
         </div>
     );
 }
-
 const styles = {
     container: {
         fontFamily: 'Arial, sans-serif',
