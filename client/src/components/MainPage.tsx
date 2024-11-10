@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Header from './Header';
@@ -12,8 +12,20 @@ export default function MainPage() {
         roundTrip: 'true',
     });
 
-    const [airportSuggestions, setAirportSuggestions] = useState([]); 
+    const [airportSuggestions, setAirportSuggestions] = useState([]);
+
     const router = useRouter();
+
+        useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            // Redirect to login if token is missing
+            router.push('/login');
+        }
+    }, [router]);
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;

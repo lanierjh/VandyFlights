@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export default function Login() {
     const [formData, setFormData] = useState({
-      identifier: '', // Changed from vanderbiltEmail to identifier
+      username: '',
       password: '',
     });
 
@@ -32,38 +32,40 @@ export default function Login() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log("Form submitted:", formData);
+    e.preventDefault();
+    console.log("Form submitted:", formData);
 
-        try {
-            const response = await fetch('http://localhost:8000/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    identifier: formData.identifier, // Send identifier instead of email
-                    password: formData.password
-                }),
-            });
-            console.log("response", response.status);
+    try {
+        const response = await fetch('http://localhost:8000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                username: formData.username,
+                password: formData.password
+            }),
+        });
+
             if (response.ok) {
-                console.log('Login successful:', formData);
+                // console.log('Login successful:', formData);
+                const data = await response.json();
+                console.log('Login successful:', data);
+                localStorage.setItem('accessToken', data.access_token);
                 window.location.href = '/mainPage';
             } else if (response.status === 401) {
-                setErrorMessage('Your username/email or password is invalid.');
-                console.error('Login failed: Invalid identifier or password');
+                setErrorMessage('Invalid login credentials');
+                console.error('Login failed: Invalid login credentials');
             } else {
                 const errorData = await response.json();
                 setErrorMessage(errorData.detail || 'An error occurred. Please try again.');
                 console.error('Login failed:', errorData.detail);
             }
-        } catch (error) {
-            console.error('Error during login:', error);
-            setErrorMessage('An error occurred. Please try again.');
-        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        setErrorMessage('An error occurred. Please try again.');
     }
-
+}
     return (
         <div className="row my-5">
             <div className="col-md-4"></div>
@@ -81,12 +83,12 @@ export default function Login() {
                                 <div className="col-sm-12">
                                     <input
                                         type="text"
-                                        id="identifier"
-                                        name="identifier"
+                                        id="username"
+                                        name="username"
                                         placeholder="Username or Email"
                                         style={inputStyles}
                                         className="p-3"
-                                        value={formData.identifier}
+                                        value={formData.username}
                                         onChange={handleChange}
                                     />
                                 </div>
