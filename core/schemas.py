@@ -13,12 +13,14 @@ class UserResponse(BaseModel):
 
 class UserCreate(BaseModel):
     username: str
+    first_name: str
+    last_name: str
     email: EmailStr
     password: str
 
 
 class UserAuthenticate(BaseModel):
-    email: EmailStr
+    identifier: str
     password: str
 
 

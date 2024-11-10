@@ -8,6 +8,7 @@ export default function Register() {
         lastName: '',
         vanderbiltEmail: '',
         password: '',
+        username: '',  // New username field
     });
 
     const [errorMessage, setErrorMessage] = useState('');
@@ -56,36 +57,36 @@ export default function Register() {
         setErrorMessage('');
 
         try {
-          // const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
             const response = await fetch('http://localhost:8000/register', {
-
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: formData.firstName + formData.lastName,
-                email: formData.vanderbiltEmail,
-                password: formData.password
-            }),
-          });
-          if (response.ok) {
-            console.log('Registration successful:', formData);
-            router.push('/mainPage');
-          } else {
-            const errorData = await response.json();
-
-            if (errorData.detail === "Username or email already exists") {
-                setErrorMessage('The username or email you entered is already in use.');
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: formData.username,  // Send username
+                    email: formData.vanderbiltEmail,
+                    password: formData.password,
+                    first_name: formData.firstName,
+                    last_name: formData.lastName,
+                }),
+            });
+            if (response.ok) {
+                console.log('Registration successful:', formData);
+                router.push('/mainPage');
             } else {
-                setErrorMessage(errorData.detail || 'An error occurred. Please try again.');
-            }
+                const errorData = await response.json();
 
-            console.error('Registration failed:', errorData.detail);
-          }
+                if (errorData.detail === "Username or email already exists") {
+                    setErrorMessage('The username or email you entered is already in use.');
+                } else {
+                    setErrorMessage(errorData.detail || 'An error occurred. Please try again.');
+                }
+
+                console.error('Registration failed:', errorData.detail);
+            }
         } catch (error) {
-          console.error('Error during registration:', error);
-          setErrorMessage('An error occurred. Please try again.');
+            console.error('Error during registration:', error);
+            setErrorMessage('An error occurred. Please try again.');
         }
     };
 
@@ -93,87 +94,103 @@ export default function Register() {
         <div className="row my-5">
             <div className="col-md-4"></div>
             <div className="col-md-4 text-center my-5 py-5">
-            <div>
-                <h1>Register</h1>
-
-                {errorMessage && (
-                    <div className="alert alert-danger" role="alert">
-                        {errorMessage}
-                    </div>
-                )}
-
                 <div>
-                    <form onSubmit={handleSubmit}>
-                        <div className="row py-3">
-                            <div className="col-sm-6">
-                                <input
-                                    type="text"
-                                    id="firstName"
-                                    name="firstName"
-                                    placeholder="First Name"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.firstName}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="col-sm-6">
-                                <input
-                                    type="text"
-                                    id="lastName"
-                                    name="lastName"
-                                    placeholder="Last Name"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="row py-3">
-                            <div className="col-sm-12">
-                                <input
-                                    type="email"
-                                    id="vanderbiltEmail"
-                                    name="vanderbiltEmail"
-                                    placeholder="Vanderbilt Email"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.vanderbiltEmail}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="row py-3">
-                            <div className="col-sm-12">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    placeholder="Password"
-                                    style={inputStyles}
-                                    className="p-3"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
+                    <h1>Register</h1>
 
-                        <button
-                            type="submit"
-                            style={registerButton}
-                            className="my-4"
-                        >
-                            Register
-                        </button>
-                    </form>
+                    {errorMessage && (
+                        <div className="alert alert-danger" role="alert">
+                            {errorMessage}
+                        </div>
+                    )}
+
+                    <div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="row py-3">
+                                <div className="col-sm-6">
+                                    <input
+                                        type="text"
+                                        id="firstName"
+                                        name="firstName"
+                                        placeholder="First Name"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.firstName}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="col-sm-6">
+                                    <input
+                                        type="text"
+                                        id="lastName"
+                                        name="lastName"
+                                        placeholder="Last Name"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.lastName}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="row py-3">
+                                <div className="col-sm-12">
+                                    <input
+                                        type="text"
+                                        id="username"
+                                        name="username"
+                                        placeholder="Username"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="row py-3">
+                                <div className="col-sm-12">
+                                    <input
+                                        type="email"
+                                        id="vanderbiltEmail"
+                                        name="vanderbiltEmail"
+                                        placeholder="Vanderbilt Email"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.vanderbiltEmail}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="row py-3">
+                                <div className="col-sm-12">
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Password"
+                                        style={inputStyles}
+                                        className="p-3"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                style={registerButton}
+                                className="my-4"
+                            >
+                                Register
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
     );
 }
+

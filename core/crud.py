@@ -9,6 +9,15 @@ app = FastAPI()
 
 db = get_db()
 
+def user_login(user: UserAuthenticate):
+    existing_user = get_user_by_username_or_email(user.identifier)
+    if not existing_user or not verify_password(user.password, existing_user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+    else:
+        return {"success": "User authenticated", "user": user}
 
 def create_user(user: UserCreate):
     users_ref = db.collection("users")
@@ -29,6 +38,8 @@ def create_user(user: UserCreate):
     hashed_password = hash_password(user.password)
     new_user_data = {
         "username": user.username,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "email": user.email,
         "hashed_password": hashed_password,
         "created_at": datetime.utcnow(),
@@ -39,14 +50,17 @@ def create_user(user: UserCreate):
 
     return {"id": new_user_ref.id, **new_user_data}
 
-def get_user_by_username_or_email(username: str, email: str):
+def get_user_by_username_or_email(identifier: str):
     users_ref = db.collection("users")
 
-    username_query = list(users_ref.where("username", "==", username).limit(1).stream())
+    username_query = users_ref.where("username", "==", identifier).limit(1).get()
     if username_query:
+        # If not found by username, look up by email
         return username_query[0].to_dict()
 
-    email_query = list(users_ref.where("email", "==", email).limit(1).stream())
+
+    email_query = users_ref.where("email", "==", identifier).limit(1).get()
+
     if email_query:
         return email_query[0].to_dict()
 
