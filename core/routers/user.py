@@ -5,8 +5,9 @@ from core import models
 router = APIRouter(tags=["user"])
 @router.post("/register/", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
 def register_user(user: schemas.UserCreate):
-    existing_user = crud.get_user_by_username_or_email(user.username, user.email)
-    if existing_user:
+    existing_username = crud.get_user_by_username_or_email(user.username)
+    existing_email = crud.get_user_by_username_or_email(user.email)
+    if existing_username or existing_email:
         raise HTTPException(status_code=400, detail="Username or email already registered")
 
     new_user_data = crud.create_user(user)
