@@ -9,16 +9,6 @@ app = FastAPI()
 
 db = get_db()
 
-def user_login(user: UserAuthenticate):
-    existing_user = get_user_by_username_or_email(user.identifier)
-    if not existing_user or not verify_password(user.password, existing_user["hashed_password"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
-        )
-    else:
-        return {"success": "User authenticated", "user": user}
-
 def create_user(user: UserCreate):
     users_ref = db.collection("users")
     existing_user_by_username = list(users_ref.where("username", "==", user.username).limit(1).stream())

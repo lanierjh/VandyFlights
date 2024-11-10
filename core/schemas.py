@@ -20,7 +20,7 @@ class UserCreate(BaseModel):
 
 
 class UserAuthenticate(BaseModel):
-    identifier: str
+    username: str
     password: str
 
 
@@ -34,11 +34,6 @@ class FlightCreate(BaseModel):
 
     class Config:
         from_attributes = True
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
 
 class Token(BaseModel):
     access_token: str
