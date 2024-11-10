@@ -11,7 +11,7 @@ class User(BaseModel):
 
 class Flight(BaseModel):
     flight_number: str
-    departure: str
+    start: str
     arrival: str
     departure_time: str
     arrival_time: str

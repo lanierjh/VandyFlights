@@ -25,9 +25,11 @@ class UserAuthenticate(BaseModel):
 
 
 class FlightCreate(BaseModel):
-    flight_number: str
+    flight_number: int
+    start: str
+    destination: str
     departure: date #str?
-    arrival: date #str?
+    arrival: str #str?
     departure_time: time
     arrival_time: time
     price: int

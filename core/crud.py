@@ -61,6 +61,8 @@ def create_flight(flight_data: FlightCreate, user_id: str):
     flight_ref = db.collection("users").document(user_id).collection("flights").document()
     new_flight_data = {
         "flight_number": flight_data.flight_number,
+        "start": flight_data.start,
+        "destination": flight_data.destination,
         "departure": flight_data.departure,
         "arrival": flight_data.arrival,
         "departure_time": flight_data.departure_time,
