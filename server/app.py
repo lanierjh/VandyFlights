@@ -64,7 +64,6 @@ async def show_flightsONE_WAY(flight_request: FlightRequest):
         conn.request("GET", request_path, headers=headers)
         res = conn.getresponse()
         data = res.read()
-        print(request_path)
         logger.debug(f"Raw API Response: {data}")  # Log raw data for debugging
 
 
