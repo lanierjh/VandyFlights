@@ -9,13 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["http://localhost:3000"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 @app.post("/register", response_model=UserResponse)  # Modify the response_model as needed
 def register_user(user: UserCreate):
