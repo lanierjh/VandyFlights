@@ -52,3 +52,7 @@ def reject_friend_request(requester_username: str, current_user: models.User = D
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/users/pending_friend_requests", response_model=list[schemas.FriendRequestResponse])
+def get_pending_friend_requests(current_user: models.User = Depends(util.get_current_user)):
+    return crud.get_pending_friend_requests(recipient_id=current_user.id)
