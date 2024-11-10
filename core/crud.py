@@ -197,16 +197,17 @@ def remove_friend(user_id: str, friend_id: str):
         user_ref.update({"friends": firestore.ArrayRemove([friend_id])})
 
 
-def get_friends(user_id: str):
-    user_ref = db.collection("users").document(user_id)
-    user = user_ref.get().to_dict()
-    friend_ids = user.get("friends", [])
 
-    friends = []
-    for friend_id in friend_ids:
-        friend = db.collection("users").document(friend_id).get().to_dict()
-        if friend:
-            friends.append({"id": friend_id, "username": friend["username"]})
-    return friends
+def get_pending_friend_requests(recipient_id: str):
+    recipient_requests_ref = db.collection("users").document(recipient_id).collection("friend_requests")
+    pending_requests = recipient_requests_ref.where("status", "==", "pending").get()
 
+    requests_data = []
+    for request in pending_requests:
+        request_data = request.to_dict()
+        requests_data.append({
+            "requester_email": request_data["requester_id"],  # email is stored in requester_id field
+            "requester_username": request_data.get("requester_username", "Unknown")  # Include username if available
+        })
+    return requests_data
 

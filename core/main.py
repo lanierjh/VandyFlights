@@ -25,7 +25,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register the routers with the app
 app.include_router(user.router)
 app.include_router(auth.router)  # Include the auth router
 app.include_router(flights.router)
