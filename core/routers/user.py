@@ -46,12 +46,12 @@ def send_friend_request(request: schemas.FriendRequest, current_user: models.Use
 def accept_friend_request(requester_username: str, current_user: models.User = Depends(util.get_current_user)):
     try:
         requester_id = crud.get_user_id_by_username_or_email(requester_username)
-        reciptent_id = crud.get_user_id_by_username_or_email(current_user['user'])
+        reciptent_id = crud.get_user_id_by_username_or_email(current_user['identifier'])
         if not requester_id:
             raise ValueError("Requester not found")
-        print("Current user:", current_user['user'])
+        print("Current user:", current_user['identifier'])
         crud.accept_friend_request(recipient_id=reciptent_id, requester_email=requester_username)
-        return {"status": "accepted", "requester_id": requester_username, "recipient_id": current_user['user']}
+        return {"status": "accepted", "requester_id": requester_username, "recipient_id": current_user['identifier']}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:

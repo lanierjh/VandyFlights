@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
+from firebase_admin.auth import get_user
 from google.cloud import firestore
 from core.schemas import UserCreate, FlightCreate, UserAuthenticate
 from datetime import datetime
@@ -127,9 +128,16 @@ def send_friend_request(requester_id: str, friend_identifier: str):
     print(friend_id)
     if not friend_id:
         raise ValueError("User not found")
-
+    requester_ref = db.collection("users").document(get_user_id_by_username_or_email(requester_id))
+    requester_doc = requester_ref.get()
+    if not requester_doc.exists:
+        raise ValueError("Requester not found")
+    requester_data = requester_doc.to_dict()
+    print(3,requester_data)
+    friends_list = requester_data.get("friends", [])
+    if friend_identifier in friends_list or friend_id in friends_list:
+        raise ValueError("User is already in your friends list")
     recipient_requests_ref = db.collection("users").document(friend_id).collection("friend_requests")
-
     existing_request = recipient_requests_ref.where("requester_id", "==", requester_id).where("status", "==",
                                                                                               "pending").get()
     if existing_request:
@@ -175,8 +183,8 @@ def accept_friend_request(recipient_id: str, requester_email: str):
 
     recipient_ref = db.collection("users").document(recipient_id)
     requester_ref = db.collection("users").document(requester_id)
-    recipient_ref.update({"friends": firestore.ArrayUnion([requester_id])})
-    requester_ref.update({"friends": firestore.ArrayUnion([recipient_id])})
+    recipient_ref.update({"friends": firestore.ArrayUnion([get_user_by_id(requester_id)['username']])})
+    requester_ref.update({"friends": firestore.ArrayUnion([get_user_by_id(requester_id)['username']])})
 
 
 def reject_friend_request(recipient_id: str, requester_email: str):
@@ -220,7 +228,7 @@ def get_user_by_id(user_id: str):
     user_ref = db.collection("users").document(user_id)
     user_doc = user_ref.get()
     if user_doc.exists:
-        return user_doc.to_dict()  # Returns the entire user document as a dictionary
+        return user_doc.to_dict()
     return None
 
 def update_user_profile(user_id: str, update_data: dict):
