@@ -227,7 +227,6 @@ def get_user_by_id(user_id: str):
         return user_doc.to_dict()  # Returns the entire user document as a dictionary
     return None
 
-
 def update_user_profile(user_id: str, update_data: dict):
     user_ref = db.collection("users").document(user_id)
     user_doc = user_ref.get()
