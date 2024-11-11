@@ -60,10 +60,10 @@ def accept_friend_request(requester_username: str, current_user: models.User = D
 @router.post("/users/reject_friend_request/{requester_username}")
 def reject_friend_request(requester_username: str, current_user: models.User = Depends(util.get_current_user)):
     try:
-        requester_id = crud.get_user_id_by_username_or_email(requester_username)
-        reciptent_id = crud.get_user_id_by_username_or_email(current_user['user'])
+        # requester_id = crud.get_user_id_by_username_or_email(requester_username)
+        reciptent_id = crud.get_user_id_by_username_or_email(current_user['identifier'])
         crud.reject_friend_request(recipient_id=reciptent_id, requester_email=requester_username)
-        return {"status": "rejected", "requester_id": requester_username, "recipient_id": current_user['user']}
+        return {"status": "rejected", "requester_id": requester_username, "recipient_id": current_user['identifier']}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
@@ -71,7 +71,14 @@ def reject_friend_request(requester_username: str, current_user: models.User = D
 
 @router.get("/users/pending_friend_requests", response_model=list[schemas.FriendRequestResponse])
 def get_pending_friend_requests(current_user: models.User = Depends(util.get_current_user)):
-    return crud.get_pending_friend_requests(recipient_id=current_user.id)
+    idNum = get_user_id_by_username_or_email(current_user['identifier'])
+    print(idNum)
+    return crud.get_pending_friend_requests(recipient_id= idNum)
+
+
+
+
+
 
 
 
