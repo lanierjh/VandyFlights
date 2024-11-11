@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, status, APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 from core import crud, schemas
+from core.crud import get_user_by_username_or_email
 from core.security import util
 from core import models
 router = APIRouter(tags=["user"])
@@ -86,38 +87,31 @@ def get_profile(token: str = Depends(oauth2_scheme)):
 
     return user
 
-# @router.get("/profile/{user_id}", response_model=schemas.UserProfile)
-# def get_profile(user_id: str, current_user: models.User = Depends(util.get_current_user)):
-#     user = crud.get_user_by_id(user_id)
-#
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#
-#     return {
-#         "username": user.get("username"),
-#         "first_name": user.get("first_name"),
-#         "last_name": user.get("last_name"),
-#         "email": user.get("email")
-#     }
-
-
-@router.put("/profile/{user_id}", response_model=schemas.UserProfile)
+@router.put("/editprofile", response_model=schemas.UserProfile)
 def edit_profile(
-        user_id: str,
         profile_data: schemas.UserProfileUpdate,
         current_user: dict = Depends(util.get_current_user)
 ):
-    # print(1,user_id)
-    # print(2,crud.get_user_by_id(user_id)['email'])
-    # print(3,current_user['identifier'])
-    if current_user['identifier'] != crud.get_user_by_id(user_id)['email'] and current_user.get("role") != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
+    user_email = current_user['identifier']
 
-    user = crud.get_user_by_id(user_id)
+    print(user_email)
+
+    user = crud.get_user_by_username_or_email(user_email)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    updated_user = crud.update_user_profile(user_id, profile_data.dict())
+    id = crud.get_user_id_by_username_or_email(user_email)
+
+    update_data = {}
+    if profile_data.first_name and profile_data.first_name != "string":
+        update_data["first_name"] = profile_data.first_name
+    if profile_data.last_name and profile_data.last_name != "string":
+        update_data["last_name"] = profile_data.last_name
+
+    if update_data:
+        updated_user = crud.update_user_profile(id, update_data)
+    else:
+        updated_user = user
 
     return {
         "username": updated_user.get("username"),
