@@ -20,7 +20,7 @@ export default function FlightResults() {
     const router = useRouter();
     const todayDate = new Date().toISOString().split("T")[0];
 
-    const passengers = ["Alice Johnson", "Bob Smith", "Carol Williams", "David Brown", "Eve Davis"];
+    const passengers = ["James Huang", "Abdallah Safa", "Jackson Lanier", "Jane Sun", "Vikash Singh"];
 
     useEffect(() => {
         const storedFlightData = localStorage.getItem('flightResults');

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Header from './Header'; 
+import Header from './Header';
 
 export default function EditProfile() {
     const [formData, setFormData] = useState({
-        firstName: 'Alexa',
-        lastName: 'Rawles',
-        gender: 'female',
+        firstName: 'Vikash',
+        lastName: 'Singh',
+        destination: 'LGA',
         graduatingClass: '2025',
-        email: 'alexarawles@gmail.com'
+        email: 'vikashsingh@gmail.com'
     });
 
     const [isEditing, setIsEditing] = useState(false);
@@ -23,21 +23,17 @@ export default function EditProfile() {
 
     const handleSaveClick = () => {
         setIsEditing(false);
-        // Logic to save data (e.g., API call)
         console.log('Form data saved:', formData);
     };
 
     return (
         <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#F1D6D9', minHeight: '100vh' }}>
-            {/* Header Component at the top */}
-            <Header /> {/* The header spans the top, just like on the chat page */}
-
+            <Header />
             <div className="edit-profile-container" style={styles.profileContainer}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    {/* Profile Picture and Info */}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Image 
-                            src="/newyork.png" // Replace with actual profile image path
+                            src="/newyork.png"
                             alt="Profile picture"
                             width={100}
                             height={100}
@@ -48,7 +44,6 @@ export default function EditProfile() {
                             <p>{formData.email}</p>
                         </div>
                     </div>
-                    {/* Edit / Save Button */}
                     {isEditing ? (
                         <button 
                             type="button" 
@@ -70,7 +65,7 @@ export default function EditProfile() {
                 <form className="profile-form" style={{ marginTop: '30px' }}>
                     <div className="row" style={styles.row}>
                         <div className="form-group" style={styles.formGroup}>
-                            <label htmlFor="firstName">First Name</label>
+                            <label htmlFor="firstName" style={styles.label}>First Name</label>
                             <input 
                                 type="text" 
                                 id="firstName" 
@@ -83,7 +78,7 @@ export default function EditProfile() {
                             />
                         </div>
                         <div className="form-group" style={styles.formGroup}>
-                            <label htmlFor="lastName">Last Name</label>
+                            <label htmlFor="lastName" style={styles.label}>Last Name</label>
                             <input 
                                 type="text" 
                                 id="lastName"
@@ -98,22 +93,20 @@ export default function EditProfile() {
                     </div>
                     <div className="row" style={styles.row}>
                         <div className="form-group" style={styles.formGroup}>
-                            <label htmlFor="gender">Gender</label>
-                            <select 
-                                id="gender" 
-                                name="gender" 
-                                value={formData.gender}
+                            <label htmlFor="destination" style={styles.label}>Destination</label>
+                            <input 
+                                type="text" 
+                                id="destination" 
+                                name="destination" 
+                                value={formData.destination}
                                 onChange={handleChange} 
+                                placeholder="Your Destination"
                                 disabled={!isEditing}
                                 style={styles.inputField}
-                            >
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
+                            />
                         </div>
                         <div className="form-group" style={styles.formGroup}>
-                            <label htmlFor="graduatingClass">Graduating Class</label>
+                            <label htmlFor="graduatingClass" style={styles.label}>Graduating Class</label>
                             <input 
                                 type="text" 
                                 id="graduatingClass"
@@ -128,7 +121,7 @@ export default function EditProfile() {
                     </div>
                     <div className="row" style={{ marginTop: '20px' }}>
                         <div className="form-group" style={{ width: '100%' }}>
-                            <label htmlFor="email">Email</label>
+                            <label htmlFor="email" style={styles.label}>Email</label>
                             <input 
                                 type="email" 
                                 id="email" 
@@ -142,6 +135,22 @@ export default function EditProfile() {
                         </div>
                     </div>
                 </form>
+
+                {/* Flight Section as a single entity */}
+                <div style={{ marginTop: '30px' }}>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '10px' }}>Flight</h3>
+                    <div style={styles.flightContainer}>
+                        <div style={styles.flightDetail}>
+                            <span style={styles.label}>Flight Number:</span> AA123
+                        </div>
+                        <div style={styles.flightDetail}>
+                            <span style={styles.label}>Departure:</span> 10:00 AM, Dec 15, 2024
+                        </div>
+                        <div style={styles.flightDetail}>
+                            <span style={styles.label}>Arrival:</span> 1:30 PM, Dec 15, 2024
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -151,11 +160,11 @@ export default function EditProfile() {
 const styles = {
     profileContainer: {
         margin: '50px auto',
-        padding: '40px', // Increased padding for more spacious layout
+        padding: '40px',
         backgroundColor: 'white',
         borderRadius: '10px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        maxWidth: '900px', // Increased max width to make the container bigger
+        maxWidth: '900px',
     },
     row: {
         display: 'flex',
@@ -164,26 +173,45 @@ const styles = {
     formGroup: {
         flex: '0 0 48%',
     },
+    label: {
+        fontWeight: 'bold',
+        fontSize: '1rem', // Ensure all labels have the same font size
+        color: '#333',
+    },
     inputField: {
         width: '100%',
-        padding: '15px', // Increased padding for bigger input fields
+        padding: '15px',
         borderRadius: '10px',
         border: '1px solid #ccc',
+        backgroundColor: '#f9f9f9',
+    },
+    flightContainer: {
+        backgroundColor: '#f9f9f9',
+        padding: '15px',
+        borderRadius: '10px',
+        border: '1px solid #ccc',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+    },
+    flightDetail: {
+        fontSize: '1rem',
+        color: '#333',
     },
     saveButton: {
-        backgroundColor: '#28a745', 
-        color: 'white', 
-        border: 'none', 
-        borderRadius: '10px', 
-        padding: '15px 30px', // Bigger button
+        backgroundColor: '#28a745',
+        color: 'white',
+        border: 'none',
+        borderRadius: '10px',
+        padding: '15px 30px',
         cursor: 'pointer',
     },
     editButton: {
-        backgroundColor: '#1e3a8a', 
-        color: 'white', 
-        border: 'none', 
-        borderRadius: '10px', 
-        padding: '15px 30px', // Bigger button
+        backgroundColor: '#1e3a8a',
+        color: 'white',
+        border: 'none',
+        borderRadius: '10px',
+        padding: '15px 30px',
         cursor: 'pointer',
     },
 };
