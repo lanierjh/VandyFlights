@@ -72,15 +72,7 @@ def reject_friend_request(requester_username: str, current_user: models.User = D
 @router.get("/users/pending_friend_requests", response_model=list[schemas.FriendRequestResponse])
 def get_pending_friend_requests(current_user: models.User = Depends(util.get_current_user)):
     idNum = get_user_id_by_username_or_email(current_user['identifier'])
-    print(idNum)
     return crud.get_pending_friend_requests(recipient_id= idNum)
-
-
-
-
-
-
-
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

@@ -128,16 +128,15 @@ def send_friend_request(requester_id: str, friend_identifier: str):
     if not friend_id:
         raise ValueError("User not found")
 
-    # requester_ref = db.collection("users").document(get_user_id_by_username_or_email(requester_id))
-    # requester_doc = requester_ref.get()
-    # if not requester_doc.exists:
-    #     raise ValueError("Requester not found")
-    # requester_data = requester_doc.to_dict()
-    # print(3,requester_data)
-    # friends_list = requester_data.get("friends", [])
-    # if friend_identifier in friends_list or friend_id in friends_list:
-    #     raise ValueError("User is already in your friends list")
-
+    requester_ref = db.collection("users").document(get_user_id_by_username_or_email(requester_id))
+    requester_doc = requester_ref.get()
+    if not requester_doc.exists:
+        raise ValueError("Requester not found")
+    requester_data = requester_doc.to_dict()
+    print(3,requester_data)
+    friends_list = requester_data.get("friends", [])
+    if friend_identifier in friends_list or friend_id in friends_list:
+        raise ValueError("User is already in your friends list")
 
     recipient_requests_ref = db.collection("users").document(friend_id).collection("friend_requests")
     existing_request = recipient_requests_ref.where("requester_id", "==", requester_id).where("status", "==",
