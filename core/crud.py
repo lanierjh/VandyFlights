@@ -47,6 +47,7 @@ def create_user(user: UserCreate):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "email": user.email,
+        "flight_ids": [],
         "hashed_password": hashed_password,
         "created_at": datetime.utcnow(),
         "is_active": True
@@ -100,6 +101,9 @@ def create_flight(flight_data: FlightCreate):
 
 
     return new_flight_data
+
+#def update_user_data_with_flight(flight_data, users: UserCreate):
+    #flight_data["flight_number"]
 
 
 

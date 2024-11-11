@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, status, APIRouter, Depends
-from core import crud, schemas
-from core.security import util
-from core import models
+import crud, schemas
+from security import util
+import models
 router = APIRouter(tags=["user"])
 @router.post("/register/", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
 def register_user(user: schemas.UserCreate):

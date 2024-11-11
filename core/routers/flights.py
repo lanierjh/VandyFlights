@@ -5,8 +5,6 @@ import logging
 import bcrypt
 
 
-
-
 router = APIRouter(tags=["flights"])
 
 @router.get("/protected")
@@ -17,8 +15,11 @@ async def protected_route(current_user: dict = Depends(util.get_current_user)):
 @router.post("/addFlight", response_model=schemas.FlightResponse, status_code=status.HTTP_201_CREATED)
 async def addflight(flights: schemas.FlightCreate):
     logging.info("Incoming flight data: %s", flights)
+    print(flights)
+    
     try:
         new_flight = crud.create_flight(flights)
+        #crud.update_user_data_with_flight(new_flight, users)
         return {"success": True, "flight": new_flight}
     except Exception as e:
         logging.error("Error adding flight: %s", e)

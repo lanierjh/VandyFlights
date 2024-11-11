@@ -3,9 +3,9 @@ import redis
 from fastapi import APIRouter, HTTPException, Depends, status
 from google.cloud import firestore
 from fastapi.security import OAuth2PasswordRequestForm
-from core import crud, schemas
-from core.db import get_db
-from core.security import util
+import crud, schemas
+from db import get_db
+from security import util
 from datetime import timedelta, time
 
 db = get_db()

@@ -19,6 +19,7 @@ class UserCreate(BaseModel):
     last_name: str
     email: EmailStr
     password: str
+    flight_ids: list
 
 class UserProfile(BaseModel):
     username: str
@@ -53,8 +54,8 @@ class FlightCreate(BaseModel):
     flight_number: str
     start: str
     destination: str
-    departure: str #str?
-    arrival: str #str?
+    departure: str 
+    arrival: str 
     departure_time: str
     arrival_time: str
     price: str
