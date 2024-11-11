@@ -1,3 +1,10 @@
 client/node_modules
 client/.next
 server/__pycache__
+core/security/service-account.json
+core/__pycache__client/node_modules
+client/.next
+server/__pycache__core/security/service-account.json
+core/security/service-account.json
+core/__pycache__/
+.idea

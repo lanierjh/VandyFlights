@@ -9,7 +9,6 @@ import bcrypt
 
 router = APIRouter(tags=["flights"])
 
-
 @router.get("/protected")
 async def protected_route(current_user: dict = Depends(util.get_current_user)):
     return {"message": "Hello, World!", "user": current_user}

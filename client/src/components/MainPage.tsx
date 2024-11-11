@@ -5,7 +5,7 @@ import Header from './Header';
 
 export default function MainPage() {
     const [searchData, setSearchData] = useState({
-        origin: 'Nashville (BNA)',
+        origin: 'BNA',
         destination: '',
         departureDate: '',
         returnDate: '',
@@ -14,64 +14,111 @@ export default function MainPage() {
 
     const [airportSuggestions, setAirportSuggestions] = useState([]); 
     const router = useRouter();
+    const todayDate = new Date().toISOString().split("T")[0];
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData({ ...searchData, [name]: value });
         
         // Fetch airport suggestions if the user is typing in the "destination" field
-        if (name === 'destination') {
-            fetchAirportSuggestions(value);
-        }
+        // if (name === 'destination') {
+        //     fetchAirportSuggestions(value);
+        // }
     };
-
-    const fetchAirportSuggestions = async (query) => {
-        if (query.length > 2) { // Only fetch suggestions if query is longer than 2 characters
-            try {
-                // Replace with a real API endpoint and API key for fetching airport data
-                const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
-                const data = await response.json();
-                if (data) {
-                    setAirportSuggestions(data);
-                }
-            } catch (error) {
-                console.error('Error fetching airport data:', error);
-            }
-        } else {
-            setAirportSuggestions([]);
-        }
-    };
+    // const fetchAirportSuggestions = async (query) => {
+    //     if (query.length > 2) { // Only fetch suggestions if query is longer than 2 characters
+    //         try {
+    //             // Replace with a real API endpoint and API key for fetching airport data
+    //             const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
+    //             const data = await response.json();
+    //             if (data) {
+    //                 setAirportSuggestions(data);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching airport data:', error);
+    //         }
+    //     } else {
+    //         setAirportSuggestions([]);
+    //     }
+    // };
 
     const handleAirportSelect = (airport) => {
         setSearchData({ ...searchData, destination: `${airport.nameAirport} (${airport.codeIataAirport})` });
         setAirportSuggestions([]); // Clear suggestions after selection
     };
 
-    const handleSearchSubmit = (e) => {
+    const handleSearchSubmit = async (e) => {
         e.preventDefault();
-        const query = new URLSearchParams({
-            origin: searchData.origin,
-            destination: searchData.destination,
-            departureDate: searchData.departureDate,
-            returnDate: searchData.returnDate,
-            roundTrip: searchData.roundTrip,
-        }).toString();
+        if (!searchData.destination || !searchData.departureDate) {
+            alert("Please provide a valid destination and departure date.");
+            return;
+        }
+        console.log("Submitting search data:", searchData);
+        
+        if(searchData.roundTrip == 'true'){
+            try {
+                const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip === 'true',
+                });
+                console.log("Flight Data Response:", response.data);
     
-        router.push(`/flightResults?${query}`);
+                // Store the flight results in localStorage
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+        
+                // Navigate to the flightResults page
+                router.push('/flightResults');
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            }
+        }
+        else{
+            try {
+                const response = await axios.post('http://localhost:8001/flightsONEWAY', {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip === 'false',
+                });
+                console.log("Flight Data Response:", response.data);
+    
+                // Store the flight results in localStorage
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+        
+                // Navigate to the flightResults page
+                router.push('/flightResults');
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            }
+        }
     };
 
-    const handlePopularDestinationClick = (destination) => {
-        setSearchData({ ...searchData, destination });
-        router.push({
-            pathname: '/flightResults',
-            query: { 
+    const handlePopularDestinationClick = async (destination) => {
+        const departureDate = new Date().toISOString().split("T")[0];
+        const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
+        
+        try {
+            const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
                 origin: searchData.origin,
                 destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip,
-            },
-        });
+                departureDate,
+                returnDate,
+                roundTrip: true,
+            });
+            console.log("Flight Data Response:", response.data);
+    
+            // Store the flight results in localStorage
+            localStorage.setItem('flightResults', JSON.stringify(response.data));
+    
+            // Navigate to the flightResults page
+            router.push('/flightResults');
+        } catch (error) {
+            console.error("Error fetching flights:", error);
+        }
     };
 
     const imageStyle = {
@@ -159,6 +206,7 @@ export default function MainPage() {
                             type="date"
                             name="departureDate"
                             onChange={handleSearchChange}
+                            min={todayDate}
                             style={{
                                 padding: '15px',
                                 borderRadius: '10px',
@@ -174,6 +222,7 @@ export default function MainPage() {
                                 type="date"
                                 name="returnDate"
                                 onChange={handleSearchChange}
+                                min={searchData.departureDate || todayDate}
                                 style={{
                                     padding: '15px',
                                     borderRadius: '10px',
@@ -228,7 +277,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('New York, NY')}
+                        }}onClick={() => handlePopularDestinationClick('LGA')}
                         >
                             <img
                                 src="/newyork.png"
@@ -247,7 +296,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('Los Angeles, LA')}
+                        }}onClick={() => handlePopularDestinationClick('LAX')}
                         >
                             <img
                                 src="/losangeles.jpg"
@@ -266,7 +315,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('Miami, FL')}
+                        }}onClick={() => handlePopularDestinationClick('MIA')}
                         >
                             <img
                                 src="/miami.jpg"
@@ -286,7 +335,7 @@ export default function MainPage() {
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
                         }}
-                        onClick={() => handlePopularDestinationClick('Chicago, IL')}
+                        onClick={() => handlePopularDestinationClick('ORD')}
                         >
                             <img
                                 src="/chicago.jpg"
@@ -306,7 +355,7 @@ export default function MainPage() {
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
                         }}
-                        onClick={() => handlePopularDestinationClick('Las Vegas, NV')}
+                        onClick={() => handlePopularDestinationClick('LAS')}
                         >
                             <img
                                 src="/lasvegas.jpg"

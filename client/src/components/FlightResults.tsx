@@ -1,10 +1,8 @@
-flightResults
 "use client";
 import Header from './Header';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-
 
 export default function FlightResults() {
     const [flightData, setFlightData] = useState(null);
@@ -18,13 +16,11 @@ export default function FlightResults() {
     });
     const [selectedOutboundFlight, setSelectedOutboundFlight] = useState(null);
     const [sortOption, setSortOption] = useState('Top flights');
-    const [resultsLimit, setResultsLimit] = useState(50);
+    const [resultsLimit, setResultsLimit] = useState(50); 
     const router = useRouter();
     const todayDate = new Date().toISOString().split("T")[0];
 
-
-    const passengers = ["Alice Johnson", "Bob Smith", "Carol Williams", "David Brown", "Eve Davis"];
-
+    const passengers = ["James Huang", "Abdallah Safa", "Jackson Lanier", "Jane Sun", "Vikash Singh"];
 
     useEffect(() => {
         const storedFlightData = localStorage.getItem('flightResults');
@@ -33,7 +29,6 @@ export default function FlightResults() {
         }
         setIsLoading(false);
     }, []);
-
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
@@ -221,7 +216,6 @@ export default function FlightResults() {
                 </form>
             </section>
 
-
             <section style={styles.sortSection}>
                 <label htmlFor="sort" style={styles.sortLabel}>Sort by:</label>
                 <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.sortSelect}>
@@ -238,7 +232,6 @@ export default function FlightResults() {
                 </select>
             </section>
 
-
             <div style={styles.content}>
                 <aside style={styles.sidebar}>
                     <h3>People Going to {searchData.destination}</h3>
@@ -249,7 +242,6 @@ export default function FlightResults() {
                     </ul>
                 </aside>
 
-
                 <main style={styles.resultsContainer}>
                     {filteredFlights.map((flight, index) => (
                         <div key={index} style={styles.flightCard}>
@@ -257,7 +249,6 @@ export default function FlightResults() {
                             <div style={styles.flightLogo}>
                                 <img src={flight.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
                             </div>
-
 
                             {/* Middle section for flight details */}
                             <div style={styles.flightDetails}>
@@ -267,7 +258,6 @@ export default function FlightResults() {
                                 <p style={styles.flightCarrier}>{flight.carrier} - Flight {flight.flightNumber}</p>
                                 <p style={styles.flightStops}>{flight.stops === 0 ? "Nonstop" : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}</p>
                             </div>
-
 
                             {/* Right section for price and select button */}
                             <div style={styles.priceSection}>
@@ -281,7 +271,6 @@ export default function FlightResults() {
         </div>
     );
 }
-
 
 const styles = {
     container: {

@@ -13,7 +13,6 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
 class UserCreate(BaseModel):
     username: str
     first_name: str
@@ -21,6 +20,15 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
+class UserProfile(BaseModel):
+    username: str
+    first_name: str
+    last_name: str
+    email: EmailStr
+
+class UserProfileUpdate(BaseModel):
+    first_name: str
+    last_name: str
 
 class UserProfile(BaseModel):
     username: str
@@ -51,6 +59,8 @@ class FlightCreate(BaseModel):
     arrival_time: str
     price: str
 
+class FriendRequest(BaseModel):
+    friend_identifier: str
 
 class FlightResponse(BaseModel):
     success: bool
