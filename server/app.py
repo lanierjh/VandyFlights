@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import http.client
 import json
 import logging
-import os
 from datetime import datetime
 
 app = FastAPI()
@@ -31,10 +30,20 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def extract_flight_info(flight):
+    # This function handles multi-leg flights with layovers in a consolidated format
     flights = []
     for segment in flight["segments"]:
+        # Initialize flight info for multi-leg journeys
+        flight_info = {
+            "legs": [],  # Store individual legs
+            "layovers": [],  # Store layover details
+            "price": "Price not available",
+            "url": "URL not available"
+        }
+
+        # Process each leg of the flight
         for leg in segment["legs"]:
-            flight_info = {
+            leg_info = {
                 "origin": leg["originStationCode"],
                 "destination": leg["destinationStationCode"],
                 "departureDateTime": leg["departureDateTime"],
@@ -43,50 +52,31 @@ def extract_flight_info(flight):
                 "flightNumber": str(leg["flightNumber"]),
                 "logo": leg["marketingCarrier"].get("logoUrl", "Logo not available"),
                 "stops": leg.get("numStops", 0),
+                "distanceInKM": leg.get("distanceInKM", "N/A"),
+                "classOfService": leg.get("classOfService", "N/A"),
+                "equipmentId": leg.get("equipmentId", "N/A")
             }
-            for link in flight.get("purchaseLinks", []):
+            flight_info["legs"].append(leg_info)
+
+        # Process layovers if available
+        if "layovers" in segment:
+            for layover in segment["layovers"]:
+                layover_info = {
+                    "durationInMinutes": layover.get("durationInMinutes"),
+                    "hasStationChange": layover.get("hasStationChange", False),
+                    "durationType": layover.get("durationType", "NORMAL"),
+                }
+                flight_info["layovers"].append(layover_info)
+
+        # Extract purchase links with price and URL if available
+        if "purchaseLinks" in flight:
+            for link in flight["purchaseLinks"]:
                 price = link.get("totalPricePerPassenger")
                 flight_info["price"] = str(price) if price and price > 0 else "Price not available"
                 flight_info["url"] = link["url"]
-            flights.append(flight_info)
+
+        flights.append(flight_info)
     return flights
-
-def combine_flights(flights):
-    combined_flights = []
-    flights_sorted = sorted(flights, key=lambda x: (x["price"], x["departureDateTime"]))
-    temp_flight = None
-
-    for i, current_flight in enumerate(flights_sorted):
-        # If there is a temporary flight stored, check if it can connect with the current flight
-        if temp_flight:
-            # Check if the arrival time of the temp flight matches the departure time of the current flight
-            arrival_time = datetime.fromisoformat(temp_flight["arrivalDateTime"])
-            departure_time = datetime.fromisoformat(current_flight["departureDateTime"])
-            
-            # Check if the price is the same and the arrival matches the next departure
-            if temp_flight["price"] == current_flight["price"] and arrival_time == departure_time:
-                # Combine the flights
-                temp_flight["destination"] = current_flight["destination"]
-                temp_flight["arrivalDateTime"] = current_flight["arrivalDateTime"]
-                temp_flight["carrier"] += f" -> {current_flight['carrier']}"
-                temp_flight["flightNumber"] += f" -> {current_flight['flightNumber']}"
-                temp_flight["logo"] += f" -> {current_flight['logo']}"
-                temp_flight["stops"] += 1  # Increment stops
-                temp_flight["url"] += f" -> {current_flight['url']}"
-            else:
-                # If they don't connect, save the temp flight and start a new temp with the current flight
-                combined_flights.append(temp_flight)
-                temp_flight = current_flight
-        else:
-            # Start a new temp flight if none is stored
-            temp_flight = current_flight
-
-    # Append the last temp flight if it exists
-    if temp_flight:
-        combined_flights.append(temp_flight)
-    
-    return combined_flights
-
 
 @app.post("/flightsONEWAY")
 async def show_flightsONE_WAY(flight_request: FlightRequest):
@@ -98,7 +88,7 @@ async def show_flightsONE_WAY(flight_request: FlightRequest):
         'x-rapidapi-key': "8f9d9710dcmsh46dbd3b58cf0e4bp139f74jsn1e7767cf4d9e",
         'x-rapidapi-host': "tripadvisor16.p.rapidapi.com"
     }
-
+    
     start = flight_request.origin
     destination = flight_request.destination
     departure_date = flight_request.departureDate
@@ -111,7 +101,7 @@ async def show_flightsONE_WAY(flight_request: FlightRequest):
             f"/api/v1/flights/searchFlights?sourceAirportCode={start}&"
             f"destinationAirportCode={destination}&date={departure_date}&"
             f"itineraryType={flight_type}&sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&"
-            f"classOfService=ECONOMY&pageNumber={page_number}&nearby=yes&nonstop=yes&currencyCode=USD&region=USA"
+            f"classOfService=ECONOMY&pageNumber={page_number}&nearby=yes&nonstop=no&currencyCode=USD&region=USA"
         )
 
         try:
@@ -136,8 +126,12 @@ async def show_flightsONE_WAY(flight_request: FlightRequest):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    combined_flights = combine_flights(flights)
-    return {"start": start, "destination": destination, "flights": combined_flights[:50]}
+    # Adjusted return structure for consistency
+    return {
+        "start": start,
+        "destination": destination,
+        "flights": flights[:50]  # Key should match the expected format in the component
+    }
 
 @app.post("/flightsROUNDTRIP")
 async def show_flightsROUND_TRIP(flight_request: FlightRequest):
@@ -156,14 +150,16 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
     return_date = flight_request.returnDate
     flight_type = "ROUND_TRIP"
     page_number = 1
-    flights = []
+    outbound_flights = []
+    return_flights = []
 
-    while len(flights) < 50:  # Fetch until we have at least 50 flights
+    # Loop to fetch both outbound and return flights until we have at least 100 flights or exhaust results
+    while len(outbound_flights) + len(return_flights) < 50:
         request_path = (
             f"/api/v1/flights/searchFlights?sourceAirportCode={start}&"
             f"destinationAirportCode={destination}&date={departure_date}&"
             f"itineraryType={flight_type}&sortOrder=ML_BEST_VALUE&numAdults=1&numSeniors=0&"
-            f"classOfService=ECONOMY&returnDate={return_date}&pageNumber={page_number}&nearby=yes&nonstop=yes&"
+            f"classOfService=ECONOMY&returnDate={return_date}&pageNumber={page_number}&nearby=yes&nonstop=no&"
             "currencyCode=USD&region=USA"
         )
 
@@ -172,24 +168,33 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
             res = conn.getresponse()
             data = res.read()
             final_data = json.loads(data.decode("utf-8"))
-            print(final_data)
+
             if "flights" in final_data.get("data", {}):
                 for flight in final_data["data"]["flights"]:
-                    flights.extend(extract_flight_info(flight))
-                    if len(flights) >= 50:  # Stop if we have 50 or more flights
+                    extracted_flights = extract_flight_info(flight)
+                    for f in extracted_flights:
+                        if f["legs"][0]["origin"] == start and len(outbound_flights) < 50:
+                            outbound_flights.append(f)
+                        elif f["legs"][-1]["destination"] == start and len(return_flights) < 50:
+                            return_flights.append(f)
+
+                    if len(outbound_flights) >= 50 and len(return_flights) >= 50:
                         break
 
             if not final_data.get("data", {}).get("flights"):
-                break  # Stop if no more flights are found
+                break
 
-            page_number += 1  # Move to the next page
+            page_number += 1  # Next page
 
         except json.JSONDecodeError as json_error:
             raise HTTPException(status_code=500, detail=f"Error decoding JSON: {str(json_error)}")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    # Combine flights based on criteria
-    combined_flights = combine_flights(flights)
-
-    return {"start": start, "destination": destination, "flights": combined_flights[:50]}  # Return only the first 50 flights
+    # Return up to 50 flights for each type
+    return {
+        "start": start,
+        "destination": destination,
+        "outbound_flights": outbound_flights[:50],
+        "return_flights": return_flights[:50]
+    }

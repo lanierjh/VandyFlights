@@ -18,84 +18,71 @@ export default function MainPage() {
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
-        setSearchData({ ...searchData, [name]: value });
-        
-        // Fetch airport suggestions if the user is typing in the "destination" field
-        // if (name === 'destination') {
-        //     fetchAirportSuggestions(value);
-        // }
+    
+        setSearchData((prevData) => {
+            if (name === "roundTrip" && value === "false") {
+                return { ...prevData, [name]: value, returnDate: "" };
+            }
+            return { ...prevData, [name]: value };
+        });
     };
-    // const fetchAirportSuggestions = async (query) => {
-    //     if (query.length > 2) { // Only fetch suggestions if query is longer than 2 characters
-    //         try {
-    //             // Replace with a real API endpoint and API key for fetching airport data
-    //             const response = await axios.get(`https://aviation-edge.com/v2/public/airportDatabase?key=YOUR_API_KEY&codeIataAirport=${query}`);
-    //             const data = await response.json();
-    //             if (data) {
-    //                 setAirportSuggestions(data);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching airport data:', error);
-    //         }
-    //     } else {
-    //         setAirportSuggestions([]);
-    //     }
-    // };
+    
 
     const handleAirportSelect = (airport) => {
         setSearchData({ ...searchData, destination: `${airport.nameAirport} (${airport.codeIataAirport})` });
-        setAirportSuggestions([]); // Clear suggestions after selection
+        setAirportSuggestions([]); 
     };
 
     const handleSearchSubmit = async (e) => {
         e.preventDefault();
+    
         if (!searchData.destination || !searchData.departureDate) {
             alert("Please provide a valid destination and departure date.");
             return;
         }
-        console.log("Submitting search data:", searchData);
-        
-        if(searchData.roundTrip == 'true'){
+    
+        // Set roundTrip to false if returnDate is empty
+        const updatedSearchData = {
+            ...searchData,
+            roundTrip: searchData.returnDate ? searchData.roundTrip : 'false',
+        };
+    
+        console.log("Submitting search data:", updatedSearchData);
+    
+        if (updatedSearchData.roundTrip === 'true') {
             try {
                 const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
-                    origin: searchData.origin,
-                    destination: searchData.destination,
-                    departureDate: searchData.departureDate,
-                    returnDate: searchData.returnDate,
-                    roundTrip: searchData.roundTrip === 'true',
+                    origin: updatedSearchData.origin,
+                    destination: updatedSearchData.destination,
+                    departureDate: updatedSearchData.departureDate,
+                    returnDate: updatedSearchData.returnDate,
+                    roundTrip: updatedSearchData.roundTrip === 'true',
                 });
                 console.log("Flight Data Response:", response.data);
     
-                // Store the flight results in localStorage
                 localStorage.setItem('flightResults', JSON.stringify(response.data));
-        
-                // Navigate to the flightResults page
                 router.push('/flightResults');
             } catch (error) {
                 console.error("Error fetching flights:", error);
             }
-        }
-        else{
+        } else {
             try {
                 const response = await axios.post('http://localhost:8001/flightsONEWAY', {
-                    origin: searchData.origin,
-                    destination: searchData.destination,
-                    departureDate: searchData.departureDate,
-                    returnDate: searchData.returnDate,
-                    roundTrip: searchData.roundTrip === 'false',
+                    origin: updatedSearchData.origin,
+                    destination: updatedSearchData.destination,
+                    departureDate: updatedSearchData.departureDate,
+                    roundTrip: false,
                 });
                 console.log("Flight Data Response:", response.data);
     
-                // Store the flight results in localStorage
                 localStorage.setItem('flightResults', JSON.stringify(response.data));
-        
-                // Navigate to the flightResults page
                 router.push('/flightResults');
             } catch (error) {
                 console.error("Error fetching flights:", error);
             }
         }
     };
+    
 
     const handlePopularDestinationClick = async (destination) => {
         const departureDate = new Date().toISOString().split("T")[0];
