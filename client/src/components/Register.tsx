@@ -71,8 +71,10 @@ export default function Register() {
                 }),
             });
             if (response.ok) {
-                console.log('Registration successful:', formData);
-                router.push('/mainPage');
+                const data = await response.json();
+                console.log('Login successful:', data);
+                localStorage.setItem('accessToken', data.access_token);
+                window.location.href = '/mainPage';
             } else {
                 const errorData = await response.json();
 

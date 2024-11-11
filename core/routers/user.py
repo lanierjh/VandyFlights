@@ -3,15 +3,26 @@ from core import crud, schemas
 from core.security import util
 from core import models
 router = APIRouter(tags=["user"])
-@router.post("/register", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=schemas.Token, status_code=status.HTTP_201_CREATED)
 def register_user(user: schemas.UserCreate):
     existing_username = crud.get_user_by_username_or_email(user.username)
     existing_email = crud.get_user_by_username_or_email(user.email)
     if existing_username or existing_email:
         raise HTTPException(status_code=400, detail="Username or email already registered")
 
-    new_user_data = crud.create_user(user)
-    return new_user_data
+    new_user = crud.create_user(user)
+
+    access_token_data = {
+        "identifier": new_user["username"]  # Store the username or email
+    }
+    access_token = util.create_access_token(data=access_token_data)
+
+    # Return the user data along with the access token
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+    # return new_user_data
 
 
 @router.post("/users/send_friend_request", response_model=schemas.FriendRequestResponse)

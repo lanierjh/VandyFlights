@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Image from 'next/image';
 import Header from './Header';
+import {useRouter} from "next/navigation";
 
 export default function EditProfile() {
+    const router = useRouter();
+        useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            // Redirect to login if token is missing
+            router.push('/');
+        }
+    }, [router]);
     const [formData, setFormData] = useState({
         firstName: 'Vikash',
         lastName: 'Singh',

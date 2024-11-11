@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Header from './Header';
@@ -16,6 +16,16 @@ export default function MainPage() {
     const router = useRouter();
     const todayDate = new Date().toISOString().split("T")[0];
 
+    useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            // Redirect to login if token is missing
+            router.push('/');
+        }
+    }, [router]);
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData({ ...searchData, [name]: value });
