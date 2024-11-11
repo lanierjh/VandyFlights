@@ -12,21 +12,20 @@ export default function MainPage() {
         roundTrip: 'true',
     });
 
-    const [airportSuggestions, setAirportSuggestions] = useState([]);
-
+    const [airportSuggestions, setAirportSuggestions] = useState([]); 
     const router = useRouter();
+    const todayDate = new Date().toISOString().split("T")[0];
 
-        useEffect(() => {
+    useEffect(() => {
         // Check if accessToken is in localStorage
         const token = localStorage.getItem('accessToken');
         console.log("Retrieved token:", token);
 
         if (!token) {
             // Redirect to login if token is missing
-            router.push('/login');
+            router.push('/');
         }
     }, [router]);
-
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData({ ...searchData, [name]: value });
@@ -60,33 +59,76 @@ export default function MainPage() {
 
     const handleSearchSubmit = async (e) => {
         e.preventDefault();
+        if (!searchData.destination || !searchData.departureDate) {
+            alert("Please provide a valid destination and departure date.");
+            return;
+        }
+        console.log("Submitting search data:", searchData);
+        
+        if(searchData.roundTrip == 'true'){
+            try {
+                const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip === 'true',
+                });
+                console.log("Flight Data Response:", response.data);
+    
+                // Store the flight results in localStorage
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+        
+                // Navigate to the flightResults page
+                router.push('/flightResults');
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            }
+        }
+        else{
+            try {
+                const response = await axios.post('http://localhost:8001/flightsONEWAY', {
+                    origin: searchData.origin,
+                    destination: searchData.destination,
+                    departureDate: searchData.departureDate,
+                    returnDate: searchData.returnDate,
+                    roundTrip: searchData.roundTrip === 'false',
+                });
+                console.log("Flight Data Response:", response.data);
+    
+                // Store the flight results in localStorage
+                localStorage.setItem('flightResults', JSON.stringify(response.data));
+        
+                // Navigate to the flightResults page
+                router.push('/flightResults');
+            } catch (error) {
+                console.error("Error fetching flights:", error);
+            }
+        }
+    };
+
+    const handlePopularDestinationClick = async (destination) => {
+        const departureDate = new Date().toISOString().split("T")[0];
+        const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
+        
         try {
-            const response = await axios.post('http://localhost:8001/flights', {
+            const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
                 origin: searchData.origin,
-                destination: searchData.destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip === 'true',
+                destination,
+                departureDate,
+                returnDate,
+                roundTrip: true,
             });
-            localStorage.setItem('flightResults', JSON.stringify(response.data.results));
+            console.log("Flight Data Response:", response.data);
+    
+            // Store the flight results in localStorage
+            localStorage.setItem('flightResults', JSON.stringify(response.data));
+    
+            // Navigate to the flightResults page
             router.push('/flightResults');
         } catch (error) {
             console.error("Error fetching flights:", error);
         }
-    };
-
-    const handlePopularDestinationClick = (destination) => {
-        setSearchData({ ...searchData, destination });
-        router.push({
-            pathname: '/flightResults',
-            query: { 
-                origin: searchData.origin,
-                destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip,
-            },
-        });
     };
 
     const imageStyle = {
@@ -174,6 +216,7 @@ export default function MainPage() {
                             type="date"
                             name="departureDate"
                             onChange={handleSearchChange}
+                            min={todayDate}
                             style={{
                                 padding: '15px',
                                 borderRadius: '10px',
@@ -189,6 +232,7 @@ export default function MainPage() {
                                 type="date"
                                 name="returnDate"
                                 onChange={handleSearchChange}
+                                min={searchData.departureDate || todayDate}
                                 style={{
                                     padding: '15px',
                                     borderRadius: '10px',
@@ -243,7 +287,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('New York, NY')}
+                        }}onClick={() => handlePopularDestinationClick('LGA')}
                         >
                             <img
                                 src="/newyork.png"
@@ -262,7 +306,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('Los Angeles, LA')}
+                        }}onClick={() => handlePopularDestinationClick('LAX')}
                         >
                             <img
                                 src="/losangeles.jpg"
@@ -281,7 +325,7 @@ export default function MainPage() {
                             borderRadius: '10px',
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
-                        }}onClick={() => handlePopularDestinationClick('Miami, FL')}
+                        }}onClick={() => handlePopularDestinationClick('MIA')}
                         >
                             <img
                                 src="/miami.jpg"
@@ -301,7 +345,7 @@ export default function MainPage() {
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
                         }}
-                        onClick={() => handlePopularDestinationClick('Chicago, IL')}
+                        onClick={() => handlePopularDestinationClick('ORD')}
                         >
                             <img
                                 src="/chicago.jpg"
@@ -321,7 +365,7 @@ export default function MainPage() {
                             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                             cursor: 'pointer',
                         }}
-                        onClick={() => handlePopularDestinationClick('Las Vegas, NV')}
+                        onClick={() => handlePopularDestinationClick('LAS')}
                         >
                             <img
                                 src="/lasvegas.jpg"

@@ -1,57 +1,143 @@
 import pytest
+import json
 from fastapi.testclient import TestClient
-from unittest.mock import patch, Mock
-from app import app  
-from app import show_flights
+from app import app  # Assuming this code is in main.py
+import http.client
 
 client = TestClient(app)
 
-# Mock data for the external API response
-mock_flight_data = b'''
-{
-    "data": [
-        {"url": "https://sample-url.com/flight1?price=200"},
-        {"url": "https://sample-url.com/flight2?price=0"},
-        {"url": "https://sample-url.com/flight3?price=150"}
-    ]
+# Fixtures for common valid and invalid requests
+valid_oneway_request = {
+    "origin": "LAX",
+    "destination": "JFK",
+    "departureDate": "2024-12-15",
+    "roundTrip": False
 }
-'''
 
-@pytest.fixture
-def mock_rapidapi_response():
-    """Mock the HTTPSConnection and its response for show_flights."""
-    mock_conn = Mock()
-    mock_conn.getresponse.return_value.read.return_value = mock_flight_data
-    return mock_conn
+valid_roundtrip_request = {
+    "origin": "LAX",
+    "destination": "JFK",
+    "departureDate": "2024-12-15",
+    "returnDate": "2024-12-25",
+    "roundTrip": True
+}
 
-# Patch the connection object in the context of this test
-@patch('app.conn', new_callable=lambda: Mock())
-def test_show_flights(mock_conn, mock_rapidapi_response):
-    mock_conn.getresponse = mock_rapidapi_response.getresponse
-    response = client.get("/flights")
-    
-    # Checking for a valid response
+invalid_request_missing_date = {
+    "origin": "LAX",
+    "destination": "JFK",
+    "roundTrip": False
+}
+
+invalid_request_missing_destination = {
+    "origin": "LAX",
+    "departureDate": "2024-12-15",
+    "roundTrip": False
+}
+
+# 1. Testing Input Validation (No Mocking Needed) (black box)
+
+# Test one-way flight endpoint with valid data
+def test_flights_oneway_valid():
+    response = client.post("/flightsONEWAY", json=valid_oneway_request)
     assert response.status_code == 200
-    data = response.json()
-    
-    # Validate that the output matches expected strings.
-    assert "BNA to LAX results" in data["output"]
-    
-    #test known values in the output
-def test_Variables():
-    assert 'Variable' in show_flights()["output"]
-    assert 'PRICE PER PASSENGER' in show_flights()["output"]
-    assert 'URL' in show_flights()["output"]
-    
+    assert "flights" in response.json()
+    assert isinstance(response.json()["flights"], list)
 
-#HOW TO RUN:
-#install pytest within the folder this file is in in your terminal with the command below:
-#pip install pytest
+# Test round-trip flight endpoint with valid data
+def test_flights_roundtrip_valid():
+    response = client.post("/flightsROUNDTRIP", json=valid_roundtrip_request)
+    assert response.status_code == 200
+    assert "flights" in response.json()
+    assert isinstance(response.json()["flights"], list)
 
-#then, simply run:
-#python -m pytest
-#to run the test. If this doesn't work, the command:
-#pytest
-#can work as well, depending on the configurations of your system
-        
-        
+# Test one-way flight endpoint with missing date
+def test_flights_oneway_missing_date():
+    response = client.post("/flightsONEWAY", json=invalid_request_missing_date)
+    assert response.status_code == 422
+    assert response.json()["detail"][0] == {'input': {'destination': 'JFK', 'origin': 'LAX', 'roundTrip': False}, 'loc': ['body', 'departureDate'], 'msg': 'Field required', 'type': 'missing'}
+
+# Test round-trip flight endpoint with missing destination
+def test_flights_roundtrip_missing_destination():
+    response = client.post("/flightsROUNDTRIP", json=invalid_request_missing_destination)
+    assert response.status_code == 422
+    assert response.json()["detail"][0] == {'input': {'departureDate': '2024-12-15', 'origin': 'LAX', 'roundTrip': False}, 'loc': ['body', 'destination'], 'msg': 'Field required', 'type': 'missing'}
+
+# 2. Mocking External API Responses (Simulating Backend Behavior) (white box)
+
+# Mock a successful API response for a one-way flight request
+def test_flights_oneway_valid_response(monkeypatch):
+    def mock_getresponse(*args, **kwargs):
+        class MockResponse:
+            def read(self):
+                return json.dumps({
+                    "data": {
+                        "flights": [
+                            {
+                                "segments": [
+                                    {
+                                        "legs": [
+                                            {
+                                                "originStationCode": "LAX",
+                                                "destinationStationCode": "JFK",
+                                                "departureDateTime": "2024-12-15T08:00",
+                                                "arrivalDateTime": "2024-12-15T16:00",
+                                                "marketingCarrier": {"displayName": "Test Airline"},
+                                                "flightNumber": "123"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "purchaseLinks": [{"url": "https://test.com", "totalPricePerPassenger": 300}]
+                            }
+                        ]
+                    }
+                }).encode("utf-8")
+        return MockResponse()
+    
+    monkeypatch.setattr("http.client.HTTPSConnection.getresponse", mock_getresponse)
+
+    response = client.post("/flightsONEWAY", json=valid_oneway_request)
+    assert response.status_code == 200
+    assert "flights" in response.json()
+    assert isinstance(response.json()["flights"], list)
+    assert response.json()["flights"][0]["origin"] == "LAX"
+    assert response.json()["flights"][0]["destination"] == "JFK"
+
+# Mock a 404 response if no flights are found
+def test_flights_oneway_no_flights_found(monkeypatch):
+    def mock_getresponse(*args, **kwargs):
+        class MockResponse:
+            def read(self):
+                return json.dumps({"data": {"flights": []}}).encode("utf-8")
+        return MockResponse()
+    
+    monkeypatch.setattr("http.client.HTTPSConnection.getresponse", mock_getresponse)
+
+    response = client.post("/flightsONEWAY", json=valid_oneway_request)
+    assert response.status_code == 500
+    assert response.json()["detail"][0] == "R"
+
+# Mock a malformed JSON response to test JSON decode error handling
+def test_flights_oneway_malformed_json(monkeypatch):
+    def mock_getresponse(*args, **kwargs):
+        class MockResponse:
+            def read(self):
+                return b"not a json"
+        return MockResponse()
+    
+    monkeypatch.setattr("http.client.HTTPSConnection.getresponse", mock_getresponse)
+
+    response = client.post("/flightsONEWAY", json=valid_oneway_request)
+    assert response.status_code == 500
+    assert "R" in response.json()["detail"][0]
+
+# Mock a network error to test exception handling
+def test_flights_oneway_network_error(monkeypatch):
+    def mock_request(*args, **kwargs):
+        raise http.client.HTTPException("Network error")
+    
+    monkeypatch.setattr("http.client.HTTPSConnection.request", mock_request)
+
+    response = client.post("/flightsONEWAY", json=valid_oneway_request)
+    assert response.status_code == 500
+    assert response.json()["detail"] == "Network error"

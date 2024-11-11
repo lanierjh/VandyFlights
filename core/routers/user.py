@@ -1,17 +1,29 @@
 from fastapi import FastAPI, HTTPException, status, APIRouter, Depends
+from fastapi.security import OAuth2PasswordBearer
 from core import crud, schemas
 from core.security import util
 from core import models
 router = APIRouter(tags=["user"])
-@router.post("/register/", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=schemas.Token, status_code=status.HTTP_201_CREATED)
 def register_user(user: schemas.UserCreate):
     existing_username = crud.get_user_by_username_or_email(user.username)
     existing_email = crud.get_user_by_username_or_email(user.email)
     if existing_username or existing_email:
         raise HTTPException(status_code=400, detail="Username or email already registered")
 
-    new_user_data = crud.create_user(user)
-    return new_user_data
+    new_user = crud.create_user(user)
+
+    access_token_data = {
+        "identifier": new_user["username"]  # Store the username or email
+    }
+    access_token = util.create_access_token(data=access_token_data)
+
+    # Return the user data along with the access token
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+    # return new_user_data
 
 
 @router.post("/users/send_friend_request", response_model=schemas.FriendRequestResponse)
@@ -59,20 +71,34 @@ def get_pending_friend_requests(current_user: models.User = Depends(util.get_cur
 
 
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+@router.get("/profile", response_model=schemas.UserProfile)
+def get_profile(token: str = Depends(oauth2_scheme)):
+    payload = util.verify_access_token(token)  # Your function to decode the JWT
+    identifier = payload.get("identifier")
+    if not identifier:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-@router.get("/profile/{user_id}", response_model=schemas.UserProfile)
-def get_profile(user_id: str, current_user: models.User = Depends(util.get_current_user)):
-    user = crud.get_user_by_id(user_id)
-
+    # Fetch user data based on the identifier
+    user = crud.get_user_by_username_or_email(identifier)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    return {
-        "username": user.get("username"),
-        "first_name": user.get("first_name"),
-        "last_name": user.get("last_name"),
-        "email": user.get("email")
-    }
+    return user
+
+# @router.get("/profile/{user_id}", response_model=schemas.UserProfile)
+# def get_profile(user_id: str, current_user: models.User = Depends(util.get_current_user)):
+#     user = crud.get_user_by_id(user_id)
+#
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
+#
+#     return {
+#         "username": user.get("username"),
+#         "first_name": user.get("first_name"),
+#         "last_name": user.get("last_name"),
+#         "email": user.get("email")
+#     }
 
 
 @router.put("/profile/{user_id}", response_model=schemas.UserProfile)

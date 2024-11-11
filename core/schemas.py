@@ -4,6 +4,8 @@ from datetime import date,time
 
 class UserResponse(BaseModel):
     id: str
+    first_name: str
+    last_name: str
     username: str
     email: str
     is_active: bool
