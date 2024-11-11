@@ -55,7 +55,6 @@ def get_user_by_username_or_email(identifier: str):
 
     username_query = users_ref.where("username", "==", identifier).limit(1).get()
     if username_query:
-        # If not found by username, look up by email
         return username_query[0].to_dict()
 
 
