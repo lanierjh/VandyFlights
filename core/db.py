@@ -5,7 +5,7 @@ from google.cloud import firestore
 from typing import Dict
 import os
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/janesun/Desktop/VandyFlights/core/security/service-account.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/abdallahsafa/PycharmProjects/VandyFlights/core/security/service-account.json"
 cred = credentials.Certificate(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 
 print("GOOGLE_APPLICATION_CREDENTIALS:", os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))

@@ -4,6 +4,8 @@ from typing import Optional, List
 class User(BaseModel):
     id : str
     username: str
+    first_name: str
+    last_name: str
     email: str
     hashed_password: str
     is_active: bool = True
