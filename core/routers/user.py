@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, status, APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 from core import crud, schemas
-from core.crud import get_user_by_username_or_email
+from core.crud import get_user_by_username_or_email, get_user_id_by_username_or_email
 from core.security import util
 from core import models
 router = APIRouter(tags=["user"])
@@ -30,13 +30,17 @@ def register_user(user: schemas.UserCreate):
 @router.post("/users/send_friend_request", response_model=schemas.FriendRequestResponse)
 def send_friend_request(request: schemas.FriendRequest, current_user: models.User = Depends(util.get_current_user)):
     try:
-        print("Current user:", current_user['user'])
-        crud.send_friend_request(requester_id=current_user['user'], friend_identifier=request.friend_identifier)
-        return {"status": "pending", "requester_id": current_user['user'], "recipient_id": request.friend_identifier}
+        print(current_user)
+        print(1,"Current user:", current_user['identifier'])
+        print(request.friend_identifier)
+        crud.send_friend_request(requester_id=current_user['identifier'], friend_identifier= request.friend_identifier)
+        return {"status": "pending", "requester_id": current_user['identifier'], "recipient_id": request.friend_identifier}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
 
 @router.post("/users/accept_friend_request/{requester_username}")
 def accept_friend_request(requester_username: str, current_user: models.User = Depends(util.get_current_user)):
@@ -93,7 +97,6 @@ def edit_profile(
         current_user: dict = Depends(util.get_current_user)
 ):
     user_email = current_user['identifier']
-
     print(user_email)
 
     user = crud.get_user_by_username_or_email(user_email)

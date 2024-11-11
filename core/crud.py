@@ -124,19 +124,17 @@ from google.cloud import firestore
 
 def send_friend_request(requester_id: str, friend_identifier: str):
     friend_id = get_user_id_by_username_or_email(friend_identifier)
+    print(friend_id)
     if not friend_id:
         raise ValueError("User not found")
 
-    # Reference to the recipient's friend requests subcollection
     recipient_requests_ref = db.collection("users").document(friend_id).collection("friend_requests")
 
-    # Check if a request is already pending
     existing_request = recipient_requests_ref.where("requester_id", "==", requester_id).where("status", "==",
                                                                                               "pending").get()
     if existing_request:
         raise ValueError("Friend request already sent")
 
-    # Create the friend request with status 'pending'
     recipient_requests_ref.add({
         "requester_id": requester_id,
         "status": "pending"
