@@ -81,7 +81,10 @@ def edit_profile(
         profile_data: schemas.UserProfileUpdate,
         current_user: dict = Depends(util.get_current_user)
 ):
-    if current_user.get("user_id") != user_id and current_user.get("role") != "admin":
+    # print(1,user_id)
+    # print(2,crud.get_user_by_id(user_id)['email'])
+    # print(3,current_user['identifier'])
+    if current_user['identifier'] != crud.get_user_by_id(user_id)['email'] and current_user.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
 
     user = crud.get_user_by_id(user_id)

@@ -183,7 +183,6 @@ def accept_friend_request(recipient_id: str, requester_email: str):
 
 
 def reject_friend_request(recipient_id: str, requester_email: str):
-    # Get the requester ID from their email
     requester_id = get_user_id_by_username_or_email(requester_email)
 
     if not requester_id:
