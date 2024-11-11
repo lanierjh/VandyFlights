@@ -1,4 +1,3 @@
-import redis
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from fastapi import HTTPException, status
@@ -47,19 +46,19 @@ def verify_access_token(token: str):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+# redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 
-def is_token_blacklisted(token: str) -> bool:
-    return redis_client.get(token) is not None
+# def is_token_blacklisted(token: str) -> bool:
+#     return redis_client.get(token) is not None
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     print("Token received:", token)
-    if is_token_blacklisted(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token is invalid or has been logged out"
-        )
+    # if is_token_blacklisted(token):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Token is invalid or has been logged out"
+    #     )
     payload = verify_access_token(token)
     print("Payload:", payload)
     return payload

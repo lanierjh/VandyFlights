@@ -68,16 +68,16 @@ def login(user_cred: OAuth2PasswordRequestForm = Depends()):
     # return {"access_token": access_token, "token_type": "bearer"}
 
 
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)  # Set up Redis client
+# redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)  # Set up Redis client
 
-@router.post("/logout")
-def logout(current_user: str = Depends(util.get_current_user)):
-    try:
-        token = current_user['token']
-        decoded_token = jwt.decode(token, util.SECRET_KEY, algorithms=[util.ALGORITHM])
-        expiration = decoded_token.get("exp")
-        redis_client.setex(token, timedelta(seconds=expiration - int(time.time())), "blacklisted")
-    except Exception:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
-    return {"msg": "Successfully logged out"}
+# @router.post("/logout")
+# def logout(current_user: str = Depends(util.get_current_user)):
+#     try:
+#         token = current_user['token']
+#         decoded_token = jwt.decode(token, util.SECRET_KEY, algorithms=[util.ALGORITHM])
+#         expiration = decoded_token.get("exp")
+#         redis_client.setex(token, timedelta(seconds=expiration - int(time.time())), "blacklisted")
+#     except Exception:
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
+#     return {"msg": "Successfully logged out"}
 
