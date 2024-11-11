@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
-from security import util
+from core.security import util
 
 
 router = APIRouter(tags=["flights"])

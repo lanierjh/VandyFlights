@@ -4,6 +4,8 @@ from typing import Optional, List
 class User(BaseModel):
     id : str
     username: str
+    first_name: str
+    last_name: str
     email: str
     hashed_password: str
     is_active: bool = True
@@ -11,7 +13,7 @@ class User(BaseModel):
 
 class Flight(BaseModel):
     flight_number: str
-    start: str
+    departure: str
     arrival: str
     departure_time: str
     arrival_time: str

@@ -12,7 +12,7 @@
 
 
 from fastapi import FastAPI
-from routers import user, auth, flights
+from core.routers import user, auth, flights
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()

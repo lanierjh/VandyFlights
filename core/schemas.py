@@ -18,6 +18,15 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
+class UserProfile(BaseModel):
+    username: str
+    first_name: str
+    last_name: str
+    email: EmailStr
+
+class UserProfileUpdate(BaseModel):
+    first_name: str
+    last_name: str
 
 class UserAuthenticate(BaseModel):
     username: str
@@ -25,11 +34,9 @@ class UserAuthenticate(BaseModel):
 
 
 class FlightCreate(BaseModel):
-    flight_number: int
-    start: str
-    destination: str
+    flight_number: str
     departure: date #str?
-    arrival: str #str?
+    arrival: date #str?
     departure_time: time
     arrival_time: time
     price: int
