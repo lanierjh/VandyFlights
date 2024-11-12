@@ -9,3 +9,5 @@ node_modules
 core/routers/__pycache__
 core/security/__pycache__
 server/__pycache__
+.env
+service-account.json
