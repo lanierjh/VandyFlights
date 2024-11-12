@@ -32,7 +32,7 @@ export default function ReturnFlightResults() {
         const fetchReturnFlights = async () => {
             setIsLoading(true);
             try {
-                const response = await axios.post(`http://localhost:8001/flightsROUNDTRIP`, {
+                const response = await axios.post(`http://localhost:8000/flightsROUNDTRIP`, {
                     origin: storedSearchData.destination,
                     destination: storedSearchData.origin,
                     departureDate: storedSearchData.returnDate,

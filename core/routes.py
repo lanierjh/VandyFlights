@@ -16,14 +16,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.post("/register", response_model=UserResponse)  # Modify the response_model as needed
-def register_user(user: UserCreate):
-    return create_user(user)
-
-@app.post("/login")
-def login(user_data: UserAuthenticate):
-    return user_login(user_data)
+#
+# @app.post("/register", response_model=UserResponse)  # Modify the response_model as needed
+# def register_user(user: UserCreate):
+#     return create_user(user)
+#
+# @app.post("/login")
+# def login(user_data: UserAuthenticate):
+#     return user_login(user_data)
 
 # @app.get("/")
 # def read_root(db: Session = Depends(get_db)):

@@ -45,7 +45,7 @@ export default function FlightResults() {
         setIsLoading(true);
         try {
             const endpoint = searchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
-            const response = await axios.post(`http://localhost:8001/${endpoint}`, {
+            const response = await axios.post(`http://localhost:8000/${endpoint}`, {
                 origin: searchData.origin,
                 destination: searchData.destination,
                 departureDate: searchData.departureDate,

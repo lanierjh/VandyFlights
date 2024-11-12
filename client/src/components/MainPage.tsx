@@ -67,7 +67,7 @@ export default function MainPage() {
         
         if(searchData.roundTrip == 'true'){
             try {
-                const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
+                const response = await axios.post('http://localhost:8000/flightsROUNDTRIP', {
                     origin: searchData.origin,
                     destination: searchData.destination,
                     departureDate: searchData.departureDate,
@@ -87,7 +87,8 @@ export default function MainPage() {
         }
         else{
             try {
-                const response = await axios.post('http://localhost:8001/flightsONEWAY', {
+
+                const response = await axios.post('http://localhost:8000/flightsONEWAY', {
                     origin: searchData.origin,
                     destination: searchData.destination,
                     departureDate: searchData.departureDate,
@@ -112,7 +113,7 @@ export default function MainPage() {
         const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
         
         try {
-            const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
+            const response = await axios.post('http://localhost:8000/flightsROUNDTRIP', {
                 origin: searchData.origin,
                 destination,
                 departureDate,

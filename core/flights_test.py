@@ -1,7 +1,6 @@
-import pytest
 import json
 from fastapi.testclient import TestClient
-from app import app  # Assuming this code is in main.py
+from core.routers.flights import app  # Assuming this code is in main.py
 import http.client
 
 client = TestClient(app)
