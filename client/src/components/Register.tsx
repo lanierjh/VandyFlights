@@ -1,8 +1,8 @@
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Register() {
-    const router = useRouter();
+    // const router = useRouter();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',

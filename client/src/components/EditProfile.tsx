@@ -224,7 +224,7 @@ const styles = {
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     profileContainer: {
@@ -298,7 +298,7 @@ const styles = {
         borderRadius: '10px',
         border: '1px solid #ccc',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         gap: '10px',
     },
     flightDetail: {

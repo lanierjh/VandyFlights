@@ -191,14 +191,14 @@ const styles = {
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     searchSection: {
         backgroundImage: `url('/nashville.jpg')`,
         backgroundSize: 'cover',
         padding: '80px 20px',
-        textAlign: 'center',
+        textAlign: 'center' as const,
         color: 'white',
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
@@ -216,7 +216,7 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         gap: '15px',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap' as const,
     },
     searchInput: {
         padding: '15px',
@@ -226,13 +226,13 @@ const styles = {
         minWidth: '130px',
     },
     inputContainer: {
-        position: 'relative',
+        position: 'relative' as const,
         width: '15%',
         margin: '0 10px',
         display: 'inline-block',
     },
     suggestionsDropdown: {
-        position: 'absolute',
+        position: 'absolute' as const,
         top: '100%',
         left: 0,
         right: 0,
@@ -243,7 +243,7 @@ const styles = {
         padding: '0',
         margin: '0',
         borderRadius: '10px',
-        overflowY: 'auto',
+        overflowY: 'auto' as const,
         maxHeight: '150px',
     },
     suggestionItem: {
@@ -261,7 +261,7 @@ const styles = {
         cursor: 'pointer',
     },
     popularDestinationsSection: {
-        textAlign: 'center',
+        textAlign: 'center' as const,
         width: '100%',
         maxWidth: '1200px',
         marginTop: '10px',
@@ -275,7 +275,7 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-around',
         gap: '10px',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap' as const,
     },
     destinationCard: {
         flex: '1 1 18%',
@@ -285,12 +285,12 @@ const styles = {
         borderRadius: '10px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         cursor: 'pointer',
-        textAlign: 'center',
+        textAlign: 'center' as const,
     },
     destinationImage: {
         width: '100%',
         height: '150px',
-        objectFit: 'cover',
+        objectFit: 'cover' as const,
         borderRadius: '10px',
     },
 };

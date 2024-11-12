@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+
 export default function FlightResults() {
     const [flightData, setFlightData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -80,16 +81,16 @@ export default function FlightResults() {
     const handleSelectFlight = (flight) => {
         if (searchData.roundTrip === 'true') {
             try {
-                const flightData = {
-                    flight_number: flight.flightNumber,
-                    start: flight.origin,
-                    destination: flight.destination,
-                    departure: flight.departureDateTime,
-                    arrival: flight.arrivalDateTime,
-                    departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price,
-                };
+                // const flightData = {
+                //     flight_number: flight.flightNumber,
+                //     start: flight.origin,
+                //     destination: flight.destination,
+                //     departure: flight.departureDateTime,
+                //     arrival: flight.arrivalDateTime,
+                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     price: flight.price,
+                // };
                 // const response = fetch('http://localhost:8000/addFlight', {
                 //     method: 'POST',
                 //     headers: {
@@ -107,16 +108,16 @@ export default function FlightResults() {
             }
         } else {
             try {
-                const flightData = {
-                    flight_number: flight.flightNumber,
-                    start: flight.origin,
-                    destination: flight.destination,
-                    departure: flight.departureDateTime,
-                    arrival: flight.arrivalDateTime,
-                    departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price,
-                };
+                // const flightData = {
+                //     flight_number: flight.flightNumber,
+                //     start: flight.origin,
+                //     destination: flight.destination,
+                //     departure: flight.departureDateTime,
+                //     arrival: flight.arrivalDateTime,
+                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     price: flight.price,
+                // };
                 // const response = fetch('http://localhost:8000/addFlight', {
                 //     method: 'POST',
                 //     headers: {
@@ -142,13 +143,17 @@ export default function FlightResults() {
                     case 'Cheapest Price':
                         return a.price - b.price;
                     case 'Earliest Departure Time': {
-                        const earliestDateA = new Date(a.legs[0].departureDateTime);
-                        const earliestDateB = new Date(b.legs[0].departureDateTime);
+                        // const earliestDateA = new Date(a.legs[0].departureDateTime);
+                        // const earliestDateB = new Date(b.legs[0].departureDateTime);
+                        // return earliestDateA - earliestDateB;
+                        const earliestDateA = new Date(a.legs[0].departureDateTime).getTime();
+                        const earliestDateB = new Date(b.legs[0].departureDateTime).getTime();
                         return earliestDateA - earliestDateB;
+
                     }
                     case 'Latest Departure Time': {
-                        const latestDateA = new Date(a.legs[0].departureDateTime);
-                        const latestDateB = new Date(b.legs[0].departureDateTime);
+                        const latestDateA = new Date(a.legs[0].departureDateTime).getTime();
+                        const latestDateB = new Date(b.legs[0].departureDateTime).getTime();
                         return latestDateB - latestDateA;
                     }
                     default:
@@ -174,7 +179,8 @@ export default function FlightResults() {
     ).slice(0, resultsLimit);
 
     if (isLoading) {
-        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
+        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you&apos;re looking for!</div>;
+
     }
 
     if (!flightData || flightData.length === 0) {
@@ -294,13 +300,14 @@ export default function FlightResults() {
     );
 }
 
+
 const styles = {
     pageContainer: {
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     searchSection: {
@@ -317,7 +324,7 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         gap: '15px',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap' as const,
     },
     searchInput: {
         padding: '10px',
@@ -370,7 +377,7 @@ const styles = {
     },
     resultsContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         flex: 1,
     },
@@ -396,12 +403,12 @@ const styles = {
     },
     flightDetails: {
         flex: '1 1 auto',
-        textAlign: 'left',
+        textAlign: 'left' as const,
         padding: '0 15px',
     },
     legContainer: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap' as const,
         gap: '20px',
     },
     legDetails: {
@@ -414,7 +421,7 @@ const styles = {
     },
     priceSection: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         width: '100px',
     },
