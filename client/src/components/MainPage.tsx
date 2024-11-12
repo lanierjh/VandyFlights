@@ -26,6 +26,7 @@ export default function MainPage() {
             router.push('/');
         }
     }, [router]);
+    
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData((prevData) => {
@@ -49,8 +50,9 @@ export default function MainPage() {
         }
         const updatedSearchData = {
             ...searchData,
-            roundTrip: searchData.returnDate ? searchData.roundTrip : 'false',
+            roundTrip: searchData.returnDate ? 'true' : 'false',
         };
+        
         console.log("Submitting search data:", updatedSearchData);
         try {
             const endpoint = updatedSearchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
