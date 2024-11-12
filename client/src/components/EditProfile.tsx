@@ -27,7 +27,7 @@ export default function EditProfile() {
             router.push('/');
             return;
         }
-        axios.get('http://localhost:8000/profile', {
+        axios.get('https://vandyflights-backend.onrender.com/profile', {
             headers: { Authorization: `Bearer ${token}` }
         })
         .then(response => {

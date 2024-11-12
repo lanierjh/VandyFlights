@@ -56,7 +56,7 @@ export default function MainPage() {
         console.log("Submitting search data:", updatedSearchData);
         try {
             const endpoint = updatedSearchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
-            const response = await axios.post(`http://localhost:8000/${endpoint}`, {
+            const response = await axios.post(`https://vandyflights-backend.onrender.com/${endpoint}`, {
                 origin: updatedSearchData.origin,
                 destination: updatedSearchData.destination,
                 departureDate: updatedSearchData.departureDate,
@@ -74,7 +74,7 @@ export default function MainPage() {
         const departureDate = new Date().toISOString().split("T")[0];
         const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
         try {
-            const response = await axios.post('http://localhost:8000/flightsROUNDTRIP', {
+            const response = await axios.post('https://vandyflights-backend.onrender.com/flightsROUNDTRIP', {
                 origin: searchData.origin,
                 destination,
                 departureDate,
