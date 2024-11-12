@@ -68,6 +68,7 @@ export default function Register() {
                     password: formData.password,
                     first_name: formData.firstName,
                     last_name: formData.lastName,
+                    flight_ids: [],
                 }),
             });
             if (response.ok) {
