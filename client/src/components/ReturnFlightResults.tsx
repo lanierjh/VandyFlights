@@ -1,7 +1,7 @@
 "use client";
 import Header from './Header';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 export default function ReturnFlightResults() {
     const [outboundFlight, setOutboundFlight] = useState(null);
@@ -9,7 +9,7 @@ export default function ReturnFlightResults() {
     const [isLoading, setIsLoading] = useState(true);
     const [sortOption, setSortOption] = useState('Top flights');
     const [resultsLimit, setResultsLimit] = useState(50);
-    const router = useRouter();
+    // const router = useRouter();
     const passengers = ["James Huang", "Abdallah Safa", "Jackson Lanier", "Jane Sun", "Vikash Singh"];
 
     useEffect(() => {
@@ -36,13 +36,13 @@ export default function ReturnFlightResults() {
                 case 'Cheapest Price':
                     return a.price - b.price;
                 case 'Earliest Departure Time': {
-                    const earliestDateA = new Date(a.legs[0].departureDateTime);
-                    const earliestDateB = new Date(b.legs[0].departureDateTime);
+                    const earliestDateA = new Date(a.legs[0].departureDateTime).getTime();
+                    const earliestDateB = new Date(b.legs[0].departureDateTime).getTime();
                     return earliestDateA - earliestDateB;
                 }
                 case 'Latest Departure Time': {
-                    const latestDateA = new Date(a.legs[0].departureDateTime);
-                    const latestDateB = new Date(b.legs[0].departureDateTime);
+                    const latestDateA = new Date(a.legs[0].departureDateTime).getTime();
+                    const latestDateB = new Date(b.legs[0].departureDateTime).getTime();
                     return latestDateB - latestDateA;
                 }
                 default:
@@ -149,7 +149,7 @@ const styles = {
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     optionsSection: {
@@ -187,7 +187,7 @@ const styles = {
     },
     resultsContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         flex: 1,
     },
@@ -213,12 +213,12 @@ const styles = {
     },
     flightDetails: {
         flex: '1 1 auto',
-        textAlign: 'left',
+        textAlign: 'left' as const,
         padding: '0 15px',
     },
     legContainer: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap' as const,
         gap: '20px',
     },
     legDetails: {
@@ -231,7 +231,7 @@ const styles = {
     },
     priceSection: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         width: '100px',
     },

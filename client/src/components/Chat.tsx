@@ -192,7 +192,8 @@ const styles = {
     backgroundColor: '#F1D6D9',
     minHeight: '100vh',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
+    // flexDirection: 'column',
     alignItems: 'center',
   },
   chatSection: {
@@ -236,7 +237,7 @@ const styles = {
     listStyle: 'none',
     padding: 0,
     marginTop: '10px',
-  },
+  } as React.CSSProperties,
   friendItem: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -280,7 +281,7 @@ const styles = {
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     alignItems: 'center',
   },
   chatHeader: {
@@ -290,7 +291,7 @@ const styles = {
   },
   messagesContainer: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '10px',
     width: '100%',
   },
