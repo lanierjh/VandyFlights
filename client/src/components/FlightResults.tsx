@@ -3,59 +3,62 @@ import Header from './Header';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function FlightResults() {
-    const [flightData, setFlightData] = useState(null);
+    const [flightData, setFlightData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchData, setSearchData] = useState({
         origin: 'BNA',
         destination: '',
         departureDate: '',
         returnDate: '',
-        roundTrip: 'true',
+        roundTrip: '',
     });
-    const [selectedOutboundFlight, setSelectedOutboundFlight] = useState(null);
     const [sortOption, setSortOption] = useState('Top flights');
-    const [resultsLimit, setResultsLimit] = useState(50); 
+    const [resultsLimit, setResultsLimit] = useState(50);
     const router = useRouter();
     const todayDate = new Date().toISOString().split("T")[0];
 
     const passengers = ["James Huang", "Abdallah Safa", "Jackson Lanier", "Jane Sun", "Vikash Singh"];
 
     useEffect(() => {
-        const storedFlightData = localStorage.getItem('flightResults');
+        const storedFlightData = JSON.parse(localStorage.getItem('flightResults'));
+        console.log("Stored flight data:", storedFlightData);
         if (storedFlightData) {
-            setFlightData(JSON.parse(storedFlightData));
+            setFlightData(storedFlightData?.outbound_flights || storedFlightData?.flights || []);
         }
         setIsLoading(false);
     }, []);
 
-    const handleSearchChange = (e) => {
-        const { name, value } = e.target;
-        setSearchData({ ...searchData, [name]: value });
-    };
-
     const handleSearchSubmit = async (e) => {
         e.preventDefault();
+
         if (!searchData.destination || !searchData.departureDate) {
             alert("Please provide a valid destination and departure date.");
             return;
         }
-        
+
+        const updatedSearchData = {
+            ...searchData,
+            roundTrip: searchData.returnDate ? 'true' : 'false',
+        };
+
+        setSearchData(updatedSearchData);
         setIsLoading(true);
+
         try {
-            const endpoint = searchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
-            const response = await axios.post(`http://localhost:8001/${endpoint}`, {
-                origin: searchData.origin,
-                destination: searchData.destination,
-                departureDate: searchData.departureDate,
-                returnDate: searchData.returnDate,
-                roundTrip: searchData.roundTrip,
+            const endpoint = updatedSearchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
+            const response = await axios.post(`http://localhost:8000/${endpoint}`, {
+                origin: updatedSearchData.origin,
+                destination: updatedSearchData.destination,
+                departureDate: updatedSearchData.departureDate,
+                returnDate: updatedSearchData.returnDate,
+                roundTrip: updatedSearchData.roundTrip,
             });
-            console.log("Flight Data Response:", response.data);
+
             localStorage.setItem('flightResults', JSON.stringify(response.data));
-            localStorage.setItem('searchData', JSON.stringify(searchData));
-            setFlightData(response.data);
+            setFlightData(response.data.outbound_flights || response.data.flights || []);
         } catch (error) {
             console.error("Error fetching flights:", error);
         } finally {
@@ -63,32 +66,97 @@ export default function FlightResults() {
         }
     };
 
+
+    const handleSearchChange = (e) => {
+        const { name, value } = e.target;
+
+        setSearchData((prevData) => {
+            if (name === 'returnDate' && value === '') {
+                return { ...prevData, returnDate: '', roundTrip: 'false' };
+            }
+            return { ...prevData, [name]: value };
+        });
+    };
+
     const handleSelectFlight = (flight) => {
-        if (searchData.roundTrip === 'false') {
-            window.open(flight.url, '_blank');
+        if (searchData.roundTrip === 'true') {
+            try {
+                // const flightData = {
+                //     flight_number: flight.flightNumber,
+                //     start: flight.origin,
+                //     destination: flight.destination,
+                //     departure: flight.departureDateTime,
+                //     arrival: flight.arrivalDateTime,
+                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     price: flight.price,
+                // };
+                // const response = fetch('http://localhost:8000/addFlight', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(flightData),
+                // });
+                // if (!response) {
+                //     throw new Error(`HTTP error! status: ${response}`);
+                // }
+                localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                router.push('/returnflightresults');
+            } catch (error) {
+                console.error('Error storing to the database:', error);
+            }
         } else {
-            setSelectedOutboundFlight(flight);
-            localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
-            router.push('/returnflightresults');
+            try {
+                // const flightData = {
+                //     flight_number: flight.flightNumber,
+                //     start: flight.origin,
+                //     destination: flight.destination,
+                //     departure: flight.departureDateTime,
+                //     arrival: flight.arrivalDateTime,
+                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     price: flight.price,
+                // };
+                // const response = fetch('http://localhost:8000/addFlight', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(flightData),
+                // });
+                // if (!response) {
+                //     throw new Error(`HTTP error! status: ${response}`);
+                // }
+                window.open(flight.url, '_blank');
+            } catch (error) {
+                console.error('Error storing to the database:', error);
+            }
         }
     };
 
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
         if (flightData) {
-            const sortedData = [...flightData.flights].sort((a, b) => {
+            const sortedData = [...flightData].sort((a, b) => {
                 switch (e.target.value) {
-                    case 'Price':
+                    case 'Cheapest Price':
                         return a.price - b.price;
-                    case 'Departure time':
-                        return new Date(a.departureDateTime) - new Date(b.departureDateTime);
-                    case 'Arrival time':
-                        return new Date(a.arrivalDateTime) - new Date(b.arrivalDateTime);
+                    case 'Earliest Departure Time': {
+                        const earliestDateA = new Date(a.legs[0].departureDateTime);
+                        const earliestDateB = new Date(b.legs[0].departureDateTime);
+                        return earliestDateA - earliestDateB;
+                    }
+                    case 'Latest Departure Time': {
+                        const latestDateA = new Date(a.legs[0].departureDateTime);
+                        const latestDateB = new Date(b.legs[0].departureDateTime);
+                        return latestDateB - latestDateA;
+                    }
                     default:
                         return 0;
                 }
             });
-            setFlightData({ ...flightData, flights: sortedData });
+            setFlightData(sortedData);
         }
     };
 
@@ -96,18 +164,27 @@ export default function FlightResults() {
         setResultsLimit(Number(e.target.value));
     };
 
-    const filteredFlights = flightData?.flights.slice(0, resultsLimit);
+
+    const filteredFlights = Array.from(
+        new Map(
+            flightData.map((flight) => [
+                `${flight.flightNumber}-${flight.legs[0].origin}-${flight.legs[0].destination}-${flight.legs[0].departureDateTime}`,
+                flight,
+            ])
+        ).values()
+    ).slice(0, resultsLimit);
 
     if (isLoading) {
-        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
+        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you&apos;re looking for!</div>
     }
 
-    if (!flightData || !flightData.flights || flightData.flights.length === 0) {
+    if (!flightData || flightData.length === 0) {
         return <div>No flight data available. Please go back and search for flights again.</div>;
     }
 
+
     return (
-        <div style={styles.container}>
+        <div style={styles.pageContainer}>
             <Header />
             <section style={styles.searchSection}>
                 <form onSubmit={handleSearchSubmit} style={styles.searchForm}>
@@ -157,16 +234,16 @@ export default function FlightResults() {
                 </form>
             </section>
 
-            <section style={styles.sortSection}>
-                <label htmlFor="sort" style={styles.sortLabel}>Sort by:</label>
-                <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.sortSelect}>
-                    <option>Top flights</option>
-                    <option>Price</option>
-                    <option>Departure time</option>
-                    <option>Arrival time</option>
+            <section style={styles.optionsSection}>
+                <label htmlFor="sort" style={styles.optionLabel}>Sort by:</label>
+                <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.optionSelect}>
+                    <option>Top Flights</option>
+                    <option>Cheapest Price</option>
+                    <option>Earliest Departure Time</option>
+                    <option>Latest Departure Time</option>
                 </select>
-                <label htmlFor="resultsLimit" style={styles.resultsLimitLabel}>Show:</label>
-                <select id="resultsLimit" value={resultsLimit} onChange={handleResultsLimitChange} style={styles.resultsLimitSelect}>
+                <label htmlFor="resultsLimit" style={styles.optionLabel}>Show:</label>
+                <select id="resultsLimit" value={resultsLimit} onChange={handleResultsLimitChange} style={styles.optionSelect}>
                     <option value={10}>10 flights</option>
                     <option value={20}>20 flights</option>
                     <option value={50}>50 flights</option>
@@ -186,22 +263,27 @@ export default function FlightResults() {
                 <main style={styles.resultsContainer}>
                     {filteredFlights.map((flight, index) => (
                         <div key={index} style={styles.flightCard}>
-                            {/* Left section for logo */}
                             <div style={styles.flightLogo}>
-                                <img src={flight.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
+                                <Image src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" width={80} height={80} style={styles.planeIcon} />
                             </div>
 
-                            {/* Middle section for flight details */}
                             <div style={styles.flightDetails}>
-                                <p style={styles.flightTime}><strong>{new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong></p>
-                                <p style={styles.flightDuration}>{Math.floor((new Date(flight.arrivalDateTime) - new Date(flight.departureDateTime)) / (1000 * 60 * 60))} hr {((new Date(flight.arrivalDateTime) - new Date(flight.departureDateTime)) / (1000 * 60)) % 60} min</p>
-                                <p style={styles.flightRoute}>{flight.origin} - {flight.destination}</p>
-                                <p style={styles.flightCarrier}>{flight.carrier} - Flight {flight.flightNumber}</p>
-                                <p style={styles.flightStops}>{flight.stops === 0 ? "Nonstop" : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}</p>
+                                <h4>VandyFlight Details:</h4>
+                                <div style={styles.legContainer}>
+                                    {flight.legs && flight.legs.map((leg, legIndex) => (
+                                        <div key={legIndex} style={styles.legDetails}>
+                                            <p style={styles.legRoute}><strong>{leg.origin} → {leg.destination}</strong></p>
+                                            <p>Departure: {new Date(leg.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                            <p>Arrival: {new Date(leg.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                            <p>Carrier: {leg.carrier}</p>
+                                            <p>Flight Number: {leg.flightNumber}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
-                            {/* Right section for price and select button */}
                             <div style={styles.priceSection}>
+
                                 <p style={styles.price}>${flight.price}</p>
                                 <button style={styles.selectButton} onClick={() => handleSelectFlight(flight)}>Select</button>
                             </div>
@@ -214,34 +296,36 @@ export default function FlightResults() {
 }
 
 const styles = {
-    container: {
+    pageContainer: {
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
-        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column' as const,
+        alignItems: 'center',
     },
     searchSection: {
         backgroundColor: '#fff',
         padding: '20px',
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        margin: '20px auto',
-        width: '90%',
-        maxWidth: '700px',
+        margin: '20px 0',
+        width: '80%',
+        maxWidth: '800px',
     },
     searchForm: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: '10px',
+        gap: '15px',
         flexWrap: 'wrap',
     },
     searchInput: {
         padding: '10px',
         borderRadius: '5px',
         border: '1px solid #ddd',
-        width: '18%',
-        minWidth: '120px',
+        width: '20%',
+        minWidth: '130px',
     },
     searchButton: {
         padding: '10px 20px',
@@ -252,32 +336,25 @@ const styles = {
         fontWeight: 'bold',
         cursor: 'pointer',
     },
-    sortSection: {
+    optionsSection: {
         display: 'flex',
-        justifyContent: 'center',
         alignItems: 'center',
-        marginTop: '20px',
         gap: '10px',
+        marginTop: '10px',
     },
-    sortLabel: {
+    optionLabel: {
         marginRight: '5px',
     },
-    sortSelect: {
-        padding: '10px',
-        borderRadius: '5px',
-        border: '1px solid #ddd',
-    },
-    resultsLimitLabel: {
-        marginLeft: '15px',
-    },
-    resultsLimitSelect: {
-        padding: '10px',
+    optionSelect: {
+        padding: '8px',
         borderRadius: '5px',
         border: '1px solid #ddd',
     },
     content: {
         display: 'flex',
         gap: '20px',
+        width: '80%',
+        maxWidth: '1000px',
         marginTop: '20px',
     },
     sidebar: {
@@ -285,35 +362,22 @@ const styles = {
         padding: '20px',
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        width: '250px',
+        width: '200px',
     },
     passengerItem: {
         listStyleType: 'none',
         padding: '8px 0',
         borderBottom: '1px solid #ddd',
     },
-    flightInfo: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-    },
-    flightIcon: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-    },
     resultsContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         flex: 1,
     },
     flightCard: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
         backgroundColor: '#fff',
         border: '1px solid #ddd',
         borderRadius: '8px',
@@ -321,45 +385,39 @@ const styles = {
         margin: '10px 0',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         width: '100%',
-        maxWidth: '700px',
+        maxWidth: '800px',
     },
     flightLogo: {
-        flex: '0 0 auto',
+        flex: '0 0 100px',
         marginRight: '20px',
     },
     planeIcon: {
-        width: '100px', // Increased size for the logo
-        height: '100px',
+        width: '80px',
+        height: '80px',
     },
     flightDetails: {
         flex: '1 1 auto',
-        textAlign: 'center',
+        textAlign: 'left',
+        padding: '0 15px',
     },
-    flightTime: {
-        fontSize: '1.2em',
+    legContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '20px',
+    },
+    legDetails: {
+        flex: '0 0 calc(50% - 20px)',
+        marginBottom: '10px',
+    },
+    legRoute: {
+        fontSize: '1.1em',
         fontWeight: 'bold',
-    },
-    flightDuration: {
-        fontSize: '1em',
-        color: '#666',
-    },
-    flightRoute: {
-        fontSize: '1em',
-        color: '#333',
-    },
-    flightCarrier: {
-        fontSize: '1em',
-        color: '#333',
-        fontStyle: 'italic',
-    },
-    flightStops: {
-        fontSize: '0.9em',
-        color: '#999',
     },
     priceSection: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
+        width: '100px',
     },
     price: {
         fontSize: '1.5em',
@@ -369,10 +427,9 @@ const styles = {
     selectButton: {
         backgroundColor: '#0b8457',
         color: '#fff',
-        padding: '10px 20px',
+        padding: '10px 15px',
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
-        fontSize: '1em',
     },
 };

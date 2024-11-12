@@ -1,14 +1,12 @@
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Register() {
-    const router = useRouter();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         vanderbiltEmail: '',
         password: '',
-        username: '',  // New username field
+        username: '', 
     });
 
     const [errorMessage, setErrorMessage] = useState('');
@@ -63,7 +61,7 @@ export default function Register() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: formData.username,  // Send username
+                    username: formData.username,
                     email: formData.vanderbiltEmail,
                     password: formData.password,
                     first_name: formData.firstName,
@@ -71,8 +69,10 @@ export default function Register() {
                 }),
             });
             if (response.ok) {
-                console.log('Registration successful:', formData);
-                router.push('/mainPage');
+                const data = await response.json();
+                console.log('Login successful:', data);
+                localStorage.setItem('accessToken', data.access_token);
+                window.location.href = '/mainPage';
             } else {
                 const errorData = await response.json();
 
