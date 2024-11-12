@@ -12,7 +12,7 @@ export default function FlightResults() {
         destination: '',
         departureDate: '',
         returnDate: '',
-        roundTrip: 'true',
+        roundTrip: '',
     });
     const [sortOption, setSortOption] = useState('Top flights');
     const [resultsLimit, setResultsLimit] = useState(50);
@@ -53,7 +53,7 @@ export default function FlightResults() {
                 destination: updatedSearchData.destination,
                 departureDate: updatedSearchData.departureDate,
                 returnDate: updatedSearchData.returnDate,
-                roundTrip: updatedSearchData.roundTrip === 'true',
+                roundTrip: updatedSearchData.roundTrip,
             });
 
             localStorage.setItem('flightResults', JSON.stringify(response.data));
@@ -100,11 +100,11 @@ export default function FlightResults() {
                 // if (!response) {
                 //     throw new Error(`HTTP error! status: ${response}`);
                 // }
+                localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                router.push('/returnflightresults');
             } catch (error) {
                 console.error('Error storing to the database:', error);
             }
-            localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
-            router.push('/returnflightresults');
         } else {
             try {
                 const flightData = {
@@ -127,7 +127,6 @@ export default function FlightResults() {
                 // if (!response) {
                 //     throw new Error(`HTTP error! status: ${response}`);
                 // }
-
                 window.open(flight.url, '_blank');
             } catch (error) {
                 console.error('Error storing to the database:', error);
