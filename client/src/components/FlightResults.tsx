@@ -77,6 +77,7 @@ export default function FlightResults() {
     };
     
     const handleSelectFlight = (flight) => {
+        console.log("Selected flight data:", flight);
         if (searchData.roundTrip === 'true') {
             try {
                 const flightData = {
