@@ -1,6 +1,6 @@
 import json
 from fastapi.testclient import TestClient
-from core.main import app  # Assuming this code is in main.py
+from main import app  # Assuming this code is in main.py
 import http.client
 
 client = TestClient(app)

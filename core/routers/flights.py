@@ -7,7 +7,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from core.db import get_db
+from db import get_db
 
 db = get_db()
 router = APIRouter(tags=["flights"])
