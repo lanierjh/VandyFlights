@@ -78,12 +78,11 @@ def get_pending_friend_requests(current_user: models.User = Depends(util.get_cur
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 @router.get("/profile", response_model=schemas.UserProfile)
 def get_profile(token: str = Depends(oauth2_scheme)):
-    payload = util.verify_access_token(token)  # Your function to decode the JWT
+    payload = util.verify_access_token(token)
     identifier = payload.get("identifier")
     if not identifier:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-    # Fetch user data based on the identifier
     user = crud.get_user_by_username_or_email(identifier)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

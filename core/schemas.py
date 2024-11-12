@@ -1,6 +1,8 @@
 from pydantic import BaseModel, EmailStr
 import re
 from datetime import date,time
+from typing import List
+
 
 class UserResponse(BaseModel):
     id: str
@@ -25,6 +27,7 @@ class UserProfile(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
+    friends : List[str]  = []
 
 class UserProfileUpdate(BaseModel):
     first_name: str
