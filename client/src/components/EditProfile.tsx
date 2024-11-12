@@ -27,21 +27,21 @@ export default function EditProfile() {
     };
 
     return (
-        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#F1D6D9', minHeight: '100vh' }}>
+        <div style={styles.pageContainer}>
             <Header />
             <div className="edit-profile-container" style={styles.profileContainer}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={styles.profileHeader}>
+                    <div style={styles.profileInfo}>
                         <Image 
                             src="/newyork.png"
                             alt="Profile picture"
                             width={100}
                             height={100}
-                            style={{ borderRadius: '50%', marginRight: '20px' }}
+                            style={styles.profileImage}
                         />
                         <div>
-                            <h2>{formData.firstName} {formData.lastName}</h2>
-                            <p>{formData.email}</p>
+                            <h2 style={styles.profileName}>{formData.firstName} {formData.lastName}</h2>
+                            <p style={styles.profileEmail}>{formData.email}</p>
                         </div>
                     </div>
                     {isEditing ? (
@@ -62,7 +62,7 @@ export default function EditProfile() {
                 </div>
 
                 {/* Profile Form */}
-                <form className="profile-form" style={{ marginTop: '30px' }}>
+                <form className="profile-form" style={styles.profileForm}>
                     <div className="row" style={styles.row}>
                         <div className="form-group" style={styles.formGroup}>
                             <label htmlFor="firstName" style={styles.label}>First Name</label>
@@ -136,9 +136,9 @@ export default function EditProfile() {
                     </div>
                 </form>
 
-                {/* Flight Section as a single entity */}
-                <div style={{ marginTop: '30px' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '10px' }}>Flight</h3>
+                {/* Flight Section */}
+                <div style={styles.flightSection}>
+                    <h3 style={styles.flightHeading}>Flight</h3>
                     <div style={styles.flightContainer}>
                         <div style={styles.flightDetail}>
                             <span style={styles.label}>Flight Number:</span> AA123
@@ -158,6 +158,14 @@ export default function EditProfile() {
 
 // Styles
 const styles = {
+    pageContainer: {
+        fontFamily: 'Arial, sans-serif',
+        backgroundColor: '#F1D6D9',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
     profileContainer: {
         margin: '50px auto',
         padding: '40px',
@@ -165,18 +173,47 @@ const styles = {
         borderRadius: '10px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
         maxWidth: '900px',
+        width: '100%',
+    },
+    profileHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '30px',
+    },
+    profileInfo: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    profileImage: {
+        borderRadius: '50%',
+        marginRight: '20px',
+    },
+    profileName: {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+    },
+    profileEmail: {
+        color: '#555',
+        fontSize: '1rem',
+    },
+    profileForm: {
+        marginTop: '30px',
     },
     row: {
         display: 'flex',
         justifyContent: 'space-between',
+        gap: '20px',
     },
     formGroup: {
-        flex: '0 0 48%',
+        flex: '1',
     },
     label: {
         fontWeight: 'bold',
-        fontSize: '1rem', // Ensure all labels have the same font size
+        fontSize: '1rem',
         color: '#333',
+        display: 'block',
+        marginBottom: '5px',
     },
     inputField: {
         width: '100%',
@@ -184,6 +221,15 @@ const styles = {
         borderRadius: '10px',
         border: '1px solid #ccc',
         backgroundColor: '#f9f9f9',
+        fontSize: '1rem',
+    },
+    flightSection: {
+        marginTop: '30px',
+    },
+    flightHeading: {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        marginBottom: '10px',
     },
     flightContainer: {
         backgroundColor: '#f9f9f9',
@@ -203,7 +249,8 @@ const styles = {
         color: 'white',
         border: 'none',
         borderRadius: '10px',
-        padding: '15px 30px',
+        padding: '10px 20px',
+        fontSize: '1rem',
         cursor: 'pointer',
     },
     editButton: {
@@ -211,7 +258,8 @@ const styles = {
         color: 'white',
         border: 'none',
         borderRadius: '10px',
-        padding: '15px 30px',
+        padding: '10px 20px',
+        fontSize: '1rem',
         cursor: 'pointer',
     },
 };
