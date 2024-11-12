@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import FlightResults from './FlightResults';
+import FlightResults from '../components/FlightResults';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 
 jest.mock('axios');
 jest.mock('next/navigation', () => ({

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ReturnFlightResults from './ReturnFlightResults';
+import ReturnFlightResults from '../components/ReturnFlightResults';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),

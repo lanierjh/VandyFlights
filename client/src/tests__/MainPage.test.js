@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import MainPage from './MainPage';
+import MainPage from '../components/MainPage';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 
 jest.mock('axios');
 jest.mock('next/navigation', () => ({

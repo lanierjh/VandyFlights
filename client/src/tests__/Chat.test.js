@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import ChatPage from './ChatPage';
+import ChatPage from '../components/Chat';
+import React from 'react';
 
 describe('ChatPage', () => {
   test('renders friends list by default', () => {

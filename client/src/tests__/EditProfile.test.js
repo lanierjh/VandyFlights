@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import EditProfile from './EditProfile';
+import EditProfile from '../components/EditProfile';
+import React from 'react';
 
 describe('EditProfile', () => {
   test('renders profile information with default data', () => {
