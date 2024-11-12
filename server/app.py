@@ -78,6 +78,7 @@ def extract_flight_info(flight):
         flights.append(flight_info)
     return flights
 
+
 @app.post("/flightsONEWAY")
 async def show_flightsONE_WAY(flight_request: FlightRequest):
     logger.debug(f"Received FlightRequest: {flight_request}")

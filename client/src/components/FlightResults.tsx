@@ -90,16 +90,16 @@ export default function FlightResults() {
                     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     price: flight.price,
                 };
-                // const response = fetch('http://localhost:8000/addFlight', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(flightData),
-                // });
-                // if (!response) {
-                //     throw new Error(`HTTP error! status: ${response}`);
-                // }
+                const response = fetch('http://localhost:8000/addFlight', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(flightData),
+                 });
+                 if (!response) {
+                     throw new Error(`HTTP error! status: ${response}`);
+                 }
             } catch (error) {
                 console.error('Error storing to the database:', error);
             }
@@ -117,21 +117,21 @@ export default function FlightResults() {
                     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     price: flight.price.toFixed(2),
                 };
-                // const response = fetch('http://localhost:8000/addFlight', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(flightData),
-                // });
-                // if (!response) {
-                //     throw new Error(`HTTP error! status: ${response}`);
-                // }
+                 const response = fetch('http://localhost:8000/addFlight', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(flightData),
+                 });
+                 if (!response) {
+                     throw new Error(`HTTP error! status: ${response}`);
+                 }
    
-                window.open(flight.url, '_blank');
             } catch (error) {
                 console.error('Error storing to the database:', error);
             }
+            window.open(flight.url, '_blank');
         }
     };
     
