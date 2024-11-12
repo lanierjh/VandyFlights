@@ -30,28 +30,29 @@ export default function ReturnFlightResults() {
 
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
-        if (flightData) {
-            const sortedData = [...flightData].sort((a, b) => {
-                switch (e.target.value) {
-                    case 'Cheapest Price':
-                        return a.price - b.price;
-                    case 'Earliest Departure Time': {
-                        const earliestDateA = new Date(a.legs[0].departureDateTime);
-                        const earliestDateB = new Date(b.legs[0].departureDateTime);
-                        return earliestDateA - earliestDateB;
-                    }
-                    case 'Latest Departure Time': {
-                        const latestDateA = new Date(a.legs[0].departureDateTime);
-                        const latestDateB = new Date(b.legs[0].departureDateTime);
-                        return latestDateB - latestDateA;
-                    }
-                    default:
-                        return 0;
+    
+        const sortedData = [...returnFlights].sort((a, b) => {
+            switch (e.target.value) {
+                case 'Cheapest Price':
+                    return a.price - b.price;
+                case 'Earliest Departure Time': {
+                    const earliestDateA = new Date(a.legs[0].departureDateTime);
+                    const earliestDateB = new Date(b.legs[0].departureDateTime);
+                    return earliestDateA - earliestDateB;
                 }
-            });
-            setFlightData(sortedData);
-        }
+                case 'Latest Departure Time': {
+                    const latestDateA = new Date(a.legs[0].departureDateTime);
+                    const latestDateB = new Date(b.legs[0].departureDateTime);
+                    return latestDateB - latestDateA;
+                }
+                default:
+                    return 0;
+            }
+        });
+    
+        setReturnFlights(sortedData);
     };
+    
     
 
     const handleResultsLimitChange = (e) => {
