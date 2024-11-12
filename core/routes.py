@@ -1,8 +1,8 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
-from core.db import get_db  # Ensure this imports your `get_db` function
-from core.schemas import UserCreate, FlightCreate, UserResponse, UserAuthenticate
-from core.crud import create_user, get_user_by_username_or_email, create_flight, \
+from db import get_db  # Ensure this imports your `get_db` function
+from schemas import UserCreate, FlightCreate, UserResponse, UserAuthenticate
+from crud import create_user, get_user_by_username_or_email, create_flight, \
     fetch_flight_details, user_login
 from fastapi.middleware.cors import CORSMiddleware
 

@@ -6,3 +6,6 @@ server/__pycache__core/security/service-account.json
 .idea
 *.env
 __pycache__/
+*/__pycache__/
+core/routers/__pycache__/
+core/security/__pycache__/

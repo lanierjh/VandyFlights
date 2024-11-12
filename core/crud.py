@@ -6,9 +6,12 @@ from datetime import datetime
 from core.security.util import hash_password, verify_password
 from core.db import get_db
 
+
 app = FastAPI()
 
+
 db = get_db()
+
 
 def user_login(user: UserAuthenticate):
     existing_user = get_user_by_username_or_email(user.identifier)
@@ -20,6 +23,7 @@ def user_login(user: UserAuthenticate):
     else:
         return {"success": "User authenticated", "user": user}
 
+
 def create_user(user: UserCreate):
     users_ref = db.collection("users")
     existing_user_by_username = list(users_ref.where("username", "==", user.username).limit(1).stream())
@@ -29,6 +33,7 @@ def create_user(user: UserCreate):
             detail="Username already exists"
         )
 
+
     existing_user_by_email = list(users_ref.where("email", "==", user.email).limit(1).stream())
     if existing_user_by_email:
         raise HTTPException(
@@ -36,12 +41,14 @@ def create_user(user: UserCreate):
             detail="Email already exists"
         )
 
+
     hashed_password = hash_password(user.password)
     new_user_data = {
         "username": user.username,
         "first_name": user.first_name,
         "last_name": user.last_name,
         "email": user.email,
+        "flight_ids": [],
         "hashed_password": hashed_password,
         "created_at": datetime.utcnow(),
         "is_active": True
@@ -49,28 +56,39 @@ def create_user(user: UserCreate):
     new_user_ref = users_ref.document()
     new_user_ref.set(new_user_data)
 
+
     return {"id": new_user_ref.id, **new_user_data}
+
 
 def get_user_by_username_or_email(identifier: str):
     users_ref = db.collection("users")
+
 
     username_query = users_ref.where("username", "==", identifier).limit(1).get()
     if username_query:
         return username_query[0].to_dict()
 
 
+
+
     email_query = users_ref.where("email", "==", identifier).limit(1).get()
+
 
     if email_query:
         return email_query[0].to_dict()
 
+
     return None
 
 
-def create_flight(flight_data: FlightCreate, user_id: str):
-    flight_ref = db.collection("users").document(user_id).collection("flights").document()
+
+
+def create_flight(flight_data: FlightCreate):
+    flight_ref = db.collection("flights")
     new_flight_data = {
         "flight_number": flight_data.flight_number,
+        "start": flight_data.start,
+        "destination": flight_data.destination,
         "departure": flight_data.departure,
         "arrival": flight_data.arrival,
         "departure_time": flight_data.departure_time,
@@ -78,8 +96,16 @@ def create_flight(flight_data: FlightCreate, user_id: str):
         "price": flight_data.price,
         "purchase_time": datetime.utcnow()
     }
-    flight_ref.set(new_flight_data)
+    new_flight_ref = flight_ref.document()
+    new_flight_ref.set(new_flight_data)
+
+
     return new_flight_data
+
+#def update_user_data_with_flight(flight_data, users: UserCreate):
+    #flight_data["flight_number"]
+
+
 
 
 def fetch_flight_details(query: str):
@@ -90,6 +116,7 @@ def fetch_flight_details(query: str):
         "x-rapidapi-host": "sky-scanner3.p.rapidapi.com"
     }
     params = {"query": query}
+
 
     response = requests.get(url, headers=headers, params=params)
     if response.status_code == 200:

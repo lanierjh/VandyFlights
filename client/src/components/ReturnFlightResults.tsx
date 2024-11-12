@@ -1,168 +1,189 @@
 "use client";
 import Header from './Header';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function ReturnFlightResults() {
-    const [flightData, setFlightData] = useState(null);
+    const [outboundFlight, setOutboundFlight] = useState(null);
+    const [returnFlights, setReturnFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchData, setSearchData] = useState({
-        origin: '',
-        destination: 'BNA', // Assume this is the user's return airport
-        departureDate: '',
-        returnDate: '',
-        roundTrip: 'true',
-    });
     const [sortOption, setSortOption] = useState('Top flights');
-    const [resultsLimit, setResultsLimit] = useState(50); 
+    const [resultsLimit, setResultsLimit] = useState(50);
+    const router = useRouter();
+    const passengers = ["James Huang", "Abdallah Safa", "Jackson Lanier", "Jane Sun", "Vikash Singh"];
 
     useEffect(() => {
-        const storedSearchData = JSON.parse(localStorage.getItem('searchData'));
         const storedOutboundFlight = JSON.parse(localStorage.getItem('selectedOutboundFlight'));
+        const storedFlightResults = JSON.parse(localStorage.getItem('flightResults'));
 
-        if (storedSearchData && storedOutboundFlight) {
-            setSearchData({
-                origin: storedSearchData.destination, // set origin as destination from outbound
-                destination: storedSearchData.origin, // set destination as origin from outbound
-                departureDate: storedSearchData.returnDate, // return date as departure for return leg
-                roundTrip: 'false',
-            });
+        if (storedOutboundFlight) {
+            setOutboundFlight(storedOutboundFlight);
         }
 
-        const fetchReturnFlights = async () => {
-            setIsLoading(true);
-            try {
-                const response = await axios.post(`http://localhost:8000/flightsROUNDTRIP`, {
-                    origin: storedSearchData.destination,
-                    destination: storedSearchData.origin,
-                    departureDate: storedSearchData.returnDate,
-                    roundTrip: 'false',
-                });
-                console.log("Return Flight Data Response:", response.data);
-                setFlightData(response.data);
-            } catch (error) {
-                console.error("Error fetching return flights:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (storedSearchData && storedSearchData.returnDate) {
-            fetchReturnFlights();
+        if (storedFlightResults?.return_flights) {
+            setReturnFlights(storedFlightResults.return_flights);
+        } else {
+            console.error("No return flight data found.");
         }
+        setIsLoading(false);
     }, []);
-
-    const handleSelectFlight = (flight) => {
-        window.open(flight.url, '_blank');
-    };
 
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
-        if (flightData) {
-            const sortedData = [...flightData.flights].sort((a, b) => {
-                switch (e.target.value) {
-                    case 'Price':
-                        return a.price - b.price;
-                    case 'Departure time':
-                        return new Date(a.departureDateTime) - new Date(b.departureDateTime);
-                    case 'Arrival time':
-                        return new Date(a.arrivalDateTime) - new Date(b.arrivalDateTime);
-                    default:
-                        return 0;
+
+        const sortedData = [...returnFlights].sort((a, b) => {
+            switch (e.target.value) {
+                case 'Cheapest Price':
+                    return a.price - b.price;
+                case 'Earliest Departure Time': {
+                    const earliestDateA = new Date(a.legs[0].departureDateTime);
+                    const earliestDateB = new Date(b.legs[0].departureDateTime);
+                    return earliestDateA - earliestDateB;
                 }
-            });
-            setFlightData({ ...flightData, flights: sortedData });
-        }
+                case 'Latest Departure Time': {
+                    const latestDateA = new Date(a.legs[0].departureDateTime);
+                    const latestDateB = new Date(b.legs[0].departureDateTime);
+                    return latestDateB - latestDateA;
+                }
+                default:
+                    return 0;
+            }
+        });
+
+        setReturnFlights(sortedData);
     };
+
+
 
     const handleResultsLimitChange = (e) => {
         setResultsLimit(Number(e.target.value));
     };
 
-    const filteredFlights = flightData?.flights.slice(0, resultsLimit);
+    const handleSelectFlight = (flight) => {
+        window.open(flight.url, '_blank');
+    };
+
+    const filteredFlights = Array.from(
+        new Map(
+            returnFlights.map((flight) => [
+                `${flight.flightNumber}-${flight.legs[0].origin}-${flight.legs[0].destination}-${flight.legs[0].departureDateTime}`,
+                flight,
+            ])
+        ).values()
+    ).slice(0, resultsLimit);
 
     if (isLoading) {
-        return <div>Loading... We are pulling up the return flight info right now.</div>;
+        return <div>Loading... We are pulling up the return flight info right now. Please wait.</div>;
     }
 
-    if (!flightData || !flightData.flights || flightData.flights.length === 0) {
+    if (!returnFlights || returnFlights.length === 0) {
         return <div>No return flight data available. Please go back and search for flights again.</div>;
     }
 
     return (
-        <div style={styles.container}>
+        <div style={styles.pageContainer}>
             <Header />
-            <section style={styles.sortSection}>
-                <label htmlFor="sort" style={styles.sortLabel}>Sort by:</label>
-                <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.sortSelect}>
-                    <option>Top flights</option>
-                    <option>Price</option>
-                    <option>Departure time</option>
-                    <option>Arrival time</option>
+
+            <section style={styles.optionsSection}>
+                <label htmlFor="sort" style={styles.optionLabel}>Sort by:</label>
+                <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.optionSelect}>
+                    <option>Top Flights</option>
+                    <option>Cheapest Price</option>
+                    <option>Earliest Departure Time</option>
+                    <option>Latest Departure Time</option>
                 </select>
-                <label htmlFor="resultsLimit" style={styles.resultsLimitLabel}>Show:</label>
-                <select id="resultsLimit" value={resultsLimit} onChange={handleResultsLimitChange} style={styles.resultsLimitSelect}>
+                <label htmlFor="resultsLimit" style={styles.optionLabel}>Show:</label>
+                <select id="resultsLimit" value={resultsLimit} onChange={handleResultsLimitChange} style={styles.optionSelect}>
                     <option value={10}>10 flights</option>
                     <option value={20}>20 flights</option>
                     <option value={50}>50 flights</option>
                 </select>
             </section>
 
-            <main style={styles.resultsContainer}>
-                {filteredFlights.map((flight, index) => (
-                    <div key={index} style={styles.flightCard}>
-                        <div style={styles.flightLogo}>
-                            <img src={flight.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
-                        </div>
+            <div style={styles.content}>
+                <aside style={styles.sidebar}>
+                    <h3>People Going to {outboundFlight?.destination || "your destination"}</h3>
+                    <ul>
+                        {passengers.map((name, index) => (
+                            <li key={index} style={styles.passengerItem}>{name}</li>
+                        ))}
+                    </ul>
+                </aside>
 
-                        <div style={styles.flightDetails}>
-                            <p style={styles.flightTime}><strong>{new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong></p>
-                            <p style={styles.flightDuration}>{Math.floor((new Date(flight.arrivalDateTime) - new Date(flight.departureDateTime)) / (1000 * 60 * 60))} hr {((new Date(flight.arrivalDateTime) - new Date(flight.departureDateTime)) / (1000 * 60)) % 60} min</p>
-                            <p style={styles.flightRoute}>{flight.origin} - {flight.destination}</p>
-                            <p style={styles.flightCarrier}>{flight.carrier} - Flight {flight.flightNumber}</p>
-                            <p style={styles.flightStops}>{flight.stops === 0 ? "Nonstop" : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}</p>
-                        </div>
+                <main style={styles.resultsContainer}>
+                    {filteredFlights.map((flight, index) => (
+                        <div key={index} style={styles.flightCard}>
+                            <div style={styles.flightLogo}>
+                                <img src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
+                            </div>
 
-                        <div style={styles.priceSection}>
-                            <p style={styles.price}>${flight.price}</p>
-                            <button style={styles.selectButton} onClick={() => handleSelectFlight(flight)}>Select</button>
+                            <div style={styles.flightDetails}>
+                                <h4>VandyFlight Details:</h4>
+                                <div style={styles.legContainer}>
+                                    {flight.legs && flight.legs.map((leg, legIndex) => (
+                                        <div key={legIndex} style={styles.legDetails}>
+                                            <p style={styles.legRoute}><strong>{leg.origin} → {leg.destination}</strong></p>
+                                            <p>Departure: {new Date(leg.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                            <p>Arrival: {new Date(leg.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                            <p>Carrier: {leg.carrier}</p>
+                                            <p>Flight Number: {leg.flightNumber}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div style={styles.priceSection}>
+                                <p style={styles.price}>${flight.price}</p>
+                                <button style={styles.selectButton} onClick={() => handleSelectFlight(flight)}>Select</button>
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </main>
+                    ))}
+                </main>
+            </div>
         </div>
     );
 }
 
 const styles = {
-    container: {
+    pageContainer: {
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
-        padding: '20px',
-    },
-    sortSection: {
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
         alignItems: 'center',
-        marginTop: '20px',
-        gap: '10px',
     },
-    sortLabel: {
+    optionsSection: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        marginTop: '10px',
+    },
+    optionLabel: {
         marginRight: '5px',
     },
-    sortSelect: {
-        padding: '10px',
+    optionSelect: {
+        padding: '8px',
         borderRadius: '5px',
         border: '1px solid #ddd',
     },
-    resultsLimitLabel: {
-        marginLeft: '15px',
+    content: {
+        display: 'flex',
+        gap: '20px',
+        width: '80%',
+        maxWidth: '1000px',
+        marginTop: '20px',
     },
-    resultsLimitSelect: {
-        padding: '10px',
-        borderRadius: '5px',
-        border: '1px solid #ddd',
+    sidebar: {
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        width: '200px',
+    },
+    passengerItem: {
+        listStyleType: 'none',
+        padding: '8px 0',
+        borderBottom: '1px solid #ddd',
     },
     resultsContainer: {
         display: 'flex',
@@ -173,7 +194,6 @@ const styles = {
     flightCard: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
         backgroundColor: '#fff',
         border: '1px solid #ddd',
         borderRadius: '8px',
@@ -181,45 +201,39 @@ const styles = {
         margin: '10px 0',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         width: '100%',
-        maxWidth: '700px',
+        maxWidth: '800px',
     },
     flightLogo: {
-        flex: '0 0 auto',
+        flex: '0 0 100px',
         marginRight: '20px',
     },
     planeIcon: {
-        width: '100px',
-        height: '100px',
+        width: '80px',
+        height: '80px',
     },
     flightDetails: {
         flex: '1 1 auto',
-        textAlign: 'center',
+        textAlign: 'left',
+        padding: '0 15px',
     },
-    flightTime: {
-        fontSize: '1.2em',
+    legContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '20px',
+    },
+    legDetails: {
+        flex: '0 0 calc(50% - 20px)',
+        marginBottom: '10px',
+    },
+    legRoute: {
+        fontSize: '1.1em',
         fontWeight: 'bold',
-    },
-    flightDuration: {
-        fontSize: '1em',
-        color: '#666',
-    },
-    flightRoute: {
-        fontSize: '1em',
-        color: '#333',
-    },
-    flightCarrier: {
-        fontSize: '1em',
-        color: '#333',
-        fontStyle: 'italic',
-    },
-    flightStops: {
-        fontSize: '0.9em',
-        color: '#999',
     },
     priceSection: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        width: '100px',
     },
     price: {
         fontSize: '1.5em',
@@ -229,10 +243,9 @@ const styles = {
     selectButton: {
         backgroundColor: '#0b8457',
         color: '#fff',
-        padding: '10px 20px',
+        padding: '10px 15px',
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
-        fontSize: '1em',
     },
 };

@@ -19,7 +19,7 @@ export default function ChatPage() {
   const [currentTab, setCurrentTab] = useState('friends');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  
+
   // Hardcoded list of potential friends
   const allUsers = [
     {
@@ -28,7 +28,7 @@ export default function ChatPage() {
         firstName: 'Jane',
         lastName: 'Sun',
         email: 'jane.sun@example.com',
-        destination: 'New York, JFK',
+        destination: 'JFK',
         graduatingClass: '2025',
       },
     },
@@ -38,7 +38,7 @@ export default function ChatPage() {
         firstName: 'Abdallah',
         lastName: 'Safa',
         email: 'abdallah.safa@example.com',
-        destination: 'Miami, MIA',
+        destination: 'MIA',
         graduatingClass: '2023',
       },
     },
@@ -48,7 +48,7 @@ export default function ChatPage() {
         firstName: 'Jackson',
         lastName: 'Lanier',
         email: 'jackson.lanier@example.com',
-        destination: 'Chicago, ORD',
+        destination: 'ORD',
         graduatingClass: '2024',
       },
     },
@@ -85,10 +85,9 @@ export default function ChatPage() {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.pageContainer}>
       <Header />
-      <div style={styles.mainContent}>
-        {/* Friends List Section */}
+      <section style={styles.chatSection}>
         <div style={styles.friendsList}>
           <div style={styles.tabContainer}>
             <button
@@ -163,49 +162,52 @@ export default function ChatPage() {
           )}
         </div>
 
-        {/* Chat Section */}
         <div style={styles.chatWindow}>
           {selectedFriend ? (
             <>
               <h2 style={styles.chatHeader}>{selectedFriend.name}</h2>
               <div style={styles.messagesContainer}>
-                {/* Placeholder messages */}
                 <div style={styles.messageBubble}>
-                  Hello, how are you?
+                  Hi!
                 </div>
                 <div style={styles.messageBubble}>
                   Are you excited about the trip to{' '}
                   {selectedFriend.profile.destination}?
                 </div>
-                {/* More messages */}
               </div>
             </>
           ) : (
             <h2 style={styles.chatHeader}>Select a friend to chat with</h2>
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
-// Styles
+// Updated styles for alignment with main page
 const styles = {
-  container: {
+  pageContainer: {
     fontFamily: 'Arial, sans-serif',
     backgroundColor: '#F1D6D9',
     minHeight: '100vh',
-  },
-  mainContent: {
     display: 'flex',
-    padding: '20px',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  chatSection: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+    maxWidth: '1200px',
+    padding: '30px',
+    gap: '20px',
   },
   friendsList: {
     flex: '1',
     backgroundColor: 'white',
     borderRadius: '10px',
     padding: '20px',
-    marginRight: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   },
   tabContainer: {
@@ -277,6 +279,9 @@ const styles = {
     borderRadius: '10px',
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   chatHeader: {
     fontSize: '1.5rem',
@@ -287,6 +292,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
+    width: '100%',
   },
   messageBubble: {
     backgroundColor: '#f0f0f0',
