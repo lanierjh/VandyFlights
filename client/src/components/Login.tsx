@@ -48,7 +48,6 @@ export default function Login() {
         });
 
             if (response.ok) {
-                // console.log('Login successful:', formData);
                 const data = await response.json();
                 console.log('Login successful:', data);
                 localStorage.setItem('accessToken', data.access_token);

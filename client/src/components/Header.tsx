@@ -1,4 +1,3 @@
-// Header.tsx
 import React, {useEffect} from 'react';
 import {useRouter} from "next/navigation";
 
@@ -7,10 +6,8 @@ export default function Header() {
     const router = useRouter();
 
     const handleLogout= () => {
-    // Remove the access token from local storage
     localStorage.removeItem('accessToken');
     console.log("token removed, redirecting to root...")
-    // Redirect to the root page
     router.push('/');
   };
 

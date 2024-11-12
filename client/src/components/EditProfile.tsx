@@ -17,13 +17,12 @@ export default function EditProfile() {
         email: ''
     });
     useEffect(() => {
-        // Check if accessToken is in localStorage
         const token = localStorage.getItem('accessToken');
         console.log("Retrieved token:", token);
 
         if (!token) {
             console.log("no");
-            // Redirect to login if token is missing
+
             router.push('/');
             return;
         }
@@ -217,7 +216,6 @@ export default function EditProfile() {
     );
 }
 
-// Styles
 const styles = {
     pageContainer: {
         fontFamily: 'Arial, sans-serif',

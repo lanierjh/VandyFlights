@@ -20,7 +20,6 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  // Hardcoded list of potential friends
   const allUsers = [
     {
       name: 'Jane Sun',

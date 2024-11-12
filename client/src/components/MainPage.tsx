@@ -17,12 +17,10 @@ export default function MainPage() {
     const todayDate = new Date().toISOString().split("T")[0];
 
     useEffect(() => {
-        // Check if accessToken is in localStorage
         const token = localStorage.getItem('accessToken');
         console.log("Retrieved token:", token);
 
         if (!token) {
-            // Redirect to login if token is missing
             router.push('/');
         }
     }, [router]);

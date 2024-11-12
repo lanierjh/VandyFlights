@@ -9,7 +9,7 @@ export default function ReturnFlightResults() {
     const [isLoading, setIsLoading] = useState(true);
     const [sortOption, setSortOption] = useState('Top flights');
     const [resultsLimit, setResultsLimit] = useState(50);
-    const router = useRouter();
+
     const passengers = ["James Huang", "Abdallah Safa", "Jackson Lanier", "Jane Sun", "Vikash Singh"];
 
     useEffect(() => {

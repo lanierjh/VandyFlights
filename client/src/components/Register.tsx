@@ -8,7 +8,7 @@ export default function Register() {
         lastName: '',
         vanderbiltEmail: '',
         password: '',
-        username: '',  // New username field
+        username: '', 
     });
 
     const [errorMessage, setErrorMessage] = useState('');
@@ -63,7 +63,7 @@ export default function Register() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: formData.username,  // Send username
+                    username: formData.username,
                     email: formData.vanderbiltEmail,
                     password: formData.password,
                     first_name: formData.firstName,
