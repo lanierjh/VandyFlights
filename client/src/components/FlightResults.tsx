@@ -25,7 +25,6 @@ export default function FlightResults() {
         const storedFlightData = JSON.parse(localStorage.getItem('flightResults'));
         console.log("Stored flight data:", storedFlightData);
         if (storedFlightData) {
-            // Adjusting to handle both one-way and round-trip data formats
             setFlightData(storedFlightData?.outbound_flights || storedFlightData?.flights || []);
         }
         setIsLoading(false);
