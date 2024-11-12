@@ -169,7 +169,7 @@ def accept_friend_request(recipient_id: str, requester_email: str):
     recipient_ref = db.collection("users").document(recipient_id)
     requester_ref = db.collection("users").document(requester_id)
     recipient_ref.update({"friends": firestore.ArrayUnion([get_user_by_id(requester_id)['username']])})
-    requester_ref.update({"friends": firestore.ArrayUnion([get_user_by_id(requester_id)['username']])})
+    requester_ref.update({"friends": firestore.ArrayUnion([get_user_by_id(recipient_id)['username']])})
 
 
 def reject_friend_request(recipient_id: str, requester_email: str):
