@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Header from './Header';
+import Image from 'next/image';
 
 export default function MainPage() {
     const [searchData, setSearchData] = useState({
@@ -164,7 +165,8 @@ export default function MainPage() {
                             style={styles.destinationCard}
                             onClick={() => handlePopularDestinationClick(destination.code)}
                         >
-                            <img src={destination.image} alt={destination.name} style={styles.destinationImage} />
+                            <Image src={destination.image} alt={destination.name} width={250} height={150} style={styles.destinationImage} />
+
                             <h4>{destination.name}</h4>
                             <p>{destination.description}</p>
                         </div>
@@ -189,7 +191,7 @@ const styles = {
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     searchSection: {

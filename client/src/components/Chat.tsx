@@ -184,14 +184,13 @@ export default function ChatPage() {
   );
 }
 
-// Updated styles for alignment with main page
 const styles = {
   pageContainer: {
     fontFamily: 'Arial, sans-serif',
     backgroundColor: '#F1D6D9',
     minHeight: '100vh',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     alignItems: 'center',
   },
   chatSection: {
@@ -279,9 +278,10 @@ const styles = {
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     alignItems: 'center',
-  },
+},
+
   chatHeader: {
     fontSize: '1.5rem',
     fontWeight: 'bold',
@@ -289,7 +289,7 @@ const styles = {
   },
   messagesContainer: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '10px',
     width: '100%',
   },

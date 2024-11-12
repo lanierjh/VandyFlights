@@ -3,6 +3,7 @@ import Header from './Header';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function FlightResults() {
     const [flightData, setFlightData] = useState([]);
@@ -80,16 +81,16 @@ export default function FlightResults() {
     const handleSelectFlight = (flight) => {
         if (searchData.roundTrip === 'true') {
             try {
-                const flightData = {
-                    flight_number: flight.flightNumber,
-                    start: flight.origin,
-                    destination: flight.destination,
-                    departure: flight.departureDateTime,
-                    arrival: flight.arrivalDateTime,
-                    departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price,
-                };
+                // const flightData = {
+                //     flight_number: flight.flightNumber,
+                //     start: flight.origin,
+                //     destination: flight.destination,
+                //     departure: flight.departureDateTime,
+                //     arrival: flight.arrivalDateTime,
+                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     price: flight.price,
+                // };
                 // const response = fetch('http://localhost:8000/addFlight', {
                 //     method: 'POST',
                 //     headers: {
@@ -107,16 +108,16 @@ export default function FlightResults() {
             }
         } else {
             try {
-                const flightData = {
-                    flight_number: flight.flightNumber,
-                    start: flight.origin,
-                    destination: flight.destination,
-                    departure: flight.departureDateTime,
-                    arrival: flight.arrivalDateTime,
-                    departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price,
-                };
+                // const flightData = {
+                //     flight_number: flight.flightNumber,
+                //     start: flight.origin,
+                //     destination: flight.destination,
+                //     departure: flight.departureDateTime,
+                //     arrival: flight.arrivalDateTime,
+                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                //     price: flight.price,
+                // };
                 // const response = fetch('http://localhost:8000/addFlight', {
                 //     method: 'POST',
                 //     headers: {
@@ -174,7 +175,7 @@ export default function FlightResults() {
     ).slice(0, resultsLimit);
 
     if (isLoading) {
-        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
+        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you&apos;re looking for!</div>
     }
 
     if (!flightData || flightData.length === 0) {
@@ -263,7 +264,7 @@ export default function FlightResults() {
                     {filteredFlights.map((flight, index) => (
                         <div key={index} style={styles.flightCard}>
                             <div style={styles.flightLogo}>
-                                <img src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
+                                <Image src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" width={80} height={80} style={styles.planeIcon} />
                             </div>
 
                             <div style={styles.flightDetails}>
@@ -300,7 +301,7 @@ const styles = {
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     searchSection: {
@@ -370,7 +371,7 @@ const styles = {
     },
     resultsContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         flex: 1,
     },
@@ -414,7 +415,7 @@ const styles = {
     },
     priceSection: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         width: '100px',
     },

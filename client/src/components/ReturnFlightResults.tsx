@@ -1,7 +1,7 @@
 "use client";
 import Header from './Header';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function ReturnFlightResults() {
     const [outboundFlight, setOutboundFlight] = useState(null);
@@ -114,7 +114,8 @@ export default function ReturnFlightResults() {
                     {filteredFlights.map((flight, index) => (
                         <div key={index} style={styles.flightCard}>
                             <div style={styles.flightLogo}>
-                                <img src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
+                                <Image src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" width={80} height={80} style={styles.planeIcon} />
+
                             </div>
 
                             <div style={styles.flightDetails}>
@@ -149,7 +150,7 @@ const styles = {
         backgroundColor: '#F1D6D9',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     optionsSection: {
@@ -187,7 +188,7 @@ const styles = {
     },
     resultsContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         flex: 1,
     },
@@ -231,7 +232,7 @@ const styles = {
     },
     priceSection: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         width: '100px',
     },
