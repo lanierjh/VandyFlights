@@ -28,6 +28,7 @@ class UserProfile(BaseModel):
     last_name: str
     email: EmailStr
     friends : List[str]  = []
+    flights : List[str] = []
 
 class UserProfileUpdate(BaseModel):
     first_name: str
