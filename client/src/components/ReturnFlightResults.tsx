@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function ReturnFlightResults() {
-    const [outboundFlight, setOutboundFlight] = useState(null); 
+    const [outboundFlight, setOutboundFlight] = useState(null);
     const [returnFlights, setReturnFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [sortOption, setSortOption] = useState('Top flights');
@@ -30,7 +30,7 @@ export default function ReturnFlightResults() {
 
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
-    
+
         const sortedData = [...returnFlights].sort((a, b) => {
             switch (e.target.value) {
                 case 'Cheapest Price':
@@ -49,18 +49,18 @@ export default function ReturnFlightResults() {
                     return 0;
             }
         });
-    
+
         setReturnFlights(sortedData);
     };
-    
-    
+
+
 
     const handleResultsLimitChange = (e) => {
         setResultsLimit(Number(e.target.value));
     };
 
     const handleSelectFlight = (flight) => {
-        window.open(flight.url, '_blank'); 
+        window.open(flight.url, '_blank');
     };
 
     const filteredFlights = Array.from(
@@ -70,7 +70,7 @@ export default function ReturnFlightResults() {
                 flight,
             ])
         ).values()
-    ).slice(0, resultsLimit);    
+    ).slice(0, resultsLimit);
 
     if (isLoading) {
         return <div>Loading... We are pulling up the return flight info right now. Please wait.</div>;
@@ -83,7 +83,7 @@ export default function ReturnFlightResults() {
     return (
         <div style={styles.pageContainer}>
             <Header />
-            
+
             <section style={styles.optionsSection}>
                 <label htmlFor="sort" style={styles.optionLabel}>Sort by:</label>
                 <select id="sort" value={sortOption} onChange={handleSortChange} style={styles.optionSelect}>
@@ -219,10 +219,10 @@ const styles = {
     legContainer: {
         display: 'flex',
         flexWrap: 'wrap',
-        gap: '20px', 
+        gap: '20px',
     },
     legDetails: {
-        flex: '0 0 calc(50% - 20px)', 
+        flex: '0 0 calc(50% - 20px)',
         marginBottom: '10px',
     },
     legRoute: {

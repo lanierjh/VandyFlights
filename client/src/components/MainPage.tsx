@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Header from './Header';
@@ -16,6 +16,17 @@ export default function MainPage() {
     const router = useRouter();
     const todayDate = new Date().toISOString().split("T")[0];
 
+    useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            // Redirect to login if token is missing
+            router.push('/');
+        }
+    }, [router]);
+    
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
         setSearchData((prevData) => {
@@ -28,7 +39,7 @@ export default function MainPage() {
 
     const handleAirportSelect = (airport) => {
         setSearchData({ ...searchData, destination: `${airport.nameAirport} (${airport.codeIataAirport})` });
-        setAirportSuggestions([]); 
+        setAirportSuggestions([]);
     };
 
     const handleSearchSubmit = async (e) => {
@@ -39,12 +50,13 @@ export default function MainPage() {
         }
         const updatedSearchData = {
             ...searchData,
-            roundTrip: searchData.returnDate ? searchData.roundTrip : 'false',
+            roundTrip: searchData.returnDate ? 'true' : 'false',
         };
+        
         console.log("Submitting search data:", updatedSearchData);
         try {
             const endpoint = updatedSearchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
-            const response = await axios.post(`http://localhost:8001/${endpoint}`, {
+            const response = await axios.post(`http://localhost:8000/${endpoint}`, {
                 origin: updatedSearchData.origin,
                 destination: updatedSearchData.destination,
                 departureDate: updatedSearchData.departureDate,
@@ -62,7 +74,7 @@ export default function MainPage() {
         const departureDate = new Date().toISOString().split("T")[0];
         const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
         try {
-            const response = await axios.post('http://localhost:8001/flightsROUNDTRIP', {
+            const response = await axios.post('http://localhost:8000/flightsROUNDTRIP', {
                 origin: searchData.origin,
                 destination,
                 departureDate,
@@ -192,7 +204,7 @@ const styles = {
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         width: '100%',
         maxWidth: '1200px',
-        marginBottom: '30px', 
+        marginBottom: '30px',
     },
     mainHeading: {
         fontSize: '2.5rem',

@@ -1,15 +1,76 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Image from 'next/image';
 import Header from './Header';
+import {useRouter} from "next/navigation";
+import axios from 'axios';
+
 
 export default function EditProfile() {
+    const router = useRouter();
+    // const [isEditing, setIsEditing] = useState(false);
+    // empty version of profile data before checking auth
     const [formData, setFormData] = useState({
-        firstName: 'Vikash',
-        lastName: 'Singh',
-        destination: 'LGA',
-        graduatingClass: '2025',
-        email: 'vikashsingh@gmail.com'
+        firstName: '',
+        lastName: '',
+        destination: '',
+        graduatingClass: '',
+        email: ''
     });
+    useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            console.log("no");
+            // Redirect to login if token is missing
+            router.push('/');
+            return;
+        }
+        axios.get('http://localhost:8000/profile', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(response => {
+            const data = response.data;
+            setFormData({
+                firstName: data.first_name,
+                lastName: data.last_name,
+                destination: data.destination || '',
+                graduatingClass: data.graduating_class || '',
+                email: data.email
+            });
+        })
+        .catch(error => {
+            console.error("Failed to fetch profile data:", error);
+            // if (error.response && error.response.status === 401) {
+            //     // Token expired or invalid, redirect to login
+            //     router.push('/');
+            // }
+        });
+//         fetch('http://localhost:8000/profile', {
+//     method: 'GET',
+//     headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${token}`  // Replace with a valid token if required
+//     }
+// })
+// .then(response => {
+//     if (!response.ok) throw new Error('Network response was not ok');
+//     return response.json();
+// })
+// .then(data => console.log(data))
+// .catch(error => console.error('CORS test error:', error));
+
+
+
+    }, [router]);
+    // const [formData, setFormData] = useState({
+    //     firstName: 'Vikash',
+    //     lastName: 'Singh',
+    //     destination: 'LGA',
+    //     graduatingClass: '2025',
+    //     email: 'vikashsingh@gmail.com'
+    // });
 
     const [isEditing, setIsEditing] = useState(false);
 

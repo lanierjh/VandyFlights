@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
+from firebase_admin.auth import get_user
 from google.cloud import firestore
 from schemas import UserCreate, FlightCreate, UserAuthenticate
 from datetime import datetime
@@ -65,7 +66,6 @@ def get_user_by_username_or_email(identifier: str):
 
     username_query = users_ref.where("username", "==", identifier).limit(1).get()
     if username_query:
-        # If not found by username, look up by email
         return username_query[0].to_dict()
 
 
@@ -155,37 +155,27 @@ def send_friend_request(requester_id: str, friend_identifier: str):
     if not friend_id:
         raise ValueError("User not found")
 
-    # Reference to the recipient's friend requests subcollection
-    recipient_requests_ref = db.collection("users").document(friend_id).collection("friend_requests")
+    requester_ref = db.collection("users").document(get_user_id_by_username_or_email(requester_id))
+    requester_doc = requester_ref.get()
+    if not requester_doc.exists:
+        raise ValueError("Requester not found")
+    requester_data = requester_doc.to_dict()
+    print(3,requester_data)
+    friends_list = requester_data.get("friends", [])
+    if friend_identifier in friends_list or friend_id in friends_list:
+        raise ValueError("User is already in your friends list")
 
-    # Check if a request is already pending
+    recipient_requests_ref = db.collection("users").document(friend_id).collection("friend_requests")
     existing_request = recipient_requests_ref.where("requester_id", "==", requester_id).where("status", "==",
                                                                                               "pending").get()
     if existing_request:
         raise ValueError("Friend request already sent")
 
-    # Create the friend request with status 'pending'
     recipient_requests_ref.add({
         "requester_id": requester_id,
         "status": "pending"
     })
 
-
-# def accept_friend_request(recipient_id: str, requester_id: str):
-#     recipient_requests_ref = db.collection("users").document(recipient_id).collection("friend_requests")
-#     request_query = recipient_requests_ref.where("requester_id", "==", requester_id).where("status", "==",
-#                                                                                            "pending").limit(1).get()
-#     if not request_query:
-#         raise ValueError("Friend request not found or already processed")
-#
-#     request = request_query[0]
-#     request.reference.update({"status": "accepted"})
-#
-#     # Add each other as friends
-#     recipient_ref = db.collection("users").document(recipient_id)
-#     requester_ref = db.collection("users").document(requester_id)
-#     recipient_ref.update({"friends": firestore.ArrayUnion([requester_id])})
-#     requester_ref.update({"friends": firestore.ArrayUnion([recipient_id])})
 
 def accept_friend_request(recipient_id: str, requester_email: str):
     # Get the requester ID from their email
@@ -205,14 +195,13 @@ def accept_friend_request(recipient_id: str, requester_email: str):
 
     recipient_ref = db.collection("users").document(recipient_id)
     requester_ref = db.collection("users").document(requester_id)
-    recipient_ref.update({"friends": firestore.ArrayUnion([requester_id])})
-    requester_ref.update({"friends": firestore.ArrayUnion([recipient_id])})
+    recipient_ref.update({"friends": firestore.ArrayUnion([get_user_by_id(requester_id)['username']])})
+    requester_ref.update({"friends": firestore.ArrayUnion([get_user_by_id(requester_id)['username']])})
 
 
 def reject_friend_request(recipient_id: str, requester_email: str):
-    # Get the requester ID from their email
+    print(1,requester_email)
     requester_id = get_user_id_by_username_or_email(requester_email)
-
     if not requester_id:
         raise ValueError("Requester not found")
 
@@ -225,6 +214,7 @@ def reject_friend_request(recipient_id: str, requester_email: str):
     request = request_query[0]
     request.reference.update({"status": "rejected"})
 
+#needs to be fixed
 def remove_friend(user_id: str, friend_id: str):
     user_ref = db.collection("users").document(user_id)
     user = user_ref.get().to_dict()
@@ -233,27 +223,27 @@ def remove_friend(user_id: str, friend_id: str):
         user_ref.update({"friends": firestore.ArrayRemove([friend_id])})
 
 
-
 def get_pending_friend_requests(recipient_id: str):
-    recipient_requests_ref = db.collection("users").document(recipient_id).collection("friend_requests")
-    pending_requests = recipient_requests_ref.where("status", "==", "pending").get()
+    friend_requests_ref = db.collection("users").document(recipient_id).collection("friend_requests")
+    pending_requests = friend_requests_ref.where("status", "==", "pending").stream()
 
-    requests_data = []
+    friend_requests = []
     for request in pending_requests:
         request_data = request.to_dict()
-        requests_data.append({
-            "requester_email": request_data["requester_id"],
-            "requester_username": request_data.get("requester_username", "Unknown")
+        friend_requests.append({
+            "requester_id": request_data.get("requester_id"),
+            "recipient_id": recipient_id,
+            "status": request_data.get("status")
         })
-    return requests_data
+
+    return friend_requests
 
 def get_user_by_id(user_id: str):
     user_ref = db.collection("users").document(user_id)
     user_doc = user_ref.get()
     if user_doc.exists:
-        return user_doc.to_dict()  # Returns the entire user document as a dictionary
+        return user_doc.to_dict()
     return None
-
 
 def update_user_profile(user_id: str, update_data: dict):
     user_ref = db.collection("users").document(user_id)

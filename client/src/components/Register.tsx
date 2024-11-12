@@ -57,7 +57,7 @@ export default function Register() {
         setErrorMessage('');
 
         try {
-            const response = await fetch('http://localhost:8000/register', {
+            const response = await fetch('/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,11 +68,14 @@ export default function Register() {
                     password: formData.password,
                     first_name: formData.firstName,
                     last_name: formData.lastName,
+                    flight_ids: [],
                 }),
             });
             if (response.ok) {
-                console.log('Registration successful:', formData);
-                router.push('/mainPage');
+                const data = await response.json();
+                console.log('Login successful:', data);
+                localStorage.setItem('accessToken', data.access_token);
+                window.location.href = '/mainPage';
             } else {
                 const errorData = await response.json();
 

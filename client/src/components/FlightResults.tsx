@@ -12,7 +12,7 @@ export default function FlightResults() {
         destination: '',
         departureDate: '',
         returnDate: '',
-        roundTrip: 'true',
+        roundTrip: '',
     });
     const [sortOption, setSortOption] = useState('Top flights');
     const [resultsLimit, setResultsLimit] = useState(50);
@@ -23,15 +23,16 @@ export default function FlightResults() {
 
     useEffect(() => {
         const storedFlightData = JSON.parse(localStorage.getItem('flightResults'));
+        console.log("Stored flight data:", storedFlightData);
         if (storedFlightData) {
             setFlightData(storedFlightData?.outbound_flights || storedFlightData?.flights || []);
         }
         setIsLoading(false);
     }, []);
-    
+
     const handleSearchSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (!searchData.destination || !searchData.departureDate) {
             alert("Please provide a valid destination and departure date.");
             return;
@@ -41,20 +42,20 @@ export default function FlightResults() {
             ...searchData,
             roundTrip: searchData.returnDate ? 'true' : 'false',
         };
-        
+
         setSearchData(updatedSearchData);
         setIsLoading(true);
-    
+
         try {
             const endpoint = updatedSearchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
-            const response = await axios.post(`http://localhost:8001/${endpoint}`, {
+            const response = await axios.post(`http://localhost:8000/${endpoint}`, {
                 origin: updatedSearchData.origin,
                 destination: updatedSearchData.destination,
                 departureDate: updatedSearchData.departureDate,
                 returnDate: updatedSearchData.returnDate,
-                roundTrip: updatedSearchData.roundTrip === 'true',
+                roundTrip: updatedSearchData.roundTrip,
             });
-    
+
             localStorage.setItem('flightResults', JSON.stringify(response.data));
             setFlightData(response.data.outbound_flights || response.data.flights || []);
         } catch (error) {
@@ -63,11 +64,11 @@ export default function FlightResults() {
             setIsLoading(false);
         }
     };
-    
-    
+
+
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
-    
+
         setSearchData((prevData) => {
             if (name === 'returnDate' && value === '') {
                 return { ...prevData, returnDate: '', roundTrip: 'false' };
@@ -75,13 +76,13 @@ export default function FlightResults() {
             return { ...prevData, [name]: value };
         });
     };
-    
+
     const handleSelectFlight = (flight) => {
         console.log("Selected flight data:", flight);
         if (searchData.roundTrip === 'true') {
             try {
                 const flightData = {
-                    flight_number: flight.flightNumber,      
+                    flight_number: flight.flightNumber,
                     start: flight.origin,
                     destination: flight.destination,
                     departure: flight.departureDateTime,
@@ -90,51 +91,51 @@ export default function FlightResults() {
                     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     price: flight.price,
                 };
-                const response = fetch('http://localhost:8000/addFlight', {
-                     method: 'POST',
-                     headers: {
-                         'Content-Type': 'application/json',
-                     },
-                     body: JSON.stringify(flightData),
-                 });
-                 if (!response) {
-                     throw new Error(`HTTP error! status: ${response}`);
-                 }
+                // const response = fetch('http://localhost:8000/addFlight', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(flightData),
+                // });
+                // if (!response) {
+                //     throw new Error(`HTTP error! status: ${response}`);
+                // }
+                localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                router.push('/returnflightresults');
             } catch (error) {
                 console.error('Error storing to the database:', error);
             }
-            localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
-            router.push('/returnflightresults');
         } else {
             try {
                 const flightData = {
-                    flight_number: flight.flightNumber,       
+                    flight_number: flight.flightNumber,
                     start: flight.origin,
                     destination: flight.destination,
                     departure: flight.departureDateTime,
                     arrival: flight.arrivalDateTime,
                     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price.toFixed(2),
+                    price: flight.price,
                 };
-                 const response = fetch('http://localhost:8000/addFlight', {
-                     method: 'POST',
-                     headers: {
-                         'Content-Type': 'application/json',
-                     },
-                     body: JSON.stringify(flightData),
-                 });
-                 if (!response) {
-                     throw new Error(`HTTP error! status: ${response}`);
-                 }
-   
+                // const response = fetch('http://localhost:8000/addFlight', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(flightData),
+                // });
+                // if (!response) {
+                //     throw new Error(`HTTP error! status: ${response}`);
+                // }
+                window.open(flight.url, '_blank');
             } catch (error) {
                 console.error('Error storing to the database:', error);
             }
             window.open(flight.url, '_blank');
         }
     };
-    
+
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
         if (flightData) {
@@ -159,7 +160,7 @@ export default function FlightResults() {
             setFlightData(sortedData);
         }
     };
-    
+
     const handleResultsLimitChange = (e) => {
         setResultsLimit(Number(e.target.value));
     };
@@ -172,7 +173,7 @@ export default function FlightResults() {
                 flight,
             ])
         ).values()
-    ).slice(0, resultsLimit);    
+    ).slice(0, resultsLimit);
 
     if (isLoading) {
         return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
@@ -281,9 +282,9 @@ export default function FlightResults() {
                                     ))}
                                 </div>
                             </div>
-                            
+
                             <div style={styles.priceSection}>
-                                
+
                                 <p style={styles.price}>${flight.price}</p>
                                 <button style={styles.selectButton} onClick={() => handleSelectFlight(flight)}>Select</button>
                             </div>
@@ -403,10 +404,10 @@ const styles = {
     legContainer: {
         display: 'flex',
         flexWrap: 'wrap',
-        gap: '20px', 
+        gap: '20px',
     },
     legDetails: {
-        flex: '0 0 calc(50% - 20px)', 
+        flex: '0 0 calc(50% - 20px)',
         marginBottom: '10px',
     },
     legRoute: {
