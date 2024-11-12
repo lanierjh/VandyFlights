@@ -30,20 +30,29 @@ export default function ReturnFlightResults() {
 
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
-        const sortedData = [...returnFlights].sort((a, b) => {
-            switch (e.target.value) {
-                case 'Cheapest Price':
-                    return a.price - b.price;
-                case 'Earliest Departure Time':
-                    return new Date(a.departureDateTime) - new Date(b.departureDateTime);
-                case 'Latest Departure Time':
-                    return new Date(b.departureDateTime) - new Date(a.departureDateTime);
-                default:
-                    return 0;
-            }
-        });
-        setReturnFlights(sortedData);
+        if (flightData) {
+            const sortedData = [...flightData].sort((a, b) => {
+                switch (e.target.value) {
+                    case 'Cheapest Price':
+                        return a.price - b.price;
+                    case 'Earliest Departure Time': {
+                        const earliestDateA = new Date(a.legs[0].departureDateTime);
+                        const earliestDateB = new Date(b.legs[0].departureDateTime);
+                        return earliestDateA - earliestDateB;
+                    }
+                    case 'Latest Departure Time': {
+                        const latestDateA = new Date(a.legs[0].departureDateTime);
+                        const latestDateB = new Date(b.legs[0].departureDateTime);
+                        return latestDateB - latestDateA;
+                    }
+                    default:
+                        return 0;
+                }
+            });
+            setFlightData(sortedData);
+        }
     };
+    
 
     const handleResultsLimitChange = (e) => {
         setResultsLimit(Number(e.target.value));
@@ -53,7 +62,14 @@ export default function ReturnFlightResults() {
         window.open(flight.url, '_blank'); 
     };
 
-    const filteredFlights = returnFlights.slice(0, resultsLimit);
+    const filteredFlights = Array.from(
+        new Map(
+            returnFlights.map((flight) => [
+                `${flight.flightNumber}-${flight.legs[0].origin}-${flight.legs[0].destination}-${flight.legs[0].departureDateTime}`,
+                flight,
+            ])
+        ).values()
+    ).slice(0, resultsLimit);    
 
     if (isLoading) {
         return <div>Loading... We are pulling up the return flight info right now. Please wait.</div>;

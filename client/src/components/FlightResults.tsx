@@ -81,7 +81,7 @@ export default function FlightResults() {
         if (searchData.roundTrip === 'true') {
             try {
                 const flightData = {
-                    flight_number: flight.flightNumber,           // Ensure these field names match the selected flight object's properties
+                    flight_number: flight.flightNumber,      
                     start: flight.origin,
                     destination: flight.destination,
                     departure: flight.departureDateTime,
@@ -90,18 +90,16 @@ export default function FlightResults() {
                     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     price: flight.price,
                 };
-                const response = fetch('http://localhost:8000/addFlight', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(flightData),
-                });
-                if (!response) {
-                    throw new Error(`HTTP error! status: ${response}`);
-                }
-   
-                window.open(flight.url, '_blank');
+                // const response = fetch('http://localhost:8000/addFlight', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(flightData),
+                // });
+                // if (!response) {
+                //     throw new Error(`HTTP error! status: ${response}`);
+                // }
             } catch (error) {
                 console.error('Error storing to the database:', error);
             }
@@ -110,31 +108,30 @@ export default function FlightResults() {
         } else {
             try {
                 const flightData = {
-                    flight_number: flight.flightNumber,           // Ensure these field names match the selected flight object's properties
+                    flight_number: flight.flightNumber,       
                     start: flight.origin,
                     destination: flight.destination,
                     departure: flight.departureDateTime,
                     arrival: flight.arrivalDateTime,
                     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price,
+                    price: flight.price.toFixed(2),
                 };
-                const response = fetch('http://localhost:8000/addFlight', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(flightData),
-                });
-                if (!response) {
-                    throw new Error(`HTTP error! status: ${response}`);
-                }
+                // const response = fetch('http://localhost:8000/addFlight', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(flightData),
+                // });
+                // if (!response) {
+                //     throw new Error(`HTTP error! status: ${response}`);
+                // }
    
                 window.open(flight.url, '_blank');
             } catch (error) {
                 console.error('Error storing to the database:', error);
             }
-            window.open(flight.url, '_blank'); 
         }
     };
     
@@ -145,10 +142,16 @@ export default function FlightResults() {
                 switch (e.target.value) {
                     case 'Cheapest Price':
                         return a.price - b.price;
-                    case 'Earliest Departure Time':
-                        return new Date(a.departureDateTime) - new Date(b.departureDateTime);
-                    case 'Latest Departure Time':
-                        return new Date(b.departureDateTime) - new Date(a.departureDateTime);
+                    case 'Earliest Departure Time': {
+                        const earliestDateA = new Date(a.legs[0].departureDateTime);
+                        const earliestDateB = new Date(b.legs[0].departureDateTime);
+                        return earliestDateA - earliestDateB;
+                    }
+                    case 'Latest Departure Time': {
+                        const latestDateA = new Date(a.legs[0].departureDateTime);
+                        const latestDateB = new Date(b.legs[0].departureDateTime);
+                        return latestDateB - latestDateA;
+                    }
                     default:
                         return 0;
                 }
@@ -162,7 +165,14 @@ export default function FlightResults() {
     };
 
 
-    const filteredFlights = flightData?.slice(0, resultsLimit);
+    const filteredFlights = Array.from(
+        new Map(
+            flightData.map((flight) => [
+                `${flight.flightNumber}-${flight.legs[0].origin}-${flight.legs[0].destination}-${flight.legs[0].departureDateTime}`,
+                flight,
+            ])
+        ).values()
+    ).slice(0, resultsLimit);    
 
     if (isLoading) {
         return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
