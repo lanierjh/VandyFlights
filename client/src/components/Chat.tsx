@@ -191,6 +191,7 @@ const styles = {
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column' as const,
+    // flexDirection: 'column',
     alignItems: 'center',
   },
   chatSection: {
@@ -234,7 +235,7 @@ const styles = {
     listStyle: 'none',
     padding: 0,
     marginTop: '10px',
-  },
+  } as React.CSSProperties,
   friendItem: {
     display: 'flex',
     justifyContent: 'space-between',

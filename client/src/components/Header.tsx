@@ -1,6 +1,8 @@
+// Header.tsx
+// import React, {useEffect} from 'react';
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import {useRouter} from "next/navigation";
+
 
 export default function Header() {
     const router = useRouter();

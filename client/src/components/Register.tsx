@@ -1,6 +1,8 @@
+// import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Register() {
+    // const router = useRouter();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -55,7 +57,7 @@ export default function Register() {
         setErrorMessage('');
 
         try {
-            const response = await fetch('http://localhost:8000/register', {
+            const response = await fetch('https://vandyflights-backend.onrender.com/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,6 +68,7 @@ export default function Register() {
                     password: formData.password,
                     first_name: formData.firstName,
                     last_name: formData.lastName,
+                    flight_ids: [],
                 }),
             });
             if (response.ok) {
