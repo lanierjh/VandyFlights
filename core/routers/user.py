@@ -92,32 +92,63 @@ def get_profile(token: str = Depends(oauth2_scheme)):
 
 @router.put("/editprofile", response_model=schemas.UserProfile)
 def edit_profile(
-        profile_data: schemas.UserProfileUpdate,
-        current_user: dict = Depends(util.get_current_user)
+    profile_data: schemas.UserProfileUpdate,
+    current_user: dict = Depends(util.get_current_user)
 ):
     user_email = current_user['identifier']
-    print(user_email)
-
-    user = crud.get_user_by_username_or_email(user_email)
+    print(f"Editing profile for user: {user_email}")
+    print("janer")
+    # Retrieve the user from the database
+    user = crud.get_user_id_by_username_or_email(user_email)
+    print("janey",user)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    id = crud.get_user_id_by_username_or_email(user_email)
-
-    update_data = {}
-    if profile_data.first_name and profile_data.first_name != "string":
-        update_data["first_name"] = profile_data.first_name
-    if profile_data.last_name and profile_data.last_name != "string":
-        update_data["last_name"] = profile_data.last_name
+    # Prepare update data excluding email
+    update_data = {key: value for key, value in profile_data.dict().items() if value is not None}
 
     if update_data:
-        updated_user = crud.update_user_profile(id, update_data)
+        updated_user = crud.update_user_profile(user, update_data)
     else:
-        updated_user = user
+        updated_user = crud.get_user_by_username_or_email(user_email)
+    print("xxxxx", updated_user)
+    return schemas.UserProfile(
+        username=updated_user["username"],
+        first_name=updated_user["first_name"],
+        last_name=updated_user["last_name"],
+        email=updated_user["email"],
+        graduating_class=updated_user['graduating_class'],
+        destination=updated_user['destination']
+    )
 
-    return {
-        "username": updated_user.get("username"),
-        "first_name": updated_user.get("first_name"),
-        "last_name": updated_user.get("last_name"),
-        "email": updated_user.get("email")
-    }
+# @router.put("/editprofile", response_model=schemas.UserProfile)
+# def edit_profile(
+#         profile_data: schemas.UserProfileUpdate,
+#         current_user: dict = Depends(util.get_current_user)
+# ):
+#     user_email = current_user['identifier']
+#     print(user_email)
+#
+#     user = crud.get_user_by_username_or_email(user_email)
+#     if not user:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+#
+#     id = crud.get_user_id_by_username_or_email(user_email)
+#
+#     update_data = {}
+#     if profile_data.first_name and profile_data.first_name != "string":
+#         update_data["first_name"] = profile_data.first_name
+#     if profile_data.last_name and profile_data.last_name != "string":
+#         update_data["last_name"] = profile_data.last_name
+#
+#     if update_data:
+#         updated_user = crud.update_user_profile(id, update_data)
+#     else:
+#         updated_user = user
+#
+#     return {
+#         "username": updated_user.get("username"),
+#         "first_name": updated_user.get("first_name"),
+#         "last_name": updated_user.get("last_name"),
+#         "email": updated_user.get("email")
+#     }

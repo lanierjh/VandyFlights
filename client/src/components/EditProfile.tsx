@@ -9,7 +9,8 @@ export default function EditProfile() {
     const router = useRouter();
     // const [isEditing, setIsEditing] = useState(false);
     // empty version of profile data before checking auth
-    const [formData, setFormData] = useState({
+    const [errorMessage, setErrorMessage] = useState('');
+    const [formData, setFormData, ] = useState({
         firstName: '',
         lastName: '',
         destination: '',
@@ -27,7 +28,7 @@ export default function EditProfile() {
             router.push('/');
             return;
         }
-        axios.get('https://vandyflights-backend.onrender.com/profile', {
+        axios.get('http://localhost:8000/profile', {
             headers: { Authorization: `Bearer ${token}` }
         })
         .then(response => {
@@ -47,30 +48,10 @@ export default function EditProfile() {
             //     router.push('/');
             // }
         });
-//         fetch('http://localhost:8000/profile', {
-//     method: 'GET',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'Authorization': `Bearer ${token}`  // Replace with a valid token if required
-//     }
-// })
-// .then(response => {
-//     if (!response.ok) throw new Error('Network response was not ok');
-//     return response.json();
-// })
-// .then(data => console.log(data))
-// .catch(error => console.error('CORS test error:', error));
-
 
 
     }, [router]);
-    // const [formData, setFormData] = useState({
-    //     firstName: 'Vikash',
-    //     lastName: 'Singh',
-    //     destination: 'LGA',
-    //     graduatingClass: '2025',
-    //     email: 'vikashsingh@gmail.com'
-    // });
+
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -82,10 +63,53 @@ export default function EditProfile() {
         setIsEditing(true);
     };
 
-    const handleSaveClick = () => {
-        setIsEditing(false);
-        console.log('Form data saved:', formData);
-    };
+const handleSaveClick = async () => {
+    setIsEditing(false); // Exit editing mode
+    console.log('Form data saved:', formData);
+
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+        console.error('No token found. Please log in again.');
+        router.push('/');
+        return;
+    }
+
+    if (formData.graduatingClass.length != 0) {
+        if (formData.graduatingClass.length != 4 || !(formData.graduatingClass.startsWith("20"))) {
+            setErrorMessage('Graduating class must be 4 digits and be within 2000-2099');
+            console.error('Error updating profile');
+            setIsEditing(true);
+            return;
+        }
+    }
+    setErrorMessage('');
+
+    try {
+        const response = await axios.put(
+            'http://localhost:8000/editprofile',
+            {
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                destination: formData.destination,
+                graduating_class: formData.graduatingClass,
+            },
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+
+        if (response.status === 200) {
+            console.log('Profile updated successfully:', response.data);
+        } else {
+            console.error('Failed to update profile:', response);
+        }
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        setIsEditing(true); // Re-enter editing mode on failure
+    }
+};
+
 
     return (
         <div style={styles.pageContainer}>
@@ -101,9 +125,16 @@ export default function EditProfile() {
                             style={styles.profileImage}
                         />
                         <div>
+                            {errorMessage && (
+                                <div className="alert alert-danger" role="alert">
+                                    {errorMessage}
+                                </div>
+                            )}
                             <h2 style={styles.profileName}>{formData.firstName} {formData.lastName}</h2>
                             <p style={styles.profileEmail}>{formData.email}</p>
+
                         </div>
+
                     </div>
                     {isEditing ? (
                         <button 
@@ -190,7 +221,7 @@ export default function EditProfile() {
                                 value={formData.email}
                                 onChange={handleChange} 
                                 placeholder="Your Email"
-                                disabled={!isEditing}
+                                disabled={true}
                                 style={styles.inputField}
                             />
                         </div>

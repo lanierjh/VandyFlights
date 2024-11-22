@@ -94,9 +94,9 @@ export default function Register() {
     };
 
     return (
-        <div className="row my-5">
+        <div className="row mx-1">
             <div className="col-md-4"></div>
-            <div className="col-md-4 text-center my-5 py-5">
+            <div className="col-md-4 text-center py-5">
                 <div>
                     <h1>Register</h1>
 
@@ -109,7 +109,7 @@ export default function Register() {
                     <div>
                         <form onSubmit={handleSubmit}>
                             <div className="row py-3">
-                                <div className="col-sm-6">
+                                <div className="col-sm-12">
                                     <input
                                         type="text"
                                         id="firstName"
@@ -122,7 +122,9 @@ export default function Register() {
                                         required
                                     />
                                 </div>
-                                <div className="col-sm-6">
+                                </div>
+                                <div className="row py-3">
+                                    <div className="col-sm-12">
                                     <input
                                         type="text"
                                         id="lastName"
@@ -134,8 +136,8 @@ export default function Register() {
                                         onChange={handleChange}
                                         required
                                     />
+                                    </div>
                                 </div>
-                            </div>
                             <div className="row py-3">
                                 <div className="col-sm-12">
                                     <input
