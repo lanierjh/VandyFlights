@@ -86,7 +86,7 @@ def get_user_by_username_or_email(identifier: str):
 def create_flight(flight_data: FlightCreate):
     flight_ref = db.collection("flights")
     new_flight_data = {
-        "flight_number": flight_data.flight_number,
+        #"flight_number": flight_data.flight_number,
         "start": flight_data.start,
         "destination": flight_data.destination,
         "departure": flight_data.departure,

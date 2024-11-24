@@ -12,10 +12,10 @@ class User(BaseModel):
     friends : List[str]  = []
 
 class Flight(BaseModel):
-    flight_number: str
+    #flight_number: str
     departure: str
     arrival: str
     departure_time: str
     arrival_time: str
-    price: int
+    price: str
     user_id: Optional[str]

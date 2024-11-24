@@ -8,6 +8,8 @@ import logging
 import os
 from datetime import datetime
 from db import get_db
+from crud import create_flight
+from schemas import FlightCreate
 
 db = get_db()
 router = APIRouter(tags=["flights"])
@@ -198,6 +200,18 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
         "outbound_flights": outbound_flights[:50],
         "return_flights": return_flights[:50]
     }
+    
+@router.post("/addFlights")
+async def add_flight(flight_data: FlightCreate):
+    """
+    Adds a new flight to the database.
+    """
+    try:
+        flight = create_flight(flight_data)  # Calls the `create_flight` function from `crud.py`
+        return {"success": True, "flight": flight}
+    except Exception as e:
+        logger.error(f"Error adding flight: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to add flight")
 
 # conn = http.client.HTTPSConnection("tripadvisor16.p.rapidapi.com")
 #
