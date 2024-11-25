@@ -11,7 +11,7 @@ export default function EditProfile() {
     const [isEditing, setIsEditing] = useState(false);
     // empty version of profile data before checking auth
     const [errorMessage, setErrorMessage] = useState('');
-            useEffect(() => {
+    useEffect(() => {
         // Check screen size on the client
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);

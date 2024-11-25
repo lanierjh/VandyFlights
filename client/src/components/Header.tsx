@@ -43,7 +43,7 @@ import {useRouter} from "next/navigation";
 // }
 export default function Header() {
     const router = useRouter();
-        const [margin, setMargin] = useState(20); // Default margin is 20
+    const [margin, setMargin] = useState(20); // Default margin is 20
 
     useEffect(() => {
         const handleResize = () => {

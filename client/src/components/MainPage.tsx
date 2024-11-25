@@ -28,16 +28,16 @@ export default function MainPage() {
 
         return () => window.removeEventListener('resize', handleResize); // Cleanup
     }, []);
-    // useEffect(() => {
-    //     // Check if accessToken is in localStorage
-    //     const token = localStorage.getItem('accessToken');
-    //     console.log("Retrieved token:", token);
-    //
-    //     if (!token) {
-    //         // Redirect to login if token is missing
-    //         router.push('/');
-    //     }
-    // }, [router]);
+    useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            // Redirect to login if token is missing
+            router.push('/');
+        }
+    }, [router]);
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
