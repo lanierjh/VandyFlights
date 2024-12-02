@@ -1,7 +1,8 @@
 "use client";
 import Header from './Header';
 import { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation';
+import Popup from './Popup';
+import Image from 'next/image';
 
 export default function ReturnFlightResults() {
     const [outboundFlight, setOutboundFlight] = useState(null);
@@ -9,7 +10,8 @@ export default function ReturnFlightResults() {
     const [isLoading, setIsLoading] = useState(true);
     const [sortOption, setSortOption] = useState('Top flights');
     const [resultsLimit, setResultsLimit] = useState(50);
-    // const router = useRouter();
+    const [showPopup, setShowPopup] = useState(false);
+
     const passengers = ["James Huang", "Abdallah Safa", "Jackson Lanier", "Jane Sun", "Vikash Singh"];
 
     useEffect(() => {
@@ -25,7 +27,13 @@ export default function ReturnFlightResults() {
         } else {
             console.error("No return flight data found.");
         }
+
         setIsLoading(false);
+
+        const hasVisitedFlightURL = localStorage.getItem('visitedFlightURL');
+        if (hasVisitedFlightURL) {
+            setShowPopup(true);
+        }
     }, []);
 
     const handleSortChange = (e) => {
@@ -53,14 +61,17 @@ export default function ReturnFlightResults() {
         setReturnFlights(sortedData);
     };
 
-
-
     const handleResultsLimitChange = (e) => {
         setResultsLimit(Number(e.target.value));
     };
 
     const handleSelectFlight = (flight) => {
+        setShowPopup(true);
         window.open(flight.url, '_blank');
+    };
+
+    const handleClosePopup = () => {
+        setShowPopup(false);
     };
 
     const filteredFlights = Array.from(
@@ -82,6 +93,7 @@ export default function ReturnFlightResults() {
 
     return (
         <div style={styles.pageContainer}>
+            {showPopup && <Popup onClose={handleClosePopup} />}
             <Header />
 
             <section style={styles.optionsSection}>
@@ -114,8 +126,7 @@ export default function ReturnFlightResults() {
                     {filteredFlights.map((flight, index) => (
                         <div key={index} style={styles.flightCard}>
                             <div style={styles.flightLogo}>
-                                <Image src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" width={80} height={80} style={styles.planeIcon} />
-
+                                <Image src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" width={80} height={80} />
                             </div>
 
                             <div style={styles.flightDetails}>
