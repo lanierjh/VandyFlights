@@ -399,6 +399,7 @@ async def add_flight(flight_data: FlightCreate):
 #             "flights": combined_flights[:50]}  # Return only the first 50 flights
 
 
+
 router.get("/trending-destinations")
 def get_trending_destinations(date_range: int = 30):
     cutoff_date = datetime.now() - timedelta(days=date_range)
@@ -438,3 +439,61 @@ def get_trending_destinations(date_range: int = 30):
     )
 
     return [{"destination": dest, "trend_count": count} for dest, count in trending_destinations]
+
+#untested version where we return users but flights need to be populated in the users
+
+# def get_trending_destinations(date_range: int = 30):
+#
+#     cutoff_date = datetime.now() - timedelta(days=date_range)
+#
+#     flights_ref = db.collection("flights")
+#     flights = flights_ref.where("date", ">=", cutoff_date).stream()
+#
+#     destination_trends = {}
+#     flight_to_destination = {}
+#
+#     for flight in flights:
+#         flight_data = flight.to_dict()
+#         flight_id = flight.id
+#         destination = flight_data["destination"]
+#         start_date = flight_data["start_date"]
+#         end_date = flight_data["end_date"]
+#
+#         if destination not in destination_trends:
+#             destination_trends[destination] = {
+#                 "trend_count": 0,
+#                 "users": [],
+#                 "flights": []
+#             }
+#
+#         destination_trends[destination]["flights"].append((start_date, end_date))
+#         destination_trends[destination]["trend_count"] += 1
+#         flight_to_destination[flight_id] = destination
+#
+#     users_ref = db.collection("users")
+#     users = users_ref.stream()
+#
+#     for user in users:
+#         user_data = user.to_dict()
+#         user_id = user.id
+#         user_flights = user_data.get("flights", [])
+#
+#         for flight_id in user_flights:
+#             if flight_id in flight_to_destination:
+#                 destination = flight_to_destination[flight_id]
+#                 destination_trends[destination]["users"].append(user_id)
+#
+#     trending_destinations = sorted(
+#         destination_trends.items(),
+#         key=lambda x: x[1]["trend_count"],
+#         reverse=True
+#     )
+#
+#     return [
+#         {
+#             "destination": destination,
+#             "trend_count": data["trend_count"],
+#             "users": list(set(data["users"]))
+#         }
+#         for destination, data in trending_destinations
+#     ]
