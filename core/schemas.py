@@ -49,7 +49,7 @@ class UserAuthenticate(BaseModel):
 
 
 class FlightCreate(BaseModel):
-    flight_number: str
+    #flight_number: str
     start: str
     destination: str
     departure: str 

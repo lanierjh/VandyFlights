@@ -79,60 +79,84 @@ export default function FlightResults() {
         });
     };
 
-    const handleSelectFlight = (flight) => {
+    const handleSelectFlight = async (flight) => {
+        console.log("handleSelectFlight triggered with flight:", flight);
         if (searchData.roundTrip === 'true') {
+            const flightData = {
+                //flight_number: flight.flightNumber,
+                start: flight.origin,
+                destination: flight.destination,
+                departure: new Date(flight.departureDateTime).toISOString(),
+                arrival: new Date(flight.arrivalDateTime).toISOString(),
+                departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                price: flight.price,
+            };
+            console.log("Flight Data Payload:", flightData);
             try {
-                // const flightData = {
-                //     flight_number: flight.flightNumber,
-                //     start: flight.origin,
-                //     destination: flight.destination,
-                //     departure: flight.departureDateTime,
-                //     arrival: flight.arrivalDateTime,
-                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                //     price: flight.price,
-                // };
-                // const response = fetch('http://localhost:8000/addFlight', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(flightData),
-                // });
-                // if (!response) {
-                //     throw new Error(`HTTP error! status: ${response}`);
-                // }
+                const response = await fetch('http://localhost:8000/addFlights', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(flightData),
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                const result = await response.json();
+                console.log('Flight added successfully:', result);
+        
+                if (searchData.roundTrip === 'true') {
+                    localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                    router.push('/returnflightresults');
+                } else {
+                    window.open(flight.url, '_blank');
+                }
+            } catch (error) {
+                console.error('Error adding flight:', error);
+                alert('Failed to store flight information.');
+            }
                 localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
                 router.push('/returnflightresults');
-            } catch (error) {
-                console.error('Error storing to the database:', error);
-            }
         } else {
+            const flightData = {
+                //flight_number: flight.flightNumber,
+                start: flight.legs[0]?.origin,
+                destination: flight.legs[0]?.destination,
+                departure: new Date(flight.legs[0]?.departureDateTime).toISOString(),
+                arrival: new Date(flight.legs[0]?.arrivalDateTime).toISOString(),
+                departure_time: new Date(flight.legs[0]?.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                arrival_time: new Date(flight.legs[0]?.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                price: flight.price,
+            };
+            console.log("Flight Data Payload:", flightData);
             try {
-                // const flightData = {
-                //     flight_number: flight.flightNumber,
-                //     start: flight.origin,
-                //     destination: flight.destination,
-                //     departure: flight.departureDateTime,
-                //     arrival: flight.arrivalDateTime,
-                //     departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                //     arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                //     price: flight.price,
-                // };
-                // const response = fetch('http://localhost:8000/addFlight', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(flightData),
-                // });
-                // if (!response) {
-                //     throw new Error(`HTTP error! status: ${response}`);
-                // }
-                window.open(flight.url, '_blank');
+                const response = await fetch('http://localhost:8000/addFlights', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(flightData),
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                const result = await response.json();
+                console.log('Flight added successfully:', result);
+        
+                if (searchData.roundTrip === 'true') {
+                    localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                    router.push('/returnflightresults');
+                } else {
+                    window.open(flight.url, '_blank');
+                }
             } catch (error) {
-                console.error('Error storing to the database:', error);
+                console.error('Error adding flight:', error);
+                alert('Failed to store flight information.');
             }
+                localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                router.push('/returnflightresults');
         }
     };
 
