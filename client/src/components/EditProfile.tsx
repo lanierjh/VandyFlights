@@ -70,7 +70,7 @@ export default function EditProfile() {
                 backgroundColor: '#f4e8f0',
                 minHeight: '100vh',
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'column' as const,
                 alignItems: 'center',
             },
             profileContainer: {
@@ -81,7 +81,7 @@ export default function EditProfile() {
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                 maxWidth: '900px',
                 width: isMobile ? '90%' : '100%',
-                boxSizing: 'border-box',
+                boxSizing: 'border-box' as const,
             },
         profileHeader: {
             display: 'flex',
@@ -108,13 +108,13 @@ export default function EditProfile() {
             profileForm: {
                 marginTop: '30px',
                 padding: '10px 20px',
-                boxSizing: 'border-box',
+                boxSizing: 'border-box' as const,
             },
             row: {
                 display: 'flex',
                 justifyContent: 'space-between',
                 gap: isMobile ? '10px' : '20px',
-                flexDirection: isMobile ? 'column' : 'row',
+                flexDirection: isMobile ? 'column' as const: 'row' as const,
             },
         formGroup: {
             flex: '1',
@@ -148,7 +148,7 @@ export default function EditProfile() {
             borderRadius: '10px',
             border: '1px solid #ccc',
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'column' as const,
             gap: '10px',
         },
         flightDetail: {

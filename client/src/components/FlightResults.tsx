@@ -3,6 +3,7 @@ import Header from './Header';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 
 export default function FlightResults() {

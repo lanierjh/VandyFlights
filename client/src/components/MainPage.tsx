@@ -336,8 +336,8 @@ const styles = {
     },
     stackContainer: {
         display: 'flex',
-        flexDirection: 'column', // Stack elements vertically
-        gap: '10px', // Space between stacked inputs
+        flexDirection: 'column' as const,
+        gap: '10px',
     },
     searchInput: {
         // padding: '15px',
@@ -362,8 +362,8 @@ const styles = {
         fontSize: '1rem',
         lineHeight: '1.2',
         height: '50px',
-        appearance: 'none',
-        boxSizing: 'border-box',
+        appearance: 'none' as const,
+        boxSizing: 'border-box'as const,
         // padding: '15px',
         // borderRadius: '10px',
         // border: '1px solid #ccc',
@@ -404,22 +404,22 @@ const styles = {
 
     },
     inputLabel: {
-        fontSize: '0.625rem', // Smaller font size (14px)
-        fontWeight: 'normal', // Regular font weight for a smaller, subtle label
-        marginBottom: '1px', // Minimal spacing between label and input
-        textAlign: 'left', // Align the label to the left
-        display: 'block', // Ensure it behaves as a block element above the input
+        fontSize: '0.625rem',
+        fontWeight: 'normal', 
+        marginBottom: '1px',
+        textAlign: 'left',
+        display: 'block',
     } as React.CSSProperties,
     spacer: {
-        height: '15px', // Match the height of the label to align properly
-        visibility: 'hidden', // Keeps the spacing without displaying any text
+        height: '15px',
+        visibility: 'hidden' as const,
     },
     destinationCard: {
         backgroundColor: 'white',
         borderRadius: '10px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         padding: '15px',
-        textAlign: 'center',
+        textAlign: 'center' as const,
     },
     destinationImage: {
         width: '100%',

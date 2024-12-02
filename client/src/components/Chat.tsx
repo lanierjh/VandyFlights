@@ -243,9 +243,9 @@ const styles = {
 
   },
   scrollableContainer: {
-  overflowY: 'auto', // Enable vertical scrolling
-  maxHeight: '250px', // Limit the height of the scrollable area
-  paddingRight: '10px', // Add some padding for scrollbar spacing
+  overflowY: 'auto' as const,
+  maxHeight: '250px',
+  paddingRight: '10px',
 },
   tabContainer: {
     display: 'flex',

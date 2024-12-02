@@ -2,6 +2,8 @@
 import React, {useEffect,useState} from 'react';
 // import React from 'react';
 import {useRouter} from "next/navigation";
+import Image from 'next/image';
+
 //
 //
 // export default function Header() {
@@ -87,7 +89,7 @@ export default function Header() {
             >
                 {/* Logo Section */}
                 <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
+                    <Image
                         src="/vanderbilt.png"
                         alt="VandyFlights Logo"
                         style={{ width: "60px", marginRight: "10px" }}
