@@ -1,7 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Header from './Header';
+import {useRouter} from "next/navigation";
 
 export default function ChatPage() {
+    const router = useRouter();
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+    useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            // Redirect to login if token is missing
+            router.push('/');
+        }
+    }, [router]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [friendsList, setFriendsList] = useState([
     {
@@ -85,8 +109,14 @@ export default function ChatPage() {
 
   return (
     <div style={styles.pageContainer}>
+
       <Header />
-      <section style={styles.chatSection}>
+      <section
+        style={{
+          ...styles.chatSection,
+          flexDirection: isSmallScreen ? 'column' : 'row',
+        }}
+      >
         <div style={styles.friendsList}>
           <div style={styles.tabContainer}>
             <button
@@ -104,6 +134,7 @@ export default function ChatPage() {
           </div>
 
           {currentTab === 'friends' && (
+              <div style={styles.scrollableContainer}>
             <ul style={styles.friendItems}>
               {friendsList.map((friend, index) => (
                 <li
@@ -123,6 +154,7 @@ export default function ChatPage() {
                 </li>
               ))}
             </ul>
+              </div>
           )}
 
           {currentTab === 'search' && (
@@ -187,11 +219,10 @@ export default function ChatPage() {
 const styles = {
   pageContainer: {
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: '#F1D6D9',
+    backgroundColor: '#f4e8f0',
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column' as const,
-    // flexDirection: 'column',
     alignItems: 'center',
   },
   chatSection: {
@@ -201,6 +232,7 @@ const styles = {
     maxWidth: '1200px',
     padding: '30px',
     gap: '20px',
+    flexDirection: 'row',
   },
   friendsList: {
     flex: '1',
@@ -208,7 +240,13 @@ const styles = {
     borderRadius: '10px',
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+
   },
+  scrollableContainer: {
+  overflowY: 'auto', // Enable vertical scrolling
+  maxHeight: '250px', // Limit the height of the scrollable area
+  paddingRight: '10px', // Add some padding for scrollbar spacing
+},
   tabContainer: {
     display: 'flex',
     borderBottom: '1px solid #ccc',

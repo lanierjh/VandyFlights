@@ -158,7 +158,7 @@ export default function ReturnFlightResults() {
 const styles = {
     pageContainer: {
         fontFamily: 'Arial, sans-serif',
-        backgroundColor: '#F1D6D9',
+        backgroundColor: '#f4e8f0',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column' as const,

@@ -7,7 +7,14 @@ export default function Login() {
     });
 
     const [errorMessage, setErrorMessage] = useState('');
+    const centerPage = {
 
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh", /* Full viewport height */
+
+    }
     const inputStyles = {
         width: "100%",
         borderRadius: "10px",
@@ -36,7 +43,7 @@ export default function Login() {
     console.log("Form submitted:", formData);
 
     try {
-        const response = await fetch('https://vandyflights-backend.onrender.com/login', {
+        const response = await fetch('http://localhost:8000/login', {
             method: 'POST',
             headers: {
                 'Content-Type': "application/x-www-form-urlencoded",
@@ -66,9 +73,8 @@ export default function Login() {
     }
 }
     return (
-        <div className="row my-5">
-            <div className="col-md-4"></div>
-            <div className="col-md-4 text-center my-5 py-5">
+        <div className="row mx-3 mx-md-1" style = {centerPage}>
+            <div className="col-10 col-sm-8 col-md-4 mx-auto text-center py-5">
                 <div>
                     <h1>Login</h1>
                     {errorMessage && (

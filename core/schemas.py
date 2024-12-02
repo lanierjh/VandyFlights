@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
-import re
-from datetime import date,time
+# import re
+# from datetime import date,time
+from typing import Optional
 
 
 class UserResponse(BaseModel):
@@ -28,21 +29,16 @@ class UserProfile(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
+    graduating_class: Optional[str]
+    destination: Optional[str]
 
-class UserProfileUpdate(BaseModel):
-    first_name: str
-    last_name: str
-
-class UserProfile(BaseModel):
-    username: str
-    first_name: str
-    last_name: str
-    email: EmailStr
 
 
 class UserProfileUpdate(BaseModel):
     first_name: str
     last_name: str
+    graduating_class: Optional[str]
+    destination: Optional[str]
 
 
 class UserAuthenticate(BaseModel):
