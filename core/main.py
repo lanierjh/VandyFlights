@@ -2,7 +2,7 @@ import os
 
 import uvicorn
 from fastapi import FastAPI
-from core.routers import user, auth, flights, app
+from core.routers import user, auth, flights
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
