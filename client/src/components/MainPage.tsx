@@ -43,7 +43,7 @@ export default function MainPage() {
     useEffect(() => {
         const fetchTrendingDestinations = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/trending-destinations'); // Update with your actual endpoint
+                const response = await axios.get('https://vandyflights-backend.onrender.com/trending-destinations'); // Update with your actual endpoint
                 setTrendingDestinations(response.data);
             } catch (error) {
                 console.error("Error fetching trending destinations:", error);
@@ -82,7 +82,7 @@ export default function MainPage() {
         console.log("Submitting search data:", updatedSearchData);
         try {
             const endpoint = updatedSearchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
-            const response = await axios.post(`http://localhost:8000/${endpoint}`, {
+            const response = await axios.post(`https://vandyflights-backend.onrender.com/${endpoint}`, {
                 origin: updatedSearchData.origin,
                 destination: updatedSearchData.destination,
                 departureDate: updatedSearchData.departureDate,
