@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 import re
 from datetime import date,time
+from typing import List
 
 
 class UserResponse(BaseModel):
@@ -21,7 +22,7 @@ class UserCreate(BaseModel):
     last_name: str
     email: EmailStr
     password: str
-    flight_ids: list
+    flight_ids: List[str] = []
 
 class UserProfile(BaseModel):
     username: str

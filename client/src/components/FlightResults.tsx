@@ -83,12 +83,12 @@ export default function FlightResults() {
         if (searchData.roundTrip === 'true') {
             const flightData = {
                 //flight_number: flight.flightNumber,
-                start: flight.origin,
-                destination: flight.destination,
-                departure: new Date(flight.departureDateTime).toISOString(),
-                arrival: new Date(flight.arrivalDateTime).toISOString(),
-                departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                start: flight.legs[0]?.origin,
+                destination: flight.legs[0]?.destination,
+                departure: new Date(flight.legs[0]?.departureDateTime).toISOString(),
+                arrival: new Date(flight.legs[0]?.arrivalDateTime).toISOString(),
+                departure_time: new Date(flight.legs[0]?.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                arrival_time: new Date(flight.legs[0]?.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 price: flight.price,
             };
             console.log("Flight Data Payload:", flightData);
@@ -112,6 +112,25 @@ export default function FlightResults() {
                 } else {
                     window.open(flight.url, '_blank');
                 }
+
+                // Update the user's flight_ids with the selected destination
+                const userUpdatePayload = {
+                    flight_id: flight.legs[flight.legs.length - 1]?.destination, // Use the destination code as the identifier
+                };
+                    
+                const userResponse = await fetch('http://localhost:8000/users/updateFlightIDs', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, 'Content-Type': 'application/json' }, // Use token for authenticated requests
+                    body: JSON.stringify(userUpdatePayload),
+                });
+    
+                if (!userResponse.ok) {
+                    throw new Error(`HTTP error! status: ${userResponse.status}`);
+                }
+    
+                const userResult = await userResponse.json();
+                console.log('User flight IDs updated successfully:', userResult)
+
             } catch (error) {
                 console.error('Error adding flight:', error);
                 alert('Failed to store flight information.');
@@ -150,6 +169,25 @@ export default function FlightResults() {
                 } else {
                     window.open(flight.url, '_blank');
                 }
+
+                // Update the user's flight_ids with the selected destination
+                const userUpdatePayload = {
+                flight_id: flight.legs[flight.legs.length - 1]?.destination, // Use the destination code as the identifier
+                };
+                
+                const userResponse = await fetch('http://localhost:8000/users/updateFlightIDs', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, 'Content-Type': 'application/json' }, // Use token for authenticated requests
+                    body: JSON.stringify(userUpdatePayload),
+                });
+
+                if (!userResponse.ok) {
+                    throw new Error(`HTTP error! status: ${userResponse.status}`);
+                }
+
+                const userResult = await userResponse.json();
+                console.log('User flight IDs updated successfully:', userResult)
+
             } catch (error) {
                 console.error('Error adding flight:', error);
                 alert('Failed to store flight information.');
