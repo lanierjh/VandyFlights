@@ -64,7 +64,7 @@ export default function Register() {
         setErrorMessage('');
 
         try {
-            const response = await fetch('/register', {
+            const response = await fetch('https://vandyflights-backend.onrender.com/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
