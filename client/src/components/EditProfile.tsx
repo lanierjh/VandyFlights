@@ -207,7 +207,7 @@ export default function EditProfile() {
 
         try {
             const response = await axios.put(
-                'https://vandyflights-backend.onrender.com/editprofile',
+                'http://localhost:8000/editprofile',
                 {
                     first_name: formData.firstName,
                     last_name: formData.lastName,

@@ -50,7 +50,7 @@ export default function FlightResults() {
 
         try {
             const endpoint = updatedSearchData.roundTrip === 'true' ? "flightsROUNDTRIP" : "flightsONEWAY";
-            const response = await axios.post(`https://vandyflights-backend.onrender.com/${endpoint}`, {
+            const response = await axios.post(`http://localhost:8000/${endpoint}`, {
                 origin: updatedSearchData.origin,
                 destination: updatedSearchData.destination,
                 departureDate: updatedSearchData.departureDate,
@@ -94,7 +94,7 @@ export default function FlightResults() {
             };
             console.log("Flight Data Payload:", flightData);
             try {
-                const response = await fetch('https://vandyflights-backend.onrender.com/addFlights', {
+                const response = await fetch('http://localhost:8000/addFlights', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(flightData),
@@ -119,7 +119,7 @@ export default function FlightResults() {
                     flight_id: flight.legs[flight.legs.length - 1]?.destination, // Use the destination code as the identifier
                 };
                     
-                const userResponse = await fetch('https://vandyflights-backend.onrender.com/users/updateFlightIDs', {
+                const userResponse = await fetch('http://localhost:8000/users/updateFlightIDs', {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, 'Content-Type': 'application/json' }, // Use token for authenticated requests
                     body: JSON.stringify(userUpdatePayload),
@@ -151,7 +151,7 @@ export default function FlightResults() {
             };
             console.log("Flight Data Payload:", flightData);
             try {
-                const response = await fetch('https://vandyflights-backend.onrender.com/addFlights', {
+                const response = await fetch('http://localhost:8000/addFlights', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(flightData),
@@ -176,7 +176,7 @@ export default function FlightResults() {
                 flight_id: flight.legs[flight.legs.length - 1]?.destination, // Use the destination code as the identifier
                 };
                 
-                const userResponse = await fetch('https://vandyflights-backend.onrender.com/users/updateFlightIDs', {
+                const userResponse = await fetch('http://localhost:8000/users/updateFlightIDs', {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, 'Content-Type': 'application/json' }, // Use token for authenticated requests
                     body: JSON.stringify(userUpdatePayload),
