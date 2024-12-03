@@ -5,7 +5,7 @@ from core import crud, schemas
 from core.crud import get_user_by_username_or_email, get_user_id_by_username_or_email
 from core.security import util
 from core.security.util import get_current_user
-import models
+import core.models
 from core.db import get_db
 from pydantic import BaseModel
 
@@ -36,7 +36,7 @@ def register_user(user: schemas.UserCreate):
 
 
 @router.post("/users/send_friend_request", response_model=schemas.FriendRequestResponse)
-def send_friend_request(request: schemas.FriendRequest, current_user: models.User = Depends(util.get_current_user)):
+def send_friend_request(request: schemas.FriendRequest, current_user: core.models.User = Depends(util.get_current_user)):
     try:
         print(current_user)
         print(1,"Current user:", current_user['identifier'])
@@ -51,7 +51,7 @@ def send_friend_request(request: schemas.FriendRequest, current_user: models.Use
 
 
 @router.post("/users/accept_friend_request/{requester_username}")
-def accept_friend_request(requester_username: str, current_user: models.User = Depends(util.get_current_user)):
+def accept_friend_request(requester_username: str, current_user: core.models.User = Depends(util.get_current_user)):
     try:
         requester_id = crud.get_user_id_by_username_or_email(requester_username)
         reciptent_id = crud.get_user_id_by_username_or_email(current_user['identifier'])
@@ -66,7 +66,7 @@ def accept_friend_request(requester_username: str, current_user: models.User = D
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/users/reject_friend_request/{requester_username}")
-def reject_friend_request(requester_username: str, current_user: models.User = Depends(util.get_current_user)):
+def reject_friend_request(requester_username: str, current_user: core.models.User = Depends(util.get_current_user)):
     try:
         # requester_id = crud.get_user_id_by_username_or_email(requester_username)
         reciptent_id = crud.get_user_id_by_username_or_email(current_user['identifier'])
@@ -78,7 +78,7 @@ def reject_friend_request(requester_username: str, current_user: models.User = D
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/users/pending_friend_requests", response_model=list[schemas.FriendRequestResponse])
-def get_pending_friend_requests(current_user: models.User = Depends(util.get_current_user)):
+def get_pending_friend_requests(current_user: core.models.User = Depends(util.get_current_user)):
     idNum = get_user_id_by_username_or_email(current_user['identifier'])
     return crud.get_pending_friend_requests(recipient_id= idNum)
 

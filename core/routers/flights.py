@@ -13,7 +13,7 @@ from core.schemas import FlightCreate
 from fastapi import Depends
 from google.cloud.firestore import SERVER_TIMESTAMP
 
-from models import Flight
+from core.models import Flight
 
 db = get_db()
 router = APIRouter(tags=["flights"])
