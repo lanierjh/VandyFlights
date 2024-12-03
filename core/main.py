@@ -16,5 +16,5 @@ app.add_middleware(
 )
 
 app.include_router(user.router)
-app.include_router(auth.router)  # Include the auth router
+app.include_router(auth.router) 
 app.include_router(flights.router)
