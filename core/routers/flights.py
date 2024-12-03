@@ -11,11 +11,13 @@ from db import get_db
 from crud import create_flight
 from schemas import FlightCreate
 from fastapi import Depends
+from google.cloud.firestore import SERVER_TIMESTAMP
 
-from core.models import Flight
+from models import Flight
 
 db = get_db()
 router = APIRouter(tags=["flights"])
+
 
 conn = http.client.HTTPSConnection("tripadvisor16.p.rapidapi.com")
 
@@ -391,31 +393,37 @@ async def add_flight(flight_data: FlightCreate):
 
 
 
-router.get("/trending-destinations")
+@router.get("/trending-destinations")
 def get_trending_destinations(date_range: int = 30):
-    cutoff_date = datetime.now() - timedelta(days=date_range)
+    # Calculate the cutoff date
+    cutoff_date = datetime.utcnow() - timedelta(days=date_range)
 
+    # Query flights purchased within the date range
     flights_ref = db.collection("flights")
-    flights = flights_ref.where("date", ">=", cutoff_date).stream()
+    flights = flights_ref.where("purchase_time", ">=", cutoff_date).stream()
 
+    # Calculate destination trends
     destination_trends = {}
     for flight in flights:
         flight_data = flight.to_dict()
         destination = flight_data["destination"]
-        start_date = flight_data["start_date"]
-        end_date = flight_data["end_date"]
+
+        # Use departure and arrival as date ranges
+        start_date = flight_data["departure"]
+        end_date = flight_data["arrival"]
 
         if destination not in destination_trends:
             destination_trends[destination] = []
 
         destination_trends[destination].append((start_date, end_date))
 
+    # Sort and merge date ranges for each destination
     for destination, date_ranges in destination_trends.items():
         date_ranges.sort()
         merged_ranges = []
         for start, end in date_ranges:
-            start_date = datetime.strptime(start, "%Y-%m-%d")
-            end_date = datetime.strptime(end, "%Y-%m-%d")
+            start_date = datetime.fromisoformat(start.replace("Z", "+00:00"))  # Parse ISO format
+            end_date = datetime.fromisoformat(end.replace("Z", "+00:00"))  # Parse ISO format
             if not merged_ranges or merged_ranges[-1][1] < start_date:
                 merged_ranges.append((start_date, end_date))
             else:
@@ -425,6 +433,7 @@ def get_trending_destinations(date_range: int = 30):
                 )
         destination_trends[destination] = len(merged_ranges)
 
+    # Sort destinations by trend count
     trending_destinations = sorted(
         destination_trends.items(), key=lambda x: x[1], reverse=True
     )

@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr
 import re
 from datetime import date,time
 from typing import List
+from typing import Optional
 
 
 class UserResponse(BaseModel):
