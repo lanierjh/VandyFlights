@@ -107,7 +107,7 @@ async def show_flightsONE_WAY(flight_request: FlightRequest):
     page_number = 1
     flights = []
 
-    while len(flights) < 50:  # Fetch until we have at least 50 flights
+    while len(flights) < 10:  # Fetch until we have at least 50 flights
         request_path = (
             f"/api/v1/flights/searchFlights?sourceAirportCode={start}&"
             f"destinationAirportCode={destination}&date={departure_date}&"
@@ -159,7 +159,7 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
     page_number = 1
     flights = []
 
-    while len(flights) < 50:  # Fetch until we have at least 50 flights
+    while len(flights) < 10:  # Fetch until we have at least 50 flights
         request_path = (
             f"/api/v1/flights/searchFlights?sourceAirportCode={start}&"
             f"destinationAirportCode={destination}&date={departure_date}&"
@@ -177,7 +177,7 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
             if "flights" in final_data.get("data", {}):
                 for flight in final_data["data"]["flights"]:
                     flights.extend(extract_flight_info(flight))
-                    if len(flights) >= 50:  # Stop if we have 50 or more flights
+                    if len(flights) >= 10:  # Stop if we have 50 or more flights
                         break
 
             if not final_data.get("data", {}).get("flights"):
@@ -193,5 +193,5 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
     # Combine flights based on criteria
     combined_flights = combine_flights(flights)
 
-    return {"start": start, "destination": destination, "flights": combined_flights[:50]}  # Return only the first 50 flights
+    return {"start": start, "destination": destination, "flights": combined_flights[:10]}  # Return only the first 50 flights
 
