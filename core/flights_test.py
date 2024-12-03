@@ -113,8 +113,10 @@ def test_flights_oneway_no_flights_found(monkeypatch):
     monkeypatch.setattr("http.client.HTTPSConnection.getresponse", mock_getresponse)
 
     response = client.post("/flightsONEWAY", json=valid_oneway_request)
-    assert response.status_code == 500
-    assert response.json()["detail"][0] == "R"
+    assert response.status_code == 200
+    assert "flights" in response.json()
+    assert response.json()["flights"] == []
+
 
 # Mock a malformed JSON response to test JSON decode error handling
 def test_flights_oneway_malformed_json(monkeypatch):
@@ -128,7 +130,7 @@ def test_flights_oneway_malformed_json(monkeypatch):
 
     response = client.post("/flightsONEWAY", json=valid_oneway_request)
     assert response.status_code == 500
-    assert "R" in response.json()["detail"][0]
+    assert "Error decoding JSON" in response.json()["detail"] 
 
 # Mock a network error to test exception handling
 def test_flights_oneway_network_error(monkeypatch):

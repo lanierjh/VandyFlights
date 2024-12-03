@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 import re
 from datetime import date,time
+from typing import List
 
 
 class UserResponse(BaseModel):
@@ -21,28 +22,23 @@ class UserCreate(BaseModel):
     last_name: str
     email: EmailStr
     password: str
-    flight_ids: list
+    flight_ids: List[str] = []
 
 class UserProfile(BaseModel):
     username: str
     first_name: str
     last_name: str
     email: EmailStr
+    graduating_class: Optional[str]
+    destination: Optional[str]
 
-class UserProfileUpdate(BaseModel):
-    first_name: str
-    last_name: str
-
-class UserProfile(BaseModel):
-    username: str
-    first_name: str
-    last_name: str
-    email: EmailStr
 
 
 class UserProfileUpdate(BaseModel):
     first_name: str
     last_name: str
+    graduating_class: Optional[str]
+    destination: Optional[str]
 
 
 class UserAuthenticate(BaseModel):
@@ -53,7 +49,7 @@ class UserAuthenticate(BaseModel):
 
 
 class FlightCreate(BaseModel):
-    flight_number: str
+    #flight_number: str
     start: str
     destination: str
     departure: str 

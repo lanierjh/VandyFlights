@@ -1,18 +1,25 @@
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Register() {
-    const router = useRouter();
+    // const router = useRouter();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         vanderbiltEmail: '',
         password: '',
-        username: '',  // New username field
+        username: '', 
     });
 
     const [errorMessage, setErrorMessage] = useState('');
+    const centerPage = {
 
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh", /* Full viewport height */
+
+    }
     const inputStyles = {
         width: "100%",
         borderRadius: "10px",
@@ -63,7 +70,7 @@ export default function Register() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: formData.username,  // Send username
+                    username: formData.username,
                     email: formData.vanderbiltEmail,
                     password: formData.password,
                     first_name: formData.firstName,
@@ -94,9 +101,8 @@ export default function Register() {
     };
 
     return (
-        <div className="row my-5">
-            <div className="col-md-4"></div>
-            <div className="col-md-4 text-center my-5 py-5">
+        <div className="row mx-3 mx-md-1" style = {centerPage}>
+            <div className="col-10 col-sm-8 col-md-4 mx-auto text-center py-5">
                 <div>
                     <h1>Register</h1>
 
@@ -109,7 +115,7 @@ export default function Register() {
                     <div>
                         <form onSubmit={handleSubmit}>
                             <div className="row py-3">
-                                <div className="col-sm-6">
+                                <div className="col-sm-12">
                                     <input
                                         type="text"
                                         id="firstName"
@@ -122,7 +128,9 @@ export default function Register() {
                                         required
                                     />
                                 </div>
-                                <div className="col-sm-6">
+                                </div>
+                                <div className="row py-3">
+                                    <div className="col-sm-12">
                                     <input
                                         type="text"
                                         id="lastName"
@@ -134,8 +142,8 @@ export default function Register() {
                                         onChange={handleChange}
                                         required
                                     />
+                                    </div>
                                 </div>
-                            </div>
                             <div className="row py-3">
                                 <div className="col-sm-12">
                                     <input

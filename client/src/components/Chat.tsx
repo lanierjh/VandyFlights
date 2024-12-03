@@ -1,7 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Header from './Header';
+import {useRouter} from "next/navigation";
 
 export default function ChatPage() {
+    const router = useRouter();
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+    useEffect(() => {
+        // Check if accessToken is in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Retrieved token:", token);
+
+        if (!token) {
+            // Redirect to login if token is missing
+            router.push('/');
+        }
+    }, [router]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [friendsList, setFriendsList] = useState([
     {
@@ -20,7 +44,6 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  // Hardcoded list of potential friends
   const allUsers = [
     {
       name: 'Jane Sun',
@@ -86,8 +109,14 @@ export default function ChatPage() {
 
   return (
     <div style={styles.pageContainer}>
+
       <Header />
-      <section style={styles.chatSection}>
+      <section
+        style={{
+          ...styles.chatSection,
+          flexDirection: isSmallScreen ? 'column' : 'row',
+        }}
+      >
         <div style={styles.friendsList}>
           <div style={styles.tabContainer}>
             <button
@@ -105,6 +134,7 @@ export default function ChatPage() {
           </div>
 
           {currentTab === 'friends' && (
+              <div style={styles.scrollableContainer}>
             <ul style={styles.friendItems}>
               {friendsList.map((friend, index) => (
                 <li
@@ -124,6 +154,7 @@ export default function ChatPage() {
                 </li>
               ))}
             </ul>
+              </div>
           )}
 
           {currentTab === 'search' && (
@@ -185,14 +216,13 @@ export default function ChatPage() {
   );
 }
 
-// Updated styles for alignment with main page
 const styles = {
   pageContainer: {
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: '#F1D6D9',
+    backgroundColor: '#f4e8f0',
     minHeight: '100vh',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     alignItems: 'center',
   },
   chatSection: {
@@ -202,6 +232,7 @@ const styles = {
     maxWidth: '1200px',
     padding: '30px',
     gap: '20px',
+    flexDirection: 'row',
   },
   friendsList: {
     flex: '1',
@@ -209,7 +240,13 @@ const styles = {
     borderRadius: '10px',
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+
   },
+  scrollableContainer: {
+  overflowY: 'auto' as const,
+  maxHeight: '250px',
+  paddingRight: '10px',
+},
   tabContainer: {
     display: 'flex',
     borderBottom: '1px solid #ccc',
@@ -236,7 +273,7 @@ const styles = {
     listStyle: 'none',
     padding: 0,
     marginTop: '10px',
-  },
+  } as React.CSSProperties,
   friendItem: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -280,9 +317,10 @@ const styles = {
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     alignItems: 'center',
-  },
+},
+
   chatHeader: {
     fontSize: '1.5rem',
     fontWeight: 'bold',
@@ -290,7 +328,7 @@ const styles = {
   },
   messagesContainer: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '10px',
     width: '100%',
   },

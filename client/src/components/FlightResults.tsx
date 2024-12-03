@@ -3,6 +3,8 @@ import Header from './Header';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
 
 export default function FlightResults() {
     const [flightData, setFlightData] = useState([]);
@@ -77,62 +79,122 @@ export default function FlightResults() {
         });
     };
 
-    const handleSelectFlight = (flight) => {
-        console.log("Selected flight data:", flight);
+    const handleSelectFlight = async (flight) => {
+        console.log("handleSelectFlight triggered with flight:", flight);
         if (searchData.roundTrip === 'true') {
+            const flightData = {
+                //flight_number: flight.flightNumber,
+                start: flight.legs[0]?.origin,
+                destination: flight.legs[0]?.destination,
+                departure: new Date(flight.legs[0]?.departureDateTime).toISOString(),
+                arrival: new Date(flight.legs[0]?.arrivalDateTime).toISOString(),
+                departure_time: new Date(flight.legs[0]?.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                arrival_time: new Date(flight.legs[0]?.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                price: flight.price,
+            };
+            console.log("Flight Data Payload:", flightData);
             try {
-                const flightData = {
-                    flight_number: flight.flightNumber,
-                    start: flight.origin,
-                    destination: flight.destination,
-                    departure: flight.departureDateTime,
-                    arrival: flight.arrivalDateTime,
-                    departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price,
+                const response = await fetch('http://localhost:8000/addFlights', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(flightData),
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                const result = await response.json();
+                console.log('Flight added successfully:', result);
+        
+                if (searchData.roundTrip === 'true') {
+                    localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                    router.push('/returnflightresults');
+                } else {
+                    window.open(flight.url, '_blank');
+                }
+
+                // Update the user's flight_ids with the selected destination
+                const userUpdatePayload = {
+                    flight_id: flight.legs[flight.legs.length - 1]?.destination, // Use the destination code as the identifier
                 };
-                // const response = fetch('http://localhost:8000/addFlight', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(flightData),
-                // });
-                // if (!response) {
-                //     throw new Error(`HTTP error! status: ${response}`);
-                // }
+                    
+                const userResponse = await fetch('http://localhost:8000/users/updateFlightIDs', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, 'Content-Type': 'application/json' }, // Use token for authenticated requests
+                    body: JSON.stringify(userUpdatePayload),
+                });
+    
+                if (!userResponse.ok) {
+                    throw new Error(`HTTP error! status: ${userResponse.status}`);
+                }
+    
+                const userResult = await userResponse.json();
+                console.log('User flight IDs updated successfully:', userResult)
+
+            } catch (error) {
+                console.error('Error adding flight:', error);
+                alert('Failed to store flight information.');
+            }
                 localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
                 router.push('/returnflightresults');
-            } catch (error) {
-                console.error('Error storing to the database:', error);
-            }
         } else {
+            const flightData = {
+                //flight_number: flight.flightNumber,
+                start: flight.legs[0]?.origin,
+                destination: flight.legs[0]?.destination,
+                departure: new Date(flight.legs[0]?.departureDateTime).toISOString(),
+                arrival: new Date(flight.legs[0]?.arrivalDateTime).toISOString(),
+                departure_time: new Date(flight.legs[0]?.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                arrival_time: new Date(flight.legs[0]?.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                price: flight.price,
+            };
+            console.log("Flight Data Payload:", flightData);
             try {
-                const flightData = {
-                    flight_number: flight.flightNumber,
-                    start: flight.origin,
-                    destination: flight.destination,
-                    departure: flight.departureDateTime,
-                    arrival: flight.arrivalDateTime,
-                    departure_time: new Date(flight.departureDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    arrival_time: new Date(flight.arrivalDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    price: flight.price,
+                const response = await fetch('http://localhost:8000/addFlights', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(flightData),
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                const result = await response.json();
+                console.log('Flight added successfully:', result);
+        
+                if (searchData.roundTrip === 'true') {
+                    localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                    router.push('/returnflightresults');
+                } else {
+                    window.open(flight.url, '_blank');
+                }
+
+                // Update the user's flight_ids with the selected destination
+                const userUpdatePayload = {
+                flight_id: flight.legs[flight.legs.length - 1]?.destination, // Use the destination code as the identifier
                 };
-                // const response = fetch('http://localhost:8000/addFlight', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(flightData),
-                // });
-                // if (!response) {
-                //     throw new Error(`HTTP error! status: ${response}`);
-                // }
-                window.open(flight.url, '_blank');
+                
+                const userResponse = await fetch('http://localhost:8000/users/updateFlightIDs', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, 'Content-Type': 'application/json' }, // Use token for authenticated requests
+                    body: JSON.stringify(userUpdatePayload),
+                });
+
+                if (!userResponse.ok) {
+                    throw new Error(`HTTP error! status: ${userResponse.status}`);
+                }
+
+                const userResult = await userResponse.json();
+                console.log('User flight IDs updated successfully:', userResult)
+
             } catch (error) {
-                console.error('Error storing to the database:', error);
+                console.error('Error adding flight:', error);
+                alert('Failed to store flight information.');
             }
-            window.open(flight.url, '_blank');
+                localStorage.setItem('selectedOutboundFlight', JSON.stringify(flight));
+                router.push('/returnflightresults');
         }
     };
 
@@ -144,13 +206,17 @@ export default function FlightResults() {
                     case 'Cheapest Price':
                         return a.price - b.price;
                     case 'Earliest Departure Time': {
-                        const earliestDateA = new Date(a.legs[0].departureDateTime);
-                        const earliestDateB = new Date(b.legs[0].departureDateTime);
+                        // const earliestDateA = new Date(a.legs[0].departureDateTime);
+                        // const earliestDateB = new Date(b.legs[0].departureDateTime);
+                        // return earliestDateA - earliestDateB;
+                        const earliestDateA = new Date(a.legs[0].departureDateTime).getTime();
+                        const earliestDateB = new Date(b.legs[0].departureDateTime).getTime();
                         return earliestDateA - earliestDateB;
+
                     }
                     case 'Latest Departure Time': {
-                        const latestDateA = new Date(a.legs[0].departureDateTime);
-                        const latestDateB = new Date(b.legs[0].departureDateTime);
+                        const latestDateA = new Date(a.legs[0].departureDateTime).getTime();
+                        const latestDateB = new Date(b.legs[0].departureDateTime).getTime();
                         return latestDateB - latestDateA;
                     }
                     default:
@@ -176,7 +242,8 @@ export default function FlightResults() {
     ).slice(0, resultsLimit);
 
     if (isLoading) {
-        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you're looking for!</div>;
+        return <div>Loading... We are pulling up the flight info right now. Hope you find the flight you&apos;re looking for!</div>;
+
     }
 
     if (!flightData || flightData.length === 0) {
@@ -265,7 +332,7 @@ export default function FlightResults() {
                     {filteredFlights.map((flight, index) => (
                         <div key={index} style={styles.flightCard}>
                             <div style={styles.flightLogo}>
-                                <img src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" style={styles.planeIcon} />
+                                <Image src={flight.legs[0]?.logo || "/plane.png"} alt="Carrier Logo" width={80} height={80} style={styles.planeIcon} />
                             </div>
 
                             <div style={styles.flightDetails}>
@@ -296,13 +363,14 @@ export default function FlightResults() {
     );
 }
 
+
 const styles = {
     pageContainer: {
         fontFamily: 'Arial, sans-serif',
-        backgroundColor: '#F1D6D9',
+        backgroundColor: '#f4e8f0',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
     },
     searchSection: {
@@ -319,7 +387,7 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         gap: '15px',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap' as const,
     },
     searchInput: {
         padding: '10px',
@@ -372,7 +440,7 @@ const styles = {
     },
     resultsContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         flex: 1,
     },
@@ -398,12 +466,12 @@ const styles = {
     },
     flightDetails: {
         flex: '1 1 auto',
-        textAlign: 'left',
+        textAlign: 'left' as const,
         padding: '0 15px',
     },
     legContainer: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap' as const,
         gap: '20px',
     },
     legDetails: {
@@ -416,7 +484,7 @@ const styles = {
     },
     priceSection: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         alignItems: 'center',
         width: '100px',
     },
