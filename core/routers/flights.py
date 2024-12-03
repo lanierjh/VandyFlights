@@ -7,9 +7,9 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta
-from db import get_db
-from crud import create_flight
-from schemas import FlightCreate
+from core.db import get_db
+from core.crud import create_flight
+from core.schemas import FlightCreate
 from fastapi import Depends
 from google.cloud.firestore import SERVER_TIMESTAMP
 

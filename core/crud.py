@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, status
 from firebase_admin.auth import get_user
 from google.cloud import firestore
-from schemas import UserCreate, FlightCreate, UserAuthenticate
+from core.schemas import UserCreate, FlightCreate, UserAuthenticate
 from datetime import datetime
-from security.util import hash_password, verify_password
-from db import get_db
+from core.security.util import hash_password, verify_password
+from core.db import get_db
 
 
 app = FastAPI()
