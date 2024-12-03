@@ -5,7 +5,7 @@ from core import crud, schemas
 from core.crud import get_user_by_username_or_email, get_user_id_by_username_or_email
 from core.security import util
 from core.security.util import get_current_user
-import core.models
+import models
 from core.db import get_db
 from pydantic import BaseModel
 
