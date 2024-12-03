@@ -69,7 +69,7 @@ export default function MainPage() {
     };
 
     const airportImages = {
-        chicago: '/chicago.jpg',
+        ord: '/ord.jpg',
         den: '/den.jpg',
         ewr: '/ewr.jpg',
         jfk: '/jfk.png',
