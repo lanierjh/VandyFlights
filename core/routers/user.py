@@ -1,10 +1,18 @@
 from fastapi import FastAPI, HTTPException, status, APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
+from google.cloud import firestore
 import crud, schemas
 from crud import get_user_by_username_or_email, get_user_id_by_username_or_email
 from security import util
+from security.util import get_current_user
 import models
+from db import get_db
+from pydantic import BaseModel
+
 router = APIRouter(tags=["user"])
+db = get_db()
+
+
 @router.post("/register", response_model=schemas.Token, status_code=status.HTTP_201_CREATED)
 def register_user(user: schemas.UserCreate):
     existing_username = crud.get_user_by_username_or_email(user.username)
@@ -110,45 +118,41 @@ def edit_profile(
     if update_data:
         updated_user = crud.update_user_profile(user, update_data)
     else:
-        updated_user = crud.get_user_by_username_or_email(user_email)
-    print("xxxxx", updated_user)
-    return schemas.UserProfile(
-        username=updated_user["username"],
-        first_name=updated_user["first_name"],
-        last_name=updated_user["last_name"],
-        email=updated_user["email"],
-        graduating_class=updated_user['graduating_class'],
-        destination=updated_user['destination']
-    )
+        updated_user = user
 
-# @router.put("/editprofile", response_model=schemas.UserProfile)
-# def edit_profile(
-#         profile_data: schemas.UserProfileUpdate,
-#         current_user: dict = Depends(util.get_current_user)
-# ):
-#     user_email = current_user['identifier']
-#     print(user_email)
-#
-#     user = crud.get_user_by_username_or_email(user_email)
-#     if not user:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-#
-#     id = crud.get_user_id_by_username_or_email(user_email)
-#
-#     update_data = {}
-#     if profile_data.first_name and profile_data.first_name != "string":
-#         update_data["first_name"] = profile_data.first_name
-#     if profile_data.last_name and profile_data.last_name != "string":
-#         update_data["last_name"] = profile_data.last_name
-#
-#     if update_data:
-#         updated_user = crud.update_user_profile(id, update_data)
-#     else:
-#         updated_user = user
-#
-#     return {
-#         "username": updated_user.get("username"),
-#         "first_name": updated_user.get("first_name"),
-#         "last_name": updated_user.get("last_name"),
-#         "email": updated_user.get("email")
-#     }
+    return {
+        "username": updated_user.get("username"),
+        "first_name": updated_user.get("first_name"),
+        "last_name": updated_user.get("last_name"),
+        "email": updated_user.get("email")
+    }
+    
+class UpdateFlightIDsRequest(BaseModel):
+    flight_id: str  # Expect a single flight ID to be added to the list
+
+@router.put("/users/updateFlightIDs")
+def update_user_flight_ids(request: UpdateFlightIDsRequest, current_user: dict = Depends(get_current_user)):
+    """
+    Update the user's flight_ids by adding the selected flight destination.
+    """
+    user_identifier = current_user.get("identifier")
+    
+    user_identifier = current_user.get("identifier")
+    if not user_identifier:
+        raise HTTPException(status_code=400, detail="User identifier not found in token payload")
+
+    # Query Firestore by email
+    user_query = db.collection("users").where("email", "==", user_identifier).limit(1).get()
+
+    if not user_query:
+        print(f"Document not found for email: {user_identifier}")  # Debug log
+        raise HTTPException(status_code=404, detail=f"User with email {user_identifier} not found")
+
+    user_ref = user_query[0].reference  # Get the document reference
+
+    # Update the flight_ids field
+    user_ref.update({
+        "flight_ids": firestore.ArrayUnion([request.flight_id])
+    })
+
+    return {"success": True, "message": f"Flight ID {request.flight_id} added successfully"}
