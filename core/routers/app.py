@@ -193,3 +193,4 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
     combined_flights = combine_flights(flights)
 
     return {"start": start, "destination": destination, "flights": combined_flights[:50]}  # Return only the first 50 flights
+

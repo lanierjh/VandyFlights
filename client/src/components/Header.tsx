@@ -92,7 +92,9 @@ export default function Header() {
                     <Image
                         src="/vanderbilt.png"
                         alt="VandyFlights Logo"
-                        style={{ width: "60px", marginRight: "10px" }}
+                        width={60} // Explicitly define width
+                        height={60}
+                        style={{ marginRight: "10px" }}
                     />
                     <h1 className="header-title" style={{ color: "#000", fontSize: "1.8rem", fontWeight: "bold", margin: 0 }}>
                         VandyFlights

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Header from './Header';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 export default function MainPage() {
     const [searchData, setSearchData] = useState({
@@ -29,14 +29,29 @@ export default function MainPage() {
 
         return () => window.removeEventListener('resize', handleResize); // Cleanup
     }, []);
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        console.log("Retrieved token:", token);
 
-        if (!token) {
-            router.push('/');
-        }
-    }, [router]);
+    // useEffect(() => {
+    //     const token = localStorage.getItem('accessToken');
+    //     console.log("Retrieved token:", token);
+    //
+    //     if (!token) {
+    //         router.push('/');
+    //     }
+    // }, [router]);
+
+    const [trendingDestinations, setTrendingDestinations] = useState([]); // For dynamic destinations
+    useEffect(() => {
+        const fetchTrendingDestinations = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/trending-destinations'); // Update with your actual endpoint
+                setTrendingDestinations(response.data);
+            } catch (error) {
+                console.error("Error fetching trending destinations:", error);
+            }
+        };
+
+        fetchTrendingDestinations();
+    }, []);
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
@@ -81,28 +96,28 @@ export default function MainPage() {
         }
     };
 
-    const handlePopularDestinationClick = async (destination) => {
-        const departureDate = new Date().toISOString().split("T")[0];
-        const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
-        try {
-            const response = await axios.post('http://localhost:8000/flightsROUNDTRIP', {
-                origin: searchData.origin,
-                destination,
-                departureDate,
-                returnDate,
-                roundTrip: true,
-            });
-            console.log("Flight Data Response:", response.data);
-            if (response.data && (response.data.outbound_flights || response.data.flights)) {
-                localStorage.setItem('flightResults', JSON.stringify(response.data));
-                router.push('/flightResults');
-            } else {
-                alert("No flights found for this search.");
-            }
-        } catch (error) {
-            console.error("Error fetching flights:", error);
-        }
-    };
+    // const handlePopularDestinationClick = async (destination) => {
+    //     const departureDate = new Date().toISOString().split("T")[0];
+    //     const returnDate = new Date(new Date().setDate(new Date().getDate() + 3)).toISOString().split("T")[0];
+    //     try {
+    //         const response = await axios.post('http://localhost:8000/flightsROUNDTRIP', {
+    //             origin: searchData.origin,
+    //             destination,
+    //             departureDate,
+    //             returnDate,
+    //             roundTrip: true,
+    //         });
+    //         console.log("Flight Data Response:", response.data);
+    //         if (response.data && (response.data.outbound_flights || response.data.flights)) {
+    //             localStorage.setItem('flightResults', JSON.stringify(response.data));
+    //             router.push('/flightResults');
+    //         } else {
+    //             alert("No flights found for this search.");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching flights:", error);
+    //     }
+    // };
 
     return (
 
@@ -211,17 +226,25 @@ export default function MainPage() {
                         gridTemplateColumns: `repeat(${gridColumns}, 1fr)`,
                     }}
                 >
-                    {popularDestinations.map((destination) => (
+                    {trendingDestinations.map((item) => (
                         <div
-                            key={destination.code}
+                            key={item.destination} // Use index as the key since there are no unique IDs
                             style={styles.destinationCard}
-                            onClick={() => handlePopularDestinationClick(destination.code)}
+                            // onClick={() => handlePopularDestinationClick(item.destination)}
                         >
-                            <Image src={destination.image} alt={destination.name} width={250} height={150} style={styles.destinationImage} />
-
-                            <h4>{destination.name}</h4>
-                            <p>{destination.description}</p>
+                            <h4>{item.destination}</h4>
+                            <p>Trend Count: {item.trend_count}</p>
                         </div>
+                        // <div
+                        //     key={destination.code}
+                        //     style={styles.destinationCard}
+                        //     onClick={() => handlePopularDestinationClick(destination.code)}
+                        // >
+                        //     {/*<Image src={destination.image} alt={destination.name} width={250} height={150} style={styles.destinationImage} />*/}
+                        //
+                        //     <h4>{destination.name}</h4>
+                        //     <p>{destination.description}</p>
+                        // </div>
                     ))}
                 </div>
             </section>
@@ -229,12 +252,12 @@ export default function MainPage() {
     );
 }
 
-const popularDestinations = [
-    { code: 'LGA', name: 'New York, NY', description: '100 others are going', image: '/newyork.png' },
-    { code: 'LAX', name: 'Los Angeles, CA', description: '80 others are going', image: '/losangeles.jpg' },
-    { code: 'MIA', name: 'Miami, FL', description: '60 others are going', image: '/miami.jpg' },
-    { code: 'ORD', name: 'Chicago, IL', description: '40 others are going', image: '/chicago.jpg' },
-];
+// const popularDestinations = [
+//     { code: 'LGA', name: 'New York, NY', description: '100 others are going', image: '/newyork.png' },
+//     { code: 'LAX', name: 'Los Angeles, CA', description: '80 others are going', image: '/losangeles.jpg' },
+//     { code: 'MIA', name: 'Miami, FL', description: '60 others are going', image: '/miami.jpg' },
+//     { code: 'ORD', name: 'Chicago, IL', description: '40 others are going', image: '/chicago.jpg' },
+// ];
 
 const styles = {
     pageContainer: {
@@ -262,30 +285,7 @@ const styles = {
         fontWeight: 'bold',
         marginBottom: '20px',
     },
-    // searchForm: {
-    //     display: 'flex',
-    //     flexWrap: 'wrap', // Allows wrapping to the next line
-    //     justifyContent: 'space-between',
-    //     alignItems: 'center',
-    //     gap: '10px', // Consistent spacing
-    //     width: '100%',
-    //     maxWidth: '1200px'
-    // },
-    // searchInput: {
-    //
-    //     padding: '15px',
-    //     borderRadius: '10px',
-    //     border: '1px solid #ccc',
-    //     flex: '1 1 15%',
-    //     minWidth: '150px', // Prevents inputs from getting too small
-    //     maxWidth: '250px',
-    // },
-    // inputContainer: {
-    //     position: 'relative' as const,
-    //     flex: '1 1 15%', // Matches other inputs for uniform layout
-    //     minWidth: '150px',
-    //     maxWidth: '250px',
-    // },
+
     suggestionsDropdown: {
         position: 'absolute' as const,
         top: '100%',
@@ -306,26 +306,7 @@ const styles = {
         cursor: 'pointer',
         borderBottom: '1px solid #ccc',
     },
-    // searchButton: {
-    //
-    //     flex: '1 1 10%',
-    //     padding: '15px 30px',
-    //     backgroundColor: '#6b4c4c',
-    //     color: 'white',
-    //     border: 'none',
-    //     borderRadius: '10px',
-    //     fontWeight: 'bold',
-    //     cursor: 'pointer',
-    //
-    // },
-    //     searchForm: {
-    //     display: 'grid',
-    //     gridTemplateColumns: 'repeat(3, 1fr)', // 3 columns: two stacks and one selector
-    //     gap: '20px', // Space between columns
-    //     alignItems: 'start',
-    //     width: '100%',
-    //     maxWidth: '1200px',
-    // },
+
     searchForm: {
         display: 'grid',
         gridTemplateColumns: 'minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)', // Each column is at least 150px wide
