@@ -68,6 +68,27 @@ export default function MainPage() {
         setAirportSuggestions([]);
     };
 
+    const airportImages = {
+        ord: '/ord.jpg',
+        den: '/den.jpg',
+        ewr: '/ewr.jpg',
+        jfk: '/jfk.png',
+        las: '/las.jpg',
+        lax: '/lax.jpg',
+        lga: '/lga.png',
+        mia: '/mia.jpg',
+        nashville: '/nashville.jpg',
+        sea: '/sea.jpg',
+        sfo: '/sfo.jpg',
+        vanderbilt: '/vanderbilt.png',
+        zeppos: '/zeppos.jpg',
+    };
+    
+    const getAirportImage = (airportCode) => {
+        const code = airportCode.toLowerCase();
+        return airportImages[code];
+    };
+
     const handleSearchSubmit = async (e) => {
         e.preventDefault();
         if (!searchData.destination || !searchData.departureDate) {
@@ -232,6 +253,11 @@ export default function MainPage() {
                             style={styles.destinationCard}
                             // onClick={() => handlePopularDestinationClick(item.destination)}
                         >
+                            <img
+                                src={getAirportImage(item.destination)}
+                                alt={item.destination}
+                                style={styles.destinationImage}
+                            />
                             <h4>{item.destination}</h4>
                             <p>Trend Count: {item.trend_count}</p>
                         </div>

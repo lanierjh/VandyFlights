@@ -177,7 +177,7 @@ async def show_flightsROUND_TRIP(flight_request: FlightRequest):
                         elif f["legs"][-1]["destination"] == start and len(return_flights) < 50:
                             return_flights.append(f)
 
-                    if len(outbound_flights) >= 50 and len(return_flights) >= 50:
+                    if len(outbound_flights) >= 10 and len(return_flights) >= 10:
                         break
 
             if not final_data.get("data", {}).get("flights"):
